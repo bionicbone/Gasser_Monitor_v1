@@ -1,18 +1,33 @@
 /*
     Name:       Gasser_Monitor_v1.ino
-    Created:	15/03/2020 16:19:35
-    Author:     LT9\Kevin
+    Created:		15/03/2020 16:19:35
+    Author:     (c) Kevin Guest - AKA The Bionicbone on RCGroups.
+		Decription:	Migrating code from the Gasser Charger Module and placing into cpp & h files.
 */
 
+/*
+		FrSky S-Port Telemetry library example
+		(c) Pawelsky 20180402
+		Not for commercial use
+*/
 
-void setup()
-{
+#include "RPM.h"
 
+
+void setup() {
+	Serial.begin(9600);
+	rpm_ActivateInterrupts();
+
+	Serial.println("Setup Complete");
+}
+
+
+void loop() {
+	calcualte_RPMSensorPulse();
 
 }
 
-void loop()
-{
 
-
+void stop() {
+	while (1);
 }
