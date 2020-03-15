@@ -11,7 +11,11 @@
 		Not for commercial use
 */
 
+#include <SBUS.h>
+#include "RxLinkQuality.h"
 #include "RPM.h"
+
+//#define REPORT_ERRORS
 
 
 void setup() {

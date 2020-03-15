@@ -24,9 +24,15 @@
     <ClInclude Include="RPM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RxLinkQuality.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RPM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RxLinkQuality.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
