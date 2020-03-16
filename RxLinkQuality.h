@@ -14,6 +14,10 @@
 
 #endif
 
+// Links to "extern" variables
+#include "SBUS.h"
+
+
 // Public Variables
 extern float lostFramesPercentage100Result;
 extern float badFramesPercentage100Result;
