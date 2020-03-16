@@ -9,12 +9,14 @@
 SBUS sbus(Serial1);
 const byte BAD_FRAME_MAX_INCREASE = 10;
 const byte BAD_FRAME_NORMAL_INCREASE = 8;
+const uint16_t MAX_WAIT_TIME_MS = 5000;
 
 
 // Public Variables
 float lostFramesPercentage100Result = 0;
 float badFramesPercentage100Result = 0;
 uint32_t totalFrames = 0;
+byte badFramesMonitoringChannel = 0;
 
 
 // Private Variables
@@ -22,7 +24,6 @@ uint16_t channels[16];
 uint16_t channelsPrevious[16];
 bool lostFrame = false;
 bool failSafe = false;
-byte badFramesMonitoringChannel = 0;
 
 uint16_t badFramesDifference = 0;
 uint32_t badFramesCounter = 0;
@@ -41,6 +42,7 @@ uint32_t lostFramesPercentage100Array[100] = { 0 };
 //TODO - Add FailSafe Counter
 //TODO - Add the Maximum Channels Held over last 100 frames 
 //TODO - Add the Min / Max SBUS Refresh Rates over last 100 frames
+//TODO - Confirm that MAX_WAIT_TIME_MS = 5000 is not too short or too long when receiver is attached.
 
 
 // Check the Quality of the Rx signal
@@ -170,12 +172,14 @@ void rxLinkQuality_ActivateSBUS() {
 
 // Search channels 1-16 for the channel that transmits the wave
 byte find_WaveChannel() {
+	uint32_t maxWaitTimeMillis = millis();
 	byte waveChannel = 0;
 	byte counter = 0;
 	byte channelsAvg[16]{ 0 };
 	byte maxHit = 0;
 	// Scan all channels 20 times to see which has increases between 6 to 10.
-	while (counter < 20) {
+	while (counter < 20 && millis() - maxWaitTimeMillis < MAX_WAIT_TIME_MS) {
+		delay(5);
 		if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 			for (int ch = 0; ch < 16; ch++) {
 				if (abs(channels[ch] - channelsPrevious[ch]) >= 6 && abs(channels[ch] - channelsPrevious[ch]) <= 10) {
