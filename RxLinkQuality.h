@@ -26,7 +26,7 @@ extern uint32_t totalFrames;
 
 // Public Functions
 void rxLinkQuality_ActivateSBUS();
-void report_WaveChannelsError(byte badFramesMonitoringChannel);
+void rxLinkQuality_Scan();
 
 
 // Private Functions

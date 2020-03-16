@@ -22,7 +22,9 @@
 
 void setup() {
 	Serial.begin(9600);
-	rpm_ActivateInterrupts();
+	rpm_ActivateInterrupts(); 
+	
+	rxLinkQuality_ActivateSBUS();
 
 
 	void telemetry_ActivateTelemetry();
@@ -32,9 +34,13 @@ void setup() {
 
 void loop() {
 	calcualte_RPMSensorPulse();
+	rxLinkQuality_Scan();
 
 
 	telemetry_SendTelemetry();
+
+
+
 }
 
 

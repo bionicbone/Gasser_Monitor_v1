@@ -44,7 +44,7 @@ uint32_t lostFramesPercentage100Array[100] = { 0 };
 
 
 // Check the Quality of the Rx signal
-void report_WaveChannelsError(byte badFramesMonitoringChannel) {
+void rxLinkQuality_Scan() {
 
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 		// Increase total frames received
