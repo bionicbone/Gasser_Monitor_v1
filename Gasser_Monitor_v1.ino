@@ -11,6 +11,8 @@
 		Not for commercial use
 */
 
+#include <FrSkySportDecoder.h>
+#include "Telemetry.h"
 #include <SBUS.h>
 #include "RxLinkQuality.h"
 #include "RPM.h"
@@ -22,6 +24,8 @@ void setup() {
 	Serial.begin(9600);
 	rpm_ActivateInterrupts();
 
+
+	void telemetry_ActivateTelemetry();
 	Serial.println("Setup Complete");
 }
 
@@ -29,6 +33,8 @@ void setup() {
 void loop() {
 	calcualte_RPMSensorPulse();
 
+
+	telemetry_SendTelemetry();
 }
 
 
