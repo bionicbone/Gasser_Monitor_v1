@@ -31,7 +31,7 @@ void setup() {
 
 	// Start RPM for Engine and Clutch sensor monitoring
 	rpm_ActivateInterrupts(); 
-	
+
 	// Start the RX Link Quality monitoring
 	rxLinkQuality_ActivateSBUS();
 
@@ -43,20 +43,20 @@ void setup() {
 
 
 void loop() {
-	
+
 	// Create a loop timer
 	// Must be at the start of the loop
 	timeLoopMicros = micros();
-	
+
 	// Calculate the Current RPM data
 	// updates variables mainRPMSensorDetectedRPM & clutchRPMSensorDetectedRPM
 	// also updates variable inFlight
 	calcualte_RPMSensorPulse();
-	
+
 	// Calculate the Rx Quality Indicators
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
-	rxLinkQuality_Scan();
+	if (badFramesMonitoringChannel != 0) { rxLinkQuality_Scan(); }
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data

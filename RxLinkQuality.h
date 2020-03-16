@@ -22,6 +22,7 @@
 extern float lostFramesPercentage100Result;
 extern float badFramesPercentage100Result;
 extern uint32_t totalFrames;
+extern byte badFramesMonitoringChannel;
 
 
 // Public Functions
