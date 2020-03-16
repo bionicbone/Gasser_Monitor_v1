@@ -20,7 +20,9 @@
 
 void setup() {
 	Serial.begin(9600);
-	rpm_ActivateInterrupts();
+	rpm_ActivateInterrupts(); 
+	
+	rxLinkQuality_ActivateSBUS();
 
 	Serial.println("Setup Complete");
 }
@@ -28,7 +30,7 @@ void setup() {
 
 void loop() {
 	calcualte_RPMSensorPulse();
-
+	rxLinkQuality_Scan();
 }
 
 
