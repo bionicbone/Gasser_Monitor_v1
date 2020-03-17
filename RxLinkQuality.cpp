@@ -9,7 +9,7 @@
 SBUS sbus(Serial1);
 const byte BAD_FRAME_MAX_INCREASE = 10;
 const byte BAD_FRAME_NORMAL_INCREASE = 8;
-const uint16_t MAX_WAIT_TIME_MS = 5000;
+const uint16_t MAX_WAIT_TIME_MS = 200;
 
 
 // Public Variables
@@ -42,12 +42,10 @@ uint32_t lostFramesPercentage100Array[100] = { 0 };
 //TODO - Add FailSafe Counter
 //TODO - Add the Maximum Channels Held over last 100 frames 
 //TODO - Add the Min / Max SBUS Refresh Rates over last 100 frames
-//TODO - Confirm that MAX_WAIT_TIME_MS = 5000 is not too short or too long when receiver is attached.
 
 
 // Check the Quality of the Rx signal
 void rxLinkQuality_Scan() {
-
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 		// Increase total frames received
 		totalFrames++;
@@ -67,6 +65,9 @@ void rxLinkQuality_Scan() {
 
 // Check the "real" lost frames based on SBUS extra data changes
 void calculate_BadFrames() {
+
+	// check we know the correct scan channel before attempting to scan
+	if (badFramesMonitoringChannel == 0) { badFramesMonitoringChannel = find_WaveChannel(); }
 
 	// Did SBUS channel increase by more than an expected amount
 	badFramesDifference = abs(channels[badFramesMonitoringChannel] - channelsPrevious[badFramesMonitoringChannel]);
@@ -194,7 +195,12 @@ byte find_WaveChannel() {
 			counter++;
 		}
 	}
-
-	Serial.print("Wave Channel Found: "); Serial.println(waveChannel);
+	if (waveChannel != 0) {
+		Serial.print("Wave Channel Found: "); Serial.println(waveChannel + 1);
+		Serial.print("Scan Time (ms): "); Serial.println(millis() - maxWaitTimeMillis);
+	}
+	else {
+		Serial.println("Wave Channel not Found");
+	}
 	return waveChannel;
 }
