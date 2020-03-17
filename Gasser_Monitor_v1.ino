@@ -56,7 +56,7 @@ void loop() {
 	// Calculate the Rx Quality Indicators
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
-	if (badFramesMonitoringChannel != 0) { rxLinkQuality_Scan(); }
+	rxLinkQuality_Scan();
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
