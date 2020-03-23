@@ -11,14 +11,12 @@
 		Not for commercial use
 */
 
+#include "Config.h"
 #include <FrSkySportDecoder.h>
 #include "Telemetry.h"
 #include <SBUS.h>
 #include "RxLinkQuality.h"
 #include "RPM.h"
-
-//#define REPORT_ERRORS
-
 
 unsigned long		timeLoopMicros;								// Used to remember micros() at the start of the main loop.
 unsigned long		lastLoopMicros;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us

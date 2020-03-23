@@ -2,6 +2,7 @@
 // 
 // 
 
+#include "Config.h"
 #include "RxLinkQuality.h"
 
 
@@ -13,8 +14,8 @@ const uint16_t MAX_WAIT_TIME_MS = 200;
 
 
 // Public Variables
-float lostFramesPercentage100Result = 0;
-float badFramesPercentage100Result = 0;
+uint16_t lostFramesPercentage100Result = 0;
+uint16_t badFramesPercentage100Result = 0;
 uint32_t totalFrames = 0;
 byte badFramesMonitoringChannel = 0;
 
@@ -26,7 +27,6 @@ bool lostFrame = false;
 bool failSafe = false;
 
 uint16_t badFramesDifference = 0;
-uint32_t badFramesCounter = 0;
 uint32_t badFramesPercentage100Counter = 0;
 uint32_t badFramesPercentage100Array[100] = { 0 };
 
@@ -51,10 +51,9 @@ void rxLinkQuality_Scan() {
 		totalFrames++;
 
 #if defined(DEBUG_DATA)
-		//Serial.print("failSafe = "); Serial.println(failSafe);
+		if (failSafe) { Serial.print("failSafe = "); Serial.println(failSafe); }
 		if (lostFrame) { Serial.print("lostFrame = "); Serial.println(lostFrame); }
-		Serial.print("CH"); Serial.print(badFramesMonitoringChannel); Serial.print(" = "); Serial.print(channels[badFramesMonitoringChannel]); Serial.print(" vs "); Serial.print(channelsPrevious[badFramesMonitoringChannel]);
-		Serial.print(" = "); Serial.println(channelsPrevious[badFramesMonitoringChannel] - channels[badFramesMonitoringChannel]);
+		debug_Data();
 #endif
 
 		calculate_LostFrames();
@@ -65,7 +64,6 @@ void rxLinkQuality_Scan() {
 
 // Check the "real" lost frames based on SBUS extra data changes
 void calculate_BadFrames() {
-
 	// check we know the correct scan channel before attempting to scan
 	if (badFramesMonitoringChannel == 0) { badFramesMonitoringChannel = find_WaveChannel(); }
 
@@ -75,7 +73,6 @@ void calculate_BadFrames() {
 		
 		// calculate how many frames were skipped
 		int badFrames = ((float)(abs(channels[badFramesMonitoringChannel] - channelsPrevious[badFramesMonitoringChannel])) / BAD_FRAME_NORMAL_INCREASE) - 1;
-		badFramesCounter += badFrames;
 
 #if defined(REPORT_ERRORS)		
 		Serial.print(badFrames); Serial.println(" bad frames found");
@@ -99,13 +96,9 @@ void calculate_BadFrames() {
 	}
 	// Due to lost frames it is possible for the result to be more than 100!!
 	if (badFramesPercentage100Result > 100) badFramesPercentage100Result = 100;
+
 	// The % calculation
 	badFramesPercentage100Result = 100 - badFramesPercentage100Result;
-
-#if defined(REPORT_ERRORS)	
-	Serial.print("Total Frame Count: "); Serial.println(totalFrames);
-	Serial.print("Success Rate: "); Serial.print(100 - (((float)lostFrameCounter / totalFrames) * 100)); Serial.println("% based on lost frames reported");
-#endif
 
 	// Cpature the current channel value for the next loop
 	channelsPrevious[badFramesMonitoringChannel] = channels[badFramesMonitoringChannel];
@@ -142,7 +135,7 @@ void calculate_LostFrames() {
 
 #if defined(REPORT_ERRORS)
 		Serial.println("");
-		Serial.print("lostFrame Recovered = "); Serial.print(temp); Serial.println("ms");
+		Serial.print("lostFrame Recovered = "); Serial.print(recoveryTime); Serial.println("ms");
 		Serial.println("");
 #endif
 
@@ -203,4 +196,19 @@ byte find_WaveChannel() {
 		Serial.println("Wave Channel not Found");
 	}
 	return waveChannel;
+}
+
+
+//TODO - Changes will not work with only 8 Channels
+// Dumps Previous vs Current Channel information to USB serial.
+void debug_Data() {
+#if defined(DEBUG_DATA)
+	for (int ch = badFramesMonitoringChannel; ch < badFramesMonitoringChannel + 1; ch++) {
+		Serial.print(micros()); Serial.print(":");
+		Serial.print("CH"); Serial.print(ch + 1); Serial.print(" = ");
+		Serial.print(channelsPrevious[ch]); Serial.print(" vs "); Serial.print(channels[ch]);
+		Serial.print(" = "); Serial.print(channelsPrevious[ch] - channels[ch]);
+		Serial.print("  BFP ="); Serial.println(badFramesPercentage100Result);
+	}
+#endif
 }
