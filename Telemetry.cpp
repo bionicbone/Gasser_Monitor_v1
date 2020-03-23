@@ -2,6 +2,7 @@
 // 
 // 
 
+#include "Config.h"
 #include "Telemetry.h"
 
 #include <FrSkySportDecoder.h>
@@ -82,6 +83,7 @@ void telemetry_SendTelemetry() {
 	rpm.setData(mainRPMSensorDetectedRPM,		// ID5 - Rotations per minute
 		totalFrames,							// Total SBUS Frames
 		badFramesPercentage100Result);						// Total SBUS Lost Frames
+
 	rpm2.setData(clutchRPMSensorDetectedRPM,	// ID 15 - Rotations per minute
 		engineTemp,								// Temperature #1 in degrees Celsuis (can be negative, will be rounded)
 		lostFramesPercentage100Result);						// Bad Frames Detected

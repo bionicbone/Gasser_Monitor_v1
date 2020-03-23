@@ -19,8 +19,8 @@
 
 
 // Public Variables
-extern float lostFramesPercentage100Result;
-extern float badFramesPercentage100Result;
+extern uint16_t lostFramesPercentage100Result;
+extern uint16_t badFramesPercentage100Result;
 extern uint32_t totalFrames;
 extern byte badFramesMonitoringChannel;
 
@@ -34,3 +34,4 @@ void rxLinkQuality_Scan();
 void calculate_BadFrames();
 void calculate_LostFrames();
 byte find_WaveChannel();
+void debug_Data();
