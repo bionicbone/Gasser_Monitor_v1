@@ -43,7 +43,7 @@ FrSkySportTelemetry telemetry;													// Create telemetry object without po
 // Private Variables
 
 
-
+// TODO - Review the RxLinkQuality variables to see if anything useful could be sent via telemetry
 // TODO - Activate cell1 and cell2 and remove temporary variable declarations below
 // TODO - Activate enginTemp and remove temporary variable declaration below
 // TODO - Activate error and error1 and remove temporary variable declarations below
