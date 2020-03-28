@@ -8,11 +8,6 @@
 
 // Config
 SBUS sbus(Serial1);
-// TODO - Remove the BAD_FRAME_ Const Variables
-//const byte BAD_FRAME_MAX_INCREASE_8CH = 9;
-//const byte BAD_FRAME_MAX_INCREASE_16CH = 18;
-//const byte BAD_FRAME_NORMAL_INCREASE_8CH = 8;
-//const byte BAD_FRAME_NORMAL_INCREASE_16CH = 17;
 const uint16_t MAX_WAIT_TIME_MS = 200;
 
 
@@ -323,6 +318,8 @@ void check_FailSafe() {
 		failSafeDetected = false;
 	}
 }
+
+
 
 
 // Search channels 1-16 for the channels that transmit the wave(s)
