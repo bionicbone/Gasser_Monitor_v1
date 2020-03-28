@@ -43,7 +43,9 @@ FrSkySportTelemetry telemetry;													// Create telemetry object without po
 // Private Variables
 
 
+// TODO - Look at the LQBB4 way of transmitting data
 // TODO - Review the RxLinkQuality variables to see if anything useful could be sent via telemetry
+// TODO - TFC should tx a totalFrames / 1000
 // TODO - Activate cell1 and cell2 and remove temporary variable declarations below
 // TODO - Activate enginTemp and remove temporary variable declaration below
 // TODO - Activate error and error1 and remove temporary variable declarations below
