@@ -17,6 +17,15 @@
 // Links to "extern" variables
 #include "SBUS.h"
 
+// These setting control the "badFrames" calculation and were defined by Reinhard (RC Groups) to make BB_Bits
+// Calculate to be very similar to the LF flag under FrSky Firmware v1.
+// dynamic threshold for LostFrameCtr_V2 increment (depends on slope rate of triangle (here for 2s))
+#define MAX_TRIANGLE_DIFF_8CH_1 11       // for 75 >= badFramesPercentage100Result
+#define MAX_TRIANGLE_DIFF_8CH_2  9       // for 75 <  badFramesPercentage100Result
+#define MAX_TRIANGLE_DIFF_8CH_3  9       // for 50 <  badFramesPercentage100Result
+#define TRSHLD_8CH_1_CHNG        75
+#define TRSHLD_8CH_2_CHNG        50  
+
 
 // Public Variables
 extern uint16_t lostFramesPercentage100Result;

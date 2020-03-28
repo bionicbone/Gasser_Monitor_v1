@@ -8,6 +8,7 @@
 
 // Config
 SBUS sbus(Serial1);
+// TODO - Remove the BAD_FRAME_ Const Variables
 const byte BAD_FRAME_MAX_INCREASE_8CH = 9;
 const byte BAD_FRAME_MAX_INCREASE_16CH = 18;
 const byte BAD_FRAME_NORMAL_INCREASE_8CH = 8;
@@ -23,6 +24,7 @@ byte badFramesMonitoringChannel1 = 0;
 byte badFramesMonitoringChannel2 = 0;
 uint32_t failSafeCounter = 0;
 uint32_t failSafeLongestMillis = 0;
+
 
 
 // Private Variables
@@ -85,7 +87,9 @@ void rxLinkQuality_Scan() {
 // Internal Calls Only
 
 
+
 // Check the "real" lost frames by monitoring a wave form and chacking the data increases on each SBUS update
+// Also determines the correct Tx / Rx mode (8ch or 16ch)
 void calculate_BadFrames() {
 	// check we know the correct scan channel before attempting to scan
 	if (badFramesMonitoringType == 0) { find_WaveChannel_New(badFramesMonitoringChannel1, badFramesMonitoringChannel2, badFramesMonitoringType); }
@@ -100,21 +104,38 @@ void calculate_BadFrames() {
 	bool goodFrame = true;
 	// Did SBUS channel increase by more than an expected amount for 8 Channels
 	badFramesDifference = abs(channels[badFramesMonitoringChannel1 - 1] - channelsPrevious[badFramesMonitoringChannel1 - 1]);
-	
+
 	// if channels 1-8 have not changed check 9-16
 	if (badFramesDifference == 0) {
 		badFramesDifference = abs(channels[badFramesMonitoringChannel2 - 1] - channelsPrevious[badFramesMonitoringChannel2 - 1]);
 	}
-	
+
+	/*
+		MaxDiff has to be > 11 if badFramesPercentage100Result is >=75
+		MaxDiff has to be > 9 if badFramesPercentage100Result is <75
+		MaxDiff has to be > 9 if badFramesPercentage100Result is <50
+	*/
+
+
+	// determine BB_Bit threshold based on BB Link Quality						//  8ch mode.
+	int MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_1;										//  11
+	if (badFramesPercentage100Result < TRSHLD_8CH_1_CHNG) {			// <75			
+		MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_2;											// 9
+		if (badFramesPercentage100Result < TRSHLD_8CH_2_CHNG) {		// <50
+			MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_3;										// 9
+		}
+	}
+
+
 	if (badFramesMonitoringType == 1) {															// 8ch mode
-		if (badFramesDifference > BAD_FRAME_MAX_INCREASE_8CH) {
+		if (badFramesDifference > MaxTriangleDiff) {
 			// calculate how many frames were skipped
-			int badFrames = ((float)(badFramesDifference) / BAD_FRAME_NORMAL_INCREASE_8CH) - 1;
+			int BB_Bits = ((float)(badFramesDifference) / MaxTriangleDiff);
 #if defined(REPORT_BAD_FRAME_ERRORS)		
-			Serial.print(badFrames); Serial.println(" bad frames found");
+			Serial.print(BB_Bits); Serial.println(" BB_Bits found");
 #endif
 			// Add number of bad frames to the array
-			badFramesPercentage100Array[badFramesPercentage100Counter] = badFrames;
+			badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits;
 			goodFrame = false;
 		}
 	}
@@ -126,8 +147,8 @@ void calculate_BadFrames() {
 			Serial.print(badFrames); Serial.println(" bad frames found");
 #endif
 			// Add number of bad frames to the array
-			
-			if (badFramesMonitoringType == 4) { 
+
+			if (badFramesMonitoringType == 4) {
 				badFramesPercentage100Array[badFramesPercentage100Counter] = badFrames;				// Exact
 				Serial.print("badFrames = "); Serial.println(badFrames);
 			}
@@ -138,17 +159,17 @@ void calculate_BadFrames() {
 			goodFrame = false;
 		}
 	}
-	
-	
+
+
 	if (goodFrame == true) {
 		// Good frame so add a Zero to the array
 		badFramesPercentage100Array[badFramesPercentage100Counter] = 0;
 	}
 	badFramesPercentage100Counter++;
-	
+
 	// If we reach the end of the array overwrite from the beginning
 	if (badFramesPercentage100Counter >= 100)  badFramesPercentage100Counter = 0;
-	
+
 	// Calculate bad frame % based on last 100 frames received.
 	badFramesPercentage100Result = 0;
 	for (int i = 0; i < 100; i++) {
@@ -160,16 +181,16 @@ void calculate_BadFrames() {
 	// The % calculation
 	badFramesPercentage100Result = 100 - badFramesPercentage100Result;
 
-	
+
 	/*
 	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
 	badFramesMonitoringType == 2 - 16ch mode, wave on Ch1 - Ch8
 	badFramesMonitoringType == 3 - 16ch mode, wave on Ch9 - Ch16
 	badFramesMonitoringType == 4 - 16ch mode, wave on Ch1 - Ch16
 */
-	
-	// Handle Telemetry Reporting of the Monitoring Type and Channels
-	if (totalFrames < 1000 && badFramesMonitoringType == 1) { badFramesPercentage100Result = 8;  }
+
+// Handle Telemetry Reporting of the Monitoring Type and Channels
+	if (totalFrames < 1000 && badFramesMonitoringType == 1) { badFramesPercentage100Result = 8; }
 	if (totalFrames < 1000 && badFramesMonitoringType > 1) { badFramesPercentage100Result = 16; }
 	if (totalFrames >= 1000 && totalFrames < 2000 && badFramesMonitoringType != 3) { badFramesPercentage100Result = badFramesMonitoringChannel1; }
 	if (totalFrames >= 1500 && totalFrames < 2000 && badFramesMonitoringType == 4) { badFramesPercentage100Result = badFramesMonitoringChannel2; }
