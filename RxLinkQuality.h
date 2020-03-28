@@ -40,6 +40,8 @@ extern byte badFramesMonitoringChannel1;
 extern byte badFramesMonitoringChannel2;
 extern uint32_t failSafeCounter;
 extern uint32_t failSafeLongestMillis;
+extern uint16_t wave1;																		// Used to pass current value to telemetry
+extern uint16_t wave2;																		// Used to pass current value to telemetry
 
 // Public Functions
 void rxLinkQuality_ActivateSBUS();

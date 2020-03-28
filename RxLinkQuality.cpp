@@ -24,7 +24,8 @@ byte badFramesMonitoringChannel1 = 0;
 byte badFramesMonitoringChannel2 = 0;
 uint32_t failSafeCounter = 0;
 uint32_t failSafeLongestMillis = 0;
-
+uint16_t wave1 = 0;																		// Used to pass current value to telemetry
+uint16_t wave2 = 0;																		// Used to pass current value to telemetry
 
 
 // Private Variables
@@ -241,6 +242,10 @@ void calculate_BB_Bits() {
 	}
 #endif
 
+	// Capture the current channel value for Telemetry
+	wave1 = channels[badFramesMonitoringChannel1 - 1];
+	wave2 = channels[badFramesMonitoringChannel2 - 1];
+	
 	// Capture the current channel value for the next loop
 	channelsPrevious[badFramesMonitoringChannel1 - 1] = channels[badFramesMonitoringChannel1 - 1];
 	channelsPrevious[badFramesMonitoringChannel2 - 1] = channels[badFramesMonitoringChannel2 - 1];
