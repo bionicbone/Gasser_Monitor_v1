@@ -27,6 +27,7 @@ FrSkySportSensorFlvss flvss1;														// Create FLVSS sensor with default I
 FrSkySportSensorRpm rpm;																// Create RPM sensor with default ID of 5
 FrSkySportSensorRpm rpm2(FrSkySportSensor::ID15);       // Create RPM sensor with given ID
 FrSkySportSensorRpm rpm3(FrSkySportSensor::ID16);       // Create RPM sensor with given ID
+FrSkySportSensorRpm rpm4(FrSkySportSensor::ID17);       // Create RPM sensor with given ID
 FrSkySportSensorSp2uart sp2uart;												// Create SP2UART Type B sensor with default ID
 FrSkySportTelemetry telemetry;													// Create telemetry object without polling
 //FrSkySportSensorAss ass;                              // Create ASS sensor with default ID
@@ -89,9 +90,14 @@ void telemetry_SendTelemetry() {
 	rpm2.setData(clutchRPMSensorDetectedRPM,	// ID 15 - Rotations per minute
 		engineTemp,								// Temperature #1 in degrees Celsuis (can be negative, will be rounded)
 		lostFramesPercentage100Result);						// Bad Frames Detected
+	
 	rpm3.setData(error,							// ID 16 - Error Number, 0 = OK
 		error1,									// Will contain the error data 1
 		999);					// Bad frames detected as Percentage against Total frames
+
+	rpm4.setData(999,							// ID 17 - Spare
+		wave1,											// Wave Form 1
+		wave2);											// Wave Form 2
 
 	// Set SP2UART sensor data
 	// (values from 0.0 to 3.3 are accepted)
@@ -129,7 +135,7 @@ void telemetry_ActivateTelemetry() {
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
-	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
+	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &sp2uart);
 #else
 	//telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_12, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_8, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
