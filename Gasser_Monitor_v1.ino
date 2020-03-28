@@ -37,6 +37,7 @@ void setup() {
 	telemetry_ActivateTelemetry();
 
 	Serial.println("Setup Complete");
+	Serial.print("System Started millis() "); Serial.println(millis());
 }
 
 
