@@ -48,7 +48,9 @@ All sensors are at different levels of development:-
     * Lost Frames indicated by Rx
     * Fail Safes indicated by Rx
     * 8 channel or 16 channel monitoring
- 
+
+ For more information see the WiKi    https://github.com/bionicbone/Gasser_Monitor_v1/wiki
+
 **Acknowledgements**
 * Pawelsky - For the FrSky telemetry library
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library
