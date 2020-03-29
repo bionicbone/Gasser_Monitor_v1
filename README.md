@@ -1,4 +1,4 @@
-# Gasser_Monitor_v1
+# Gasser Monitor
 
 This project aims to create a bolt on device that has huge potential to monitor RC equipment for a full range of problems
 or just provide a standard data set that can be reviewed and understood across all models.
