@@ -14,11 +14,11 @@ Over the last 18 months many proof of concept bench and flight tests have been c
 
 All sensors are at different levels of development:-
 
-* RPM sensors
+* RPM sensors **(see wiki)**
   * Up to 2 RPM sensors (potentially more) can be connected with data sent back via telemetry
-  * Ideal for gasser engine RC models to review clutch bite RPM and checking for clutch slip during flights 
+  * Ideal for gasser engine RC models to review clutch bite RPM and checking for clutch slip during flights
 * Battery Cell Voltage
-  * Initially up to 3 battery cells will be monitored with data sent beck via telemetry
+  * Initially up to 3 battery cells will be monitored with data sent back via telemetry
   * Battery status will be visible on OLED display
 * Temperature Sensors
   * Gasser Engine / ESC Temperature
@@ -40,7 +40,7 @@ All sensors are at different levels of development:-
 * Small Display Screen (1" OLED)
   * Useful for pre-flight checks of flight battery cell voltage etc.
   * Useful for checking if any serious failures were reported on the last flight
-* Rx Link Quality
+* Rx Link Quality **(see wiki)**
   * Using data from the SBUS to determine (requires Tx to transmit a wave pattern that can be analysed by the system)
     * Lock outs (i.e. SBUS not updating servos) and length of lock out in ms.
     * Quality of the link from Tx to Rx as a percentage of last 100 frames
