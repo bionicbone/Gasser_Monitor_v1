@@ -36,12 +36,13 @@ All sensors are at different levels of development but include:-
 * Warning LEDs
   * Can be fitted to model to give visual indication that something is wrong and landing should be considered.
 * Rx Link Quality
-  * Using data from the SBUS to determine
+  * Using data from the SBUS to determine (requires Tx to transmit a wave pattern that can be analysed by the system)
     * Lock outs (i.e. SBUS not updating servos) and length of lock out in ms.
     * Quality of the link from Tx to Rx as a percentage of last 100 frames
     * Actual SBUS refresh rates being achieved
     * Lost Frames indicated by Rx
     * Fail Safes indicated by Rx
+    * 8 channel or 16 channel monitoring
  
 **Acknowledgements**
 * Pawelsky - For the FrSky telemetry library
