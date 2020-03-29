@@ -35,6 +35,9 @@ All sensors are at different levels of development:-
   * Ability to detect levels of static caused by the HT system of a gasser engine, HT static can cause significant issues with flight controllers which simply changing the HT lead for better quality can resolve.
 * Warning LEDs
   * Can be fitted to model to give visual indication that something is wrong and landing should be considered.
+* Small Display Screen (1" OLED)
+  * Useful for pre-flight checks of flight battery cell voltage etc.
+  * Useful for checking if any serious failures were reported on the last flight
 * Rx Link Quality
   * Using data from the SBUS to determine (requires Tx to transmit a wave pattern that can be analysed by the system)
     * Lock outs (i.e. SBUS not updating servos) and length of lock out in ms.
@@ -52,6 +55,6 @@ All sensors are at different levels of development:-
 **Licencing:** 
 * Licencing requirements of any code used under Acknowledgements section should be considered
 * My licencing requirements does not allow profit from commercial use of this software without permission in writing from myself.
-* My licencing does allow people to build and supply the sensors or flashed Teensy for a small profit to allow others to benefit from this software.
+* My licencing does allow people to build and supply the sensors including pre-flashed Teensy for a small profit to allow others to benefit from this software.
 
-**Disclaimer:** This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This software is used at your own risk. I am under no obligation to maintain, support or leave this software or documatation in the public domain in the future, likewise I am under no obligation to release designs for all the sensors or other electronics that I have developed.
+**Disclaimer:** This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This software is used at your own risk. I am under no obligation to maintain, support or leave this software or documatation in the public domain, likewise I am under no obligation to release designs for all the sensors or other electronics that I have developed.
