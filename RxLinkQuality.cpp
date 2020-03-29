@@ -188,8 +188,8 @@ void calculate_BB_Bits() {
 			}
 			else {
 				// stop major LQ jumps due to estimation of 2nd wave by limiting BB_Bits and adding to the next frame
-				BB_Bits += carryOver16ch;
-				if (BB_Bits > MAX_16CH_ESTIMATED_BB_Bits) {	carryOver16ch = BB_Bits - MAX_16CH_ESTIMATED_BB_Bits;	}
+				BB_Bits += carryOver16ch; carryOver16ch = 0;
+				if (BB_Bits >= MAX_16CH_ESTIMATED_BB_Bits) {	carryOver16ch = BB_Bits - MAX_16CH_ESTIMATED_BB_Bits;	}
 				
 				badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits * 2;		// Estimate
 #if defined(REPORT_BAD_FRAME_ERRORS)		

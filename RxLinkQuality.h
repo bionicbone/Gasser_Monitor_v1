@@ -30,7 +30,7 @@
 #define MAX_TRIANGLE_DIFF_16CH_3  17      // for 50 <  badFramesPercentage100Result
 #define TRSHLD_16CH_1_CHNG        75
 #define TRSHLD_16CH_2_CHNG        50  
-#define MAX_16CH_ESTIMATED_BB_Bits 20			// over this the remainder will be added to the next frame
+#define MAX_16CH_ESTIMATED_BB_Bits 8			// over this the remainder will be added to the next frame
 
 // Public Variables
 extern uint16_t lostFramesPercentage100Result;
