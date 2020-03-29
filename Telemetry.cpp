@@ -46,7 +46,6 @@ FrSkySportTelemetry telemetry;													// Create telemetry object without po
 
 // TODO - Look at the LQBB4 way of transmitting data
 // TODO - Review the RxLinkQuality variables to see if anything useful could be sent via telemetry
-// TODO - TFC should tx a totalFrames / 1000
 // TODO - Activate cell1 and cell2 and remove temporary variable declarations below
 // TODO - Activate enginTemp and remove temporary variable declaration below
 // TODO - Activate error and error1 and remove temporary variable declarations below
@@ -83,8 +82,9 @@ void telemetry_SendTelemetry() {
 
 	// Set RPM/temperature sensor data
 	// (set number of blades to 2 in telemetry menu to get correct rpm value)
-	rpm.setData(mainRPMSensorDetectedRPM,		// ID5 - Rotations per minute
-		totalFrames,							// Total SBUS Frames
+	uint32_t totalFrames1K = totalFrames / 1000;
+	rpm.setData(mainRPMSensorDetectedRPM,				// ID5 - Rotations per minute
+		totalFrames1K,														// Total SBUS Frames / 1000
 		badFramesPercentage100Result);						// Total SBUS Lost Frames
 
 	rpm2.setData(clutchRPMSensorDetectedRPM,	// ID 15 - Rotations per minute
