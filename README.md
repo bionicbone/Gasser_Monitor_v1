@@ -8,6 +8,8 @@ It will be initially designed for Frsky users (due to superior telemetry functio
 
 A Teensy v3.2 (maybe changed to a Teensy v4.0) will be used as the main controller due to its size, built in USB for easy updating, and built in Hardware / Software serials that support the FrSky inverted SBUS without additional hardware for easy of building.
 
+The intention is to build a modular system whereby the required sensors can be simply added to the Teensy, where possible automation in code will detect the connection of the sensor and cofigure automatically to reduce the need for the end user to "configure" the Teensy in code to any particular setup.
+
 Over the last 18 months many proof of concept bench and flight tests have been completed and it is now time to migrate code into a project so some more real life testing and data comparisons can take place. This migration may take a number of months given all the sensors have to be compatible with each other and code future proofed for further developments.
 
 All sensors are at different levels of development:-
