@@ -62,4 +62,5 @@ All sensors are at different levels of development:-
 * My licencing does allow people to build and supply the sensors including pre-flashed Teensy for a small profit to allow others to benefit from this software.
 
 **Disclaimer:** 
+
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This software is used at your own risk. I am under no obligation to maintain, support or leave this software or documentation in the public domain, likewise I am under no obligation to release designs for all the sensors or other electronics that I have developed.
