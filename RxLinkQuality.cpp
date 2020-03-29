@@ -26,6 +26,7 @@ uint16_t wave2 = 0;																		// Used to pass current value to telemetry
 // Private Variables
 uint16_t channels[16];
 uint16_t channelsPrevious[16];
+uint16_t carryOver16ch = 0;
 bool lostFrame = false;
 bool failSafe = false;
 
@@ -163,7 +164,7 @@ void calculate_BB_Bits() {
 	if (badFramesMonitoringType == 1) {															// 8ch mode
 		if (badFramesDifference > MaxTriangleDiff) {
 			// calculate how many frames were skipped
-			int BB_Bits = ((float)(badFramesDifference) / MaxTriangleDiff);
+			uint16_t BB_Bits = ((float)(badFramesDifference) / MaxTriangleDiff);
 #if defined(REPORT_BAD_FRAME_ERRORS)		
 			Serial.print("millis(): "); Serial.print(millis()); Serial.print("   "); 
 			Serial.print(BB_Bits); Serial.println(" BB_Bits found (8ch mode)");
@@ -176,7 +177,7 @@ void calculate_BB_Bits() {
 	else {																													// 16ch mode
 		if (badFramesDifference > MaxTriangleDiff) {
 			// calculate how many frames were skipped
-			int BB_Bits = ((float)(badFramesDifference) / MaxTriangleDiff);
+			uint16_t BB_Bits = ((float)(badFramesDifference) / MaxTriangleDiff);
 			// Add number of bad frames to the array
 			if (badFramesMonitoringType == 4) {
 				badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits;				// Exact
@@ -186,10 +187,15 @@ void calculate_BB_Bits() {
 #endif
 			}
 			else {
+				// stop major LQ jumps due to estimation of 2nd wave by limiting BB_Bits and adding to the next frame
+				BB_Bits += carryOver16ch;
+				if (BB_Bits > MAX_16CH_ESTIMATED_BB_Bits) {	carryOver16ch = BB_Bits - MAX_16CH_ESTIMATED_BB_Bits;	}
+				
 				badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits * 2;		// Estimate
 #if defined(REPORT_BAD_FRAME_ERRORS)		
 				Serial.print("millis(): "); Serial.print(millis()); Serial.print("   ");
-				Serial.print(BB_Bits * 2); Serial.println(" BB_Bits found (16ch mode - *2 Estimated)");
+				Serial.print(BB_Bits * 2); Serial.print(" BB_Bits found (16ch mode - *2 Estimated)   carryOver16ch ");
+				Serial.println(carryOver16ch);
 #endif
 			}
 			goodFrame = false;
