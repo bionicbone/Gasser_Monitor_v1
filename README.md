@@ -24,7 +24,7 @@ All sensors are at different levels of development:-
   * Gasser Engine / ESC Temperature
   * Inside Canopy Temperature
   * Ambient Temperature
-* SMART Power Charing / Monitoring
+* SMART Power Charging / Monitoring
   * Control correct charging of the flight battery on Gasser models (if fitted).
   * Current provided by a Gasser charging system (if fitted).
   * Current flow from or to flight battery (charging or discharging state).
