@@ -5,6 +5,8 @@ or just provide a standard data set that can be reviewed and understood across a
 
 It will be initially designed for Frsky users (due to superior Telemetry functions), however eventually it may be rolled out for other protocols with the ability to download data post flight.
 
+A Teensy v3.2 (maybe changed to a Teensy v4.0) will be used as the main controller due to its size, built in USB for easy updating, and built in Hardware Serials that support the FrSky inverted SBUS without additional hardware.
+
 Over the last 18 months many proof of concept bench tests have been completed and it is now time to migrate code into a
 project so some more real life testing and data comparisons can take place.
 
@@ -41,3 +43,7 @@ All sensors are at different levels of development but include:-
     * Lost Frames indicated by Rx
     * Fail Safes indicated by Rx
  
+**Acknowledgements**
+* Pawelsky - For the FrSky telemetry library
+* Bolder Flights Systems SBUS by Brian Taylor for the SBUS library
+* @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
