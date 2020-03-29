@@ -51,7 +51,7 @@ All sensors are at different levels of development:-
 
  For more information see the WiKi    https://github.com/bionicbone/Gasser_Monitor_v1/wiki
 
-**Acknowledgements**
+**Acknowledgements:**
 * Pawelsky - For the FrSky telemetry library
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library
 * @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
@@ -61,4 +61,5 @@ All sensors are at different levels of development:-
 * My licencing requirements do not allow profit from commercial use of this software without permission in writing from myself.
 * My licencing does allow people to build and supply the sensors including pre-flashed Teensy for a small profit to allow others to benefit from this software.
 
-**Disclaimer:** This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This software is used at your own risk. I am under no obligation to maintain, support or leave this software or documentation in the public domain, likewise I am under no obligation to release designs for all the sensors or other electronics that I have developed.
+**Disclaimer:** 
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. This software is used at your own risk. I am under no obligation to maintain, support or leave this software or documentation in the public domain, likewise I am under no obligation to release designs for all the sensors or other electronics that I have developed.
