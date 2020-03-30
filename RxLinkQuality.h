@@ -21,8 +21,8 @@
 // Calculate to be very similar to the LF flag under FrSky Firmware v1.
 // dynamic threshold for LostFrameCtr_V2 increment (depends on slope rate of triangle (here for 2s))
 #define MAX_TRIANGLE_DIFF_8CH_1  11      // for 75 >= badFramesPercentage100Result
-#define MAX_TRIANGLE_DIFF_8CH_2  10       // for 75 <  badFramesPercentage100Result
-#define MAX_TRIANGLE_DIFF_8CH_3  10       // for 50 <  badFramesPercentage100Result
+#define MAX_TRIANGLE_DIFF_8CH_2  9       // for 75 <  badFramesPercentage100Result
+#define MAX_TRIANGLE_DIFF_8CH_3  9       // for 50 <  badFramesPercentage100Result
 #define TRSHLD_8CH_1_CHNG        75
 #define TRSHLD_8CH_2_CHNG        50  
 #define MAX_TRIANGLE_DIFF_16CH_1  19			// for 75 >= badFramesPercentage100Result
