@@ -202,11 +202,12 @@ void calculate_BB_Bits() {
 		}
 	}
 
+	// Good frame so add a Zero to the array
+	if (goodFrame) { badFramesPercentage100Array[badFramesPercentage100Counter] = 0; }
 
-	if (goodFrame == true) {
-		// Good frame so add a Zero to the array
-		badFramesPercentage100Array[badFramesPercentage100Counter] = 0;
-	}
+	// Add a bad frame if FailSafe is triggered, otherwise we stay on current % until is recovers
+	if (failSafe) { badFramesPercentage100Array[badFramesPercentage100Counter] = 1; }
+
 	badFramesPercentage100Counter++;
 
 	// If we reach the end of the array overwrite from the beginning
