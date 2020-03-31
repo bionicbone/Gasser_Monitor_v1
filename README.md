@@ -6,7 +6,7 @@ The project aims to create a bolt on device that has huge potential to monitor R
 
 It will be initially designed for Frsky users (due to superior telemetry functions), however eventually it may be rolled out for other protocols with the ability to download data post flight.
 
-A Teensy v3.2 (maybe changed to a Teensy v4.0) will be used as the main controller due to its size, built in USB for easy updating, and built in Hardware / Software serials that support the FrSky inverted SBUS without additional hardware for easy of building.
+A Teensy v3.2 (I may change this to a Teensy v4.0 as the project progresses but for now a v3.2 is recommended) will be used as the main controller due to its size, built in USB for easy updating, and built in Hardware / Software serials that support the FrSky inverted SBUS without additional hardware for easy of building.
 
 The intention is to build a modular system whereby the required sensors can be simply added to the Teensy, where possible automation in code will detect the connection of the sensor and configure automatically to reduce the need for the end user to "configure" the Teensy in code to any particular setup.
 
