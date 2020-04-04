@@ -8,8 +8,8 @@
 //#define DEBUG_WAVE_CHANNEL_DATA								// Activate to display the wave channel(s) & BFP value on USB Serial
 //#define REPORT_BAD_FRAME_ERRORS								// Activate to display the BB_Bits (calculated lost frames) on USB Serial
 //#define REPORT_CURRENT_BFP										// Activate constent monitoring of BFP value on USB Serial
-#define REPORT_SBUS_16CH_FRAME_SYNC_DATA			// Activate to display detailed SBUS Frame Sync information
-//defline REPROT_CHANNEL_HOLD_DATA							// Activate to display detailed SBUS Channel Hold information
+//#define REPORT_SBUS_16CH_FRAME_SYNC_DATA			// Activate to display detailed SBUS Frame Sync information
+#define REPROT_CHANNEL_HOLD_DATA							// Activate to display detailed SBUS Channel Hold information
 
 #if defined (REPORT_FS_LF_ERRORS)
 #warning DONT FLASH WITH REPORT_FS_LF_ERRORS ACTIVATED

@@ -313,6 +313,7 @@ void calculate_FrameHolds() {
 		// Detect when a hold ends
 		if (held == false && channelHoldTriggered[!channel16chFrameSync] == true) {
 			uint16_t diff = millis() - channelsStartHoldMillis;
+			if (badFramesMonitoringType > 1) { diff += 18; } else { diff += 9; } // add time before first missing frame detected.
 			if (diff > 10 && diff > channelsMaxHoldMillis100Result[!channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
 				channelsMaxHoldMillis100Result[!channel16chFrameSync] = diff;
 			}
