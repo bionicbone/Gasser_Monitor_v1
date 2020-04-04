@@ -45,6 +45,7 @@ FrSkySportTelemetry telemetry;													// Create telemetry object without po
 
 
 // TODO - Look at the LQBB4 way of transmitting data
+// TODO - Try changing the Telem send rates and Esc sensor https://www.rcgroups.com/forums/showpost.php?p=35507210&postcount=498
 // TODO - Review the RxLinkQuality variables to see if anything useful could be sent via telemetry
 // TODO - Activate cell1 and cell2 and remove temporary variable declarations below
 // TODO - Activate enginTemp and remove temporary variable declaration below
@@ -69,7 +70,7 @@ void telemetry_SendTelemetry() {
 	//clutchFullyEngagedRPM = 8995;
 	//clutchFullyEngaged = true;
 	int error = 99;
-	int error1 = 998;
+	//int error1 = 998;
 	float reg = 28.1;
 	float bec = 6.9;
 
@@ -91,9 +92,9 @@ void telemetry_SendTelemetry() {
 		engineTemp,								// Temperature #1 in degrees Celsuis (can be negative, will be rounded)
 		lostFramesPercentage100Result);						// Bad Frames Detected
 	
-	rpm3.setData(error,							// ID 16 - Error Number, 0 = OK
-		error1,									// Will contain the error data 1
-		999);					// Bad frames detected as Percentage against Total frames
+	rpm3.setData(error,													// ID 16 - Error Number, 0 = OK
+		channelsMaxHoldMillis100Result[0],																		// Will contain the error data 1
+		channelsMaxHoldMillis100Result[1]);					// Longest Channel Hold in last 100 Frames
 
 	rpm4.setData(999,							// ID 17 - Spare
 		wave1,											// Wave Form 1
