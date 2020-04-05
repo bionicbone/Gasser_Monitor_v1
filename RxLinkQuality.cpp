@@ -324,11 +324,11 @@ void calculate_FrameHolds() {
 			
 			if (badFramesMonitoringType == 1) { diff += 9; } else { diff += 18; } // add time before first missing frame detected.
 
-			if (diff > 10 && diff > channelsMaxHoldMillis100Result[!channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
+			if (diff > 20 && diff > channelsMaxHoldMillis100Result[!channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
 				channelsMaxHoldMillis100Result[!channel16chFrameSync] = diff;
 			}
 #if defined(REPROT_CHANNEL_HOLD_DATA)
-			if (channelsMaxHoldMillis100Result[!channel16chFrameSync]) { Serial.print("_____Channel Hold Recovered "); Serial.print(channelsMaxHoldMillis100Result[!channel16chFrameSync]); Serial.println("ms"); }
+			Serial.print("_____Channel Hold Recovered "); Serial.print(channelsMaxHoldMillis100Result[!channel16chFrameSync]); Serial.println("ms"); 
 #endif
 			channelHoldTriggered[!channel16chFrameSync] = false;
 		}
