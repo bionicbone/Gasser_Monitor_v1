@@ -37,7 +37,7 @@ uint32_t badFramesPercentage100Array[100] = { 0 };
 byte badFramesMonitoringType = 0;
 
 uint32_t		channelsStartHoldMillis = 0 ;						// Stores millis() when hold is first detected 
-bool				channelHoldTriggered[2] = { false };		// Tracks current status
+bool				channelHoldTriggered[3] = { false };		// Tracks current status
 uint8_t			channelHoldCounter = 0;									// Tracks reset after 100 readings
 bool				channel16chFrameSync = false;						// True if the 1-8ch frame is expected next
 bool				channel16chFrameSyncError = false;			// True if sync is incorrect or both frames change or both frames hold
@@ -151,8 +151,8 @@ void calculate_BB_Bits() {
 	// Did SBUS channel increase by more than an expected amount for 8 Channels
 	badFramesDifference = abs(channels[badFramesMonitoringChannel1 - 1] - channelsPrevious[badFramesMonitoringChannel1 - 1]);
 
-	// if channels 1-8 have not changed get channels 9-16 if applicable for the mode type
-	if (badFramesDifference == 0 && badFramesMonitoringType >= 3) {
+	// get channels 9-16 if applicable for the mode type and overwrite badFramesDifference
+	if (badFramesMonitoringType >= 3) {
 		badFramesDifference = abs(channels[badFramesMonitoringChannel2 - 1] - channelsPrevious[badFramesMonitoringChannel2 - 1]); 
 	}
 
@@ -291,8 +291,9 @@ void calculate_FrameHolds() {
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 	Serial.println("Frame Holds Monitoring");
 	debug_Wave_Data();
-	Serial.print("FrameSyncError? = "); Serial.println(channel16chFrameSyncError);
+	Serial.print("FrameSyncError = "); Serial.println(channel16chFrameSyncError);
 	Serial.print("FrameSyncValue = "); Serial.println(channel16chFrameSync);
+	Serial.print("Current channelHoldTriggered = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
 	Serial.print("Checking Hold on  1-8? = "); Serial.println(!channel16chFrameSync);
 	Serial.print("Checking Hold on 9-16? = "); Serial.println(channel16chFrameSync);
 #endif
@@ -301,13 +302,25 @@ void calculate_FrameHolds() {
 	// only run if the frames are in sync.
 	if (channel16chFrameSyncError == false) {
 		channelHoldCounter++;
-		// If a hold is not in progress and we've captured 100 readings reset the max millis() 
-		if (channelHoldTriggered[channel16chFrameSync] == false && channelHoldCounter >= 100) {
+		
+		Serial.print("channelHoldCounter = "); Serial.println(channelHoldCounter);
+		Serial.print("channelHoldTriggered = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
+		
+		
+		// If a hold is not in progress and we've captured 100 readings reset the max millis()
+		// It is better to use the [0] & [1] method here to ensure syncing is correct every 100 frames
+		if (channelHoldTriggered[0] == false && channelHoldTriggered[1] == false && channelHoldCounter >= 100) {
 			channelHoldCounter = 0;
-			channelsMaxHoldMillis100Result[channel16chFrameSync] = 0;
+			channelsMaxHoldMillis100Result[0] = 0;
+			channelsMaxHoldMillis100Result[1] = 0;
 		}
 
+		// check when in 16ch 1 wave mode we are scanning the correct channel with the wave
+		if (badFramesMonitoringType == 2 && channel16chFrameSync == true) goto RETURN_EARLY;
+		if (badFramesMonitoringType == 3 && channel16chFrameSync == false) goto RETURN_EARLY;
+
 		// Scan all channels to see if anything has changed
+		// TODO - Use badFramesMonitoringType and channel16chFrameSync to just scan the correct channel !!
 		bool held = true;
 		for (int ch = 0; ch < 16; ch++) {
 			if (channels[ch] != channelsPrevious[ch]) { held = false; }
@@ -332,11 +345,13 @@ void calculate_FrameHolds() {
 				channelsMaxHoldMillis100Result[channel16chFrameSync] = diff;
 			}
 #if defined(REPROT_CHANNEL_HOLD_DATA)
-			Serial.print("_____Channel Hold Recovered "); Serial.print(channelsMaxHoldMillis100Result[channel16chFrameSync]); Serial.println("ms"); 
+			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms"); 
 #endif
 			channelHoldTriggered[channel16chFrameSync] = false;
 		}
 	}
+RETURN_EARLY:
+	bool a = 0; // for goto statement
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 	Serial.print("MFH1 = "); Serial.print(channelsMaxHoldMillis100Result[0]); Serial.println("ms");
 	Serial.print("MFH2 = "); Serial.print(channelsMaxHoldMillis100Result[1]); Serial.println("ms");
@@ -365,6 +380,9 @@ void sync_16chFrame() {
 		// just set the sync like 16ch mode with no sync errors and 
 		channel16chFrameSync = false;
 	}
+	//else if (badFramesMonitoringType == 3) { 
+	//	channel16chFrameSync = true; 
+	//}
 	else {
 		// 16 channel mode
 
