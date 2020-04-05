@@ -21,7 +21,7 @@ uint32_t	failSafeCounter = 0;
 uint32_t	failSafeLongestMillis = 0;
 uint16_t	wave1 = 0;																			// Used to pass current value to telemetry
 uint16_t	wave2 = 0;																			// Used to pass current value to telemetry
-uint32_t	channelsMaxHoldMillis100Result[2] = { 0 };			// Stores max millis() for every 100 readings
+uint32_t	channelsMaxHoldMillis100Result[3] = { 0 };			// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
 float			channel16chFrameSyncSuccessRate = 0;						// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
 
 
@@ -104,17 +104,18 @@ void rxLinkQuality_Scan() {
 #if defined(DEBUG_WAVE_CHANNEL_DATA)
 		debug_Wave_Data();
 #endif
+		
 		check_FailSafe();
 		calculate_LostFrames();
-		sync_16chFrame();
-		if (channel16chFrameSyncSuccessRate < 97.5) { 
-			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   REPORT_SBUS_16CH_FRAME_SYNC_DATA
-			Serial.print("Low Sync Frame Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%"); 
-		}
+		
+		// Call Frame Sync if in a 16ch mode
+		if (badFramesMonitoringType > 0) { sync_16chFrame(); }
+				
 		calculate_FrameHolds();
+		
 		calculate_BB_Bits();		// must run last because previous channels is updated
 
-			// Capture the current channel value for Telemetry
+		// Capture the current channel value for Telemetry
 		wave1 = channels[badFramesMonitoringChannel1 - 1];
 		wave2 = channels[badFramesMonitoringChannel2 - 1];
 
@@ -276,7 +277,12 @@ void calculate_BB_Bits() {
 // at least one channel should transmit the wave, check all 16 channels for movement.
 // TODO - Add 16ch modes
 void calculate_FrameHolds() {
-	// only run if the frames are in sync.
+	/*
+	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
+	badFramesMonitoringType == 2 - 16ch mode, 1 wave on Ch1 - Ch8
+	badFramesMonitoringType == 3 - 16ch mode, 1 wave on Ch9 - Ch16
+	badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
+	*/
 
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 	Serial.println("Frame Holds Monitoring");
@@ -287,6 +293,8 @@ void calculate_FrameHolds() {
 	Serial.print("Checking Hold on 9-16? = "); Serial.println(channel16chFrameSync);
 #endif
 
+
+	// only run if the frames are in sync.
 	if (channel16chFrameSyncError == false) {
 		channelHoldCounter++;
 		// If a hold is not in progress and we've captured 100 readings reset the max millis() 
@@ -313,7 +321,9 @@ void calculate_FrameHolds() {
 		// Detect when a hold ends
 		if (held == false && channelHoldTriggered[!channel16chFrameSync] == true) {
 			uint16_t diff = millis() - channelsStartHoldMillis;
-			if (badFramesMonitoringType > 1) { diff += 18; } else { diff += 9; } // add time before first missing frame detected.
+			
+			if (badFramesMonitoringType == 1) { diff += 9; } else { diff += 18; } // add time before first missing frame detected.
+
 			if (diff > 10 && diff > channelsMaxHoldMillis100Result[!channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
 				channelsMaxHoldMillis100Result[!channel16chFrameSync] = diff;
 			}
@@ -326,79 +336,105 @@ void calculate_FrameHolds() {
 }
 
 
-// TODO add badFramesMonitoringType for 8ch mode or 16ch one wave mode
+// 16ch frame sync
 void sync_16chFrame() {
+	/*
+	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
+	badFramesMonitoringType == 2 - 16ch mode, 1 wave on Ch1 - Ch8
+	badFramesMonitoringType == 3 - 16ch mode, 1 wave on Ch9 - Ch16
+	badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
+	*/
+
 #if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
 	Serial.println("Start Frame Sync");
 	debug_Wave_Data();
 #endif
+
 	channel16chFrameSyncError = false;
-	// Check to see if both frames have updated together
-	// Testing on the X4RSB_LBT_v2.1.0 detected this occurs every x SBUS frames
-	if ((channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]
-		&& channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1])) {
-		channel16chFrameSyncError = true;
-		channel16chFrameSyncErrorCounter++;
-		// Set false because when both frames change more often than not the next update is on ch9-16 on X4R_LBT_2.1.0
-		channel16chFrameSync = false; 
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-		Serial.println("Sync Error");
-#endif
-	}
-	// Check to see if both frames are held
-	// In this case we dont want to attempt to sync the frame but dont set the channel16chFrameSyncError because otherwise the FrameHold will not measure the hold
-	if ((channelsPrevious[badFramesMonitoringChannel1 - 1] == channels[badFramesMonitoringChannel1 - 1]
-		&& channelsPrevious[badFramesMonitoringChannel2 - 1] == channels[badFramesMonitoringChannel2 - 1])) {
-		// When both frames are held then the next updated frame can be either on X4R_LBT_v2.1.0 so just leave current sequencing.
-		// However, to ensure frameHolds timing is calculated correctly then must keep the frames in sync.
-		channel16chFrameSync = !channel16chFrameSync;
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-		Serial.println("Sync Hold");
-#endif
+
+	if (badFramesMonitoringType == 1) {
+		// 8 channel mode
+		// just set the sync like 16ch mode with no sync errors and 
+		channel16chFrameSync = false;
 	}
 	else {
-		// Only run if we are in sync and at least one frame set has updated
-		if (channel16chFrameSyncError == false && (channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]
-			|| channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1])) {
+		// 16 channel mode
 
-			// channel16chFrameSync == true  for 1-8ch expected
-			// channel16chFrameSync == false for 9-16ch expected
-			if (channel16chFrameSync == true) {
-				if (channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]) {
-					channel16chFrameSync = false;  // expect 9-16ch next
+		// Check to see if both frames have updated together
+		// Testing on the X4RSB_LBT_v2.1.0 detected this occurs every x SBUS frames
+		if ((channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]
+			&& channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1])) {
+			channel16chFrameSyncError = true;
+			channel16chFrameSyncErrorCounter++;
+			// Set false because when both frames change more often than not the next update is on ch9-16 on X4R_LBT_2.1.0
+			channel16chFrameSync = false;
+
 #if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-					Serial.println("1-8ch OK");
+			Serial.println("Sync Error");
 #endif
+		}
+
+		// Check to see if both frames are held
+		// In this case we dont want to attempt to sync the frame but dont set the channel16chFrameSyncError because otherwise the FrameHold will not measure the hold
+		if ((channelsPrevious[badFramesMonitoringChannel1 - 1] == channels[badFramesMonitoringChannel1 - 1]
+			&& channelsPrevious[badFramesMonitoringChannel2 - 1] == channels[badFramesMonitoringChannel2 - 1])) {
+			// When both frames are held then the next updated frame can be either on X4R_LBT_v2.1.0 so just leave current sequencing.
+			// However, to ensure frameHolds timing is calculated correctly then must keep the frames in sync.
+			channel16chFrameSync = !channel16chFrameSync;
+#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+			Serial.println("Sync Hold");
+#endif
+		}
+		else {
+			// Only run if we are in sync and at least one frame set has updated
+			if (channel16chFrameSyncError == false && (channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]
+				|| channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1])) {
+
+				// channel16chFrameSync == true  for 1-8ch expected
+				// channel16chFrameSync == false for 9-16ch expected
+				if (channel16chFrameSync == true) {
+					if (channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]) {
+						channel16chFrameSync = false;  // expect 9-16ch next
+#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+						Serial.println("1-8ch OK");
+#endif
+					}
+					else {
+#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+						Serial.println("1-8ch Out of Sync");
+#endif
+						channel16chFrameSyncError = true;
+						channel16chFrameSyncErrorCounter++;
+						// If we go out of sync it is better not to change the expected next channel, this makes it get back in sync quicker.
+					}
 				}
 				else {
+					if (channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1]) {
+						channel16chFrameSync = true;  // expect 1-8ch next
 #if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-					Serial.println("1-8ch Out of Sync");
+						Serial.println("9-16ch OK");
 #endif
-					channel16chFrameSyncError = true;
-					channel16chFrameSyncErrorCounter++;
-					// If we go out of sync it is better not to change the expected next channel, this makes it get back in sync quicker.
-				}
-			}
-			else {
-				if (channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1]) {
-					channel16chFrameSync = true;  // expect 1-8ch next
+					}
+					else {
 #if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-					Serial.println("9-16ch OK");
+						Serial.println("9-16ch Out of Sync");
 #endif
-				}
-				else {
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
-					Serial.println("9-16ch Out of Sync");
-#endif
-					channel16chFrameSyncError = true;
-					channel16chFrameSyncErrorCounter++;
-					// If we go out of sync it is better not to change the expected next channel, this makes it get back in sync quicker.
+						channel16chFrameSyncError = true;
+						channel16chFrameSyncErrorCounter++;
+						// If we go out of sync it is better not to change the expected next channel, this makes it get back in sync quicker.
+					}
 				}
 			}
 		}
+		channel16chFrameSyncSuccessRate = 100 - (float)channel16chFrameSyncErrorCounter / totalFrames * 100;
+
+		// TEMP - Serial Print if the success rate is low
+		if (channel16chFrameSyncSuccessRate < 97.5) {
+			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   REPORT_SBUS_16CH_FRAME_SYNC_DATA
+			Serial.print("Low Sync Frame Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
+		}
 	}
-	channel16chFrameSyncSuccessRate = 100 - (float)channel16chFrameSyncErrorCounter / totalFrames * 100;
-	
+
 #if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
 	Serial.print("FrameSyncError? = "); Serial.println(channel16chFrameSyncError);
 	Serial.print("FrameSyncValue = "); Serial.println(channel16chFrameSync);
@@ -560,9 +596,9 @@ void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMoni
 		badFramesMonitoringChannel2 > 0 - wave number on Ch9 - Ch16
 
 		badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
-		badFramesMonitoringType == 2 - 16ch mode, wave on Ch1 - Ch8
-		badFramesMonitoringType == 3 - 16ch mode, wave on Ch9 - Ch16
-		badFramesMonitoringType == 4 - 16ch mode, wave on Ch1 - Ch16
+		badFramesMonitoringType == 2 - 16ch mode, 1 wave on Ch1 - Ch8
+		badFramesMonitoringType == 3 - 16ch mode, 1 wave on Ch9 - Ch16
+		badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
 	*/
 
 	Serial.print("activity = "); Serial.println(activity_16ch);
@@ -593,6 +629,7 @@ void debug_Wave_Data() {
 		Serial.print(" = "); Serial.println(channelsPrevious[badFramesMonitoringChannel2 - 1] - channels[badFramesMonitoringChannel2 - 1]);
 	}
 }
+
 
 // Dumps Previous vs Current Channel of all Channels to USB serial.
 void debug_Data() {
