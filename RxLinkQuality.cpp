@@ -135,6 +135,7 @@ void calculate_BB_Bits() {
 #if defined(REPORT_CURRENT_BFP)	
 	uint16_t lastbadFramesPercentage100Result = badFramesPercentage100Result;
 #endif
+
 	uint16_t MaxTriangleDiff = 0;
 	// check we know the correct scan channel before attempting to scan
 	if (badFramesMonitoringType == 0) { find_WaveChannel_New(badFramesMonitoringChannel1, badFramesMonitoringChannel2, badFramesMonitoringType); }
@@ -150,8 +151,8 @@ void calculate_BB_Bits() {
 	// Did SBUS channel increase by more than an expected amount for 8 Channels
 	badFramesDifference = abs(channels[badFramesMonitoringChannel1 - 1] - channelsPrevious[badFramesMonitoringChannel1 - 1]);
 
-	// if channels 1-8 have not changed get channels 9-16
-	if (badFramesDifference == 0) {
+	// if channels 1-8 have not changed get channels 9-16 if applicable for the mode type
+	if (badFramesDifference == 0 && badFramesMonitoringType >= 3) {
 		badFramesDifference = abs(channels[badFramesMonitoringChannel2 - 1] - channelsPrevious[badFramesMonitoringChannel2 - 1]); 
 	}
 
@@ -178,8 +179,14 @@ void calculate_BB_Bits() {
 		}
 	}
 
-	//Serial.print("badFramesDifference   "); Serial.println(badFramesDifference);
-	//Serial.print("MaxTriangleDiff   "); Serial.println(MaxTriangleDiff);
+
+#if defined(REPORT_BAD_FRAME_ERRORS)	
+	Serial.println("Monitor Bad Frames");
+	debug_Wave_Data();
+	Serial.print("badFramesDifference   "); Serial.println(badFramesDifference);
+	Serial.print("MaxTriangleDiff   "); Serial.println(MaxTriangleDiff);
+#endif
+
 
 	/*
 		MaxDiff has to be > 11 if badFramesPercentage100Result is >=75
@@ -192,7 +199,6 @@ void calculate_BB_Bits() {
 			// calculate how many frames were skipped
 			uint16_t BB_Bits = badFramesDifference / MaxTriangleDiff;
 #if defined(REPORT_BAD_FRAME_ERRORS)		
-			Serial.print("millis(): "); Serial.print(millis()); Serial.print("   "); 
 			Serial.print(BB_Bits); Serial.println(" BB_Bits found (8ch mode)");
 #endif
 			// Add number of bad frames to the array
@@ -208,7 +214,6 @@ void calculate_BB_Bits() {
 			if (badFramesMonitoringType == 4) {
 				badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits;				// Exact
 #if defined(REPORT_BAD_FRAME_ERRORS)		
-				Serial.print("millis(): "); Serial.print(millis()); Serial.print("   ");
 				Serial.print(BB_Bits); Serial.println(" BB_Bits found (16ch mode - Exact)");
 #endif
 			}
@@ -221,7 +226,6 @@ void calculate_BB_Bits() {
 					badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits * 2;		// Estimate
 				}
 #if defined(REPORT_BAD_FRAME_ERRORS)		
-				Serial.print("millis(): "); Serial.print(millis()); Serial.print("   ");
 				Serial.print(badFramesPercentage100Array[badFramesPercentage100Counter]); Serial.println(" BB_Bits found (16ch mode - *2 Estimated)");
 #endif
 			}
