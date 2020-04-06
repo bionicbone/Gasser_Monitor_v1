@@ -39,7 +39,8 @@ byte badFramesMonitoringType = 0;
 uint32_t		channelsStartHoldMillis = 0 ;						// Stores millis() when hold is first detected 
 bool				channelHoldTriggered[3] = { false };		// Tracks current status
 uint8_t			channelHoldCounter = 0;									// Tracks reset after 100 readings
-uint32_t		channelsMaxHoldMillis[3] = { 0 };			// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
+uint32_t		channelsMaxHoldMillis = 0;							// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
+uint32_t		channelsMaxHoldMillis100Arra[100] = { 0 };	//
 bool				channel16chFrameSync = false;						// True if the 1-8ch frame is expected next
 bool				channel16chFrameSyncError = false;			// True if sync is incorrect or both frames change or both frames hold
 uint32_t		channel16chFrameSyncErrorCounter = 0;		// increaments on each error, channel16chFrameSyncErrorCounter / totalFrames * 100 = %
@@ -303,19 +304,9 @@ void calculate_FrameHolds() {
 
 	// only run if the frames are in sync.
 	if (channel16chFrameSyncError == false) {
-		channelHoldCounter++;
 		
 		Serial.print("channelHoldCounter = "); Serial.println(channelHoldCounter);
 		Serial.print("channelHoldTriggered = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
-		
-		
-		// If a hold is not in progress and we've captured 100 readings reset the max millis()
-		// It is better to use the [0] & [1] method here to ensure syncing is correct every 100 frames
-		if (channelHoldTriggered[0] == false && channelHoldTriggered[1] == false && channelHoldCounter >= 100) {
-			channelHoldCounter = 0;
-			channelsMaxHoldMillis[0] = 0;
-			channelsMaxHoldMillis[1] = 0;
-		}
 
 		// check when in 16ch 1 wave mode we are scanning the correct channel with the wave
 		if (badFramesMonitoringType == 2 && channel16chFrameSync == true) goto RETURN_EARLY;
@@ -342,10 +333,8 @@ void calculate_FrameHolds() {
 			uint16_t diff = millis() - channelsStartHoldMillis;
 			
 			if (badFramesMonitoringType == 1) { diff += 9; } else { diff += 18; } // add time before first missing frame detected.
-
-			if (diff > 20 && diff > channelsMaxHoldMillis[channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
-				channelsMaxHoldMillis[channel16chFrameSync] = diff;
-			}
+			channelsMaxHoldMillis = diff;
+		
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms"); 
 #endif
@@ -353,17 +342,19 @@ void calculate_FrameHolds() {
 		}
 	}
 RETURN_EARLY:
-	// uodate the Telemetry value with the highest value of both frames
-	if (channelsMaxHoldMillis[0] > channelsMaxHoldMillis[1]) {
-		channelsMaxHoldMillis100Resul = channelsMaxHoldMillis[0];
-	}
-	else {
-		channelsMaxHoldMillis100Resul = channelsMaxHoldMillis[1];
+	// update the Telemetry value with the highest value of both frames
+	channelsMaxHoldMillis100Arra[channelHoldCounter] = channelsMaxHoldMillis;
+
+	channelHoldCounter++;
+	if (channelHoldCounter == 100) { channelHoldCounter = 0; }
+
+	// Find the highest value in the array
+	channelsMaxHoldMillis100Resul = 0;
+	for (int i = 0; i < 100; i++) {
+		if (channelsMaxHoldMillis100Arra[i] > channelsMaxHoldMillis100Resul) { channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
 	}
 	
 #if defined(REPROT_CHANNEL_HOLD_DATA)
-	Serial.print("MFH1 = "); Serial.print(channelsMaxHoldMillis[0]); Serial.println("ms");
-	Serial.print("MFH2 = "); Serial.print(channelsMaxHoldMillis[1]); Serial.println("ms");
 	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
 }
