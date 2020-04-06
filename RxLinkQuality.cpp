@@ -21,7 +21,7 @@ uint32_t	failSafeCounter = 0;
 uint32_t	failSafeLongestMillis = 0;
 uint16_t	wave1 = 0;																			// Used to pass current value to telemetry
 uint16_t	wave2 = 0;																			// Used to pass current value to telemetry
-uint32_t	channelsMaxHoldMillis100Result[3] = { 0 };			// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
+uint32_t  channelsMaxHoldMillis100Resul = 0;							// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
 float			channel16chFrameSyncSuccessRate = 0;						// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
 
 
@@ -39,6 +39,7 @@ byte badFramesMonitoringType = 0;
 uint32_t		channelsStartHoldMillis = 0 ;						// Stores millis() when hold is first detected 
 bool				channelHoldTriggered[3] = { false };		// Tracks current status
 uint8_t			channelHoldCounter = 0;									// Tracks reset after 100 readings
+uint32_t		channelsMaxHoldMillis[3] = { 0 };			// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
 bool				channel16chFrameSync = false;						// True if the 1-8ch frame is expected next
 bool				channel16chFrameSyncError = false;			// True if sync is incorrect or both frames change or both frames hold
 uint32_t		channel16chFrameSyncErrorCounter = 0;		// increaments on each error, channel16chFrameSyncErrorCounter / totalFrames * 100 = %
@@ -55,6 +56,7 @@ unsigned long failSafeStartMillis = 0;
 
 
 //TODO - Add the Maximum Channels Held over last 100 frames 
+//TODO - Fix the wave values that are transmitted on telemetry
 //TODO - Add the Min / Max SBUS Refresh Rates over last 100 frames
 //TODO - Align Badframes with LQBB4 calculation -- testing !!
 //TODO - Allow sending of the Test Wave Forms over Telemetry (possible two channels)
@@ -311,8 +313,8 @@ void calculate_FrameHolds() {
 		// It is better to use the [0] & [1] method here to ensure syncing is correct every 100 frames
 		if (channelHoldTriggered[0] == false && channelHoldTriggered[1] == false && channelHoldCounter >= 100) {
 			channelHoldCounter = 0;
-			channelsMaxHoldMillis100Result[0] = 0;
-			channelsMaxHoldMillis100Result[1] = 0;
+			channelsMaxHoldMillis[0] = 0;
+			channelsMaxHoldMillis[1] = 0;
 		}
 
 		// check when in 16ch 1 wave mode we are scanning the correct channel with the wave
@@ -341,8 +343,8 @@ void calculate_FrameHolds() {
 			
 			if (badFramesMonitoringType == 1) { diff += 9; } else { diff += 18; } // add time before first missing frame detected.
 
-			if (diff > 20 && diff > channelsMaxHoldMillis100Result[channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
-				channelsMaxHoldMillis100Result[channel16chFrameSync] = diff;
+			if (diff > 20 && diff > channelsMaxHoldMillis[channel16chFrameSync]) {			// Skip 10th Frame (OpenTx timing issue)
+				channelsMaxHoldMillis[channel16chFrameSync] = diff;
 			}
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms"); 
@@ -351,10 +353,18 @@ void calculate_FrameHolds() {
 		}
 	}
 RETURN_EARLY:
-	bool a = 0; // for goto statement
+	// uodate the Telemetry value with the highest value of both frames
+	if (channelsMaxHoldMillis[0] > channelsMaxHoldMillis[1]) {
+		channelsMaxHoldMillis100Resul = channelsMaxHoldMillis[0];
+	}
+	else {
+		channelsMaxHoldMillis100Resul = channelsMaxHoldMillis[1];
+	}
+	
 #if defined(REPROT_CHANNEL_HOLD_DATA)
-	Serial.print("MFH1 = "); Serial.print(channelsMaxHoldMillis100Result[0]); Serial.println("ms");
-	Serial.print("MFH2 = "); Serial.print(channelsMaxHoldMillis100Result[1]); Serial.println("ms");
+	Serial.print("MFH1 = "); Serial.print(channelsMaxHoldMillis[0]); Serial.println("ms");
+	Serial.print("MFH2 = "); Serial.print(channelsMaxHoldMillis[1]); Serial.println("ms");
+	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
 }
 
