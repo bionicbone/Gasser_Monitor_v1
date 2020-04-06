@@ -60,6 +60,9 @@ void loop() {
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
+
+	// TODO - Add a long loop warning
+
 	// Format and Send the telemetry data using the FrSky S.Port solution
 		// Must be the last thing in the loop !!!
 	while (micros() < timeLoopMicros + 9000) {
