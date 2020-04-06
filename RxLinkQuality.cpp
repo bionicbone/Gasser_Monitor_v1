@@ -15,6 +15,8 @@ uint16_t			wave1 = 0;																	// Used to pass current value to telemetry
 uint16_t			wave2 = 0;																	// Used to pass current value to telemetry
 uint32_t			channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
 float					channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
+uint16_t			sbusFrameLowMillis = 0;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
+uint16_t			sbusFrameHighMillis = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
 
 
 // Private Variables
@@ -27,7 +29,7 @@ uint32_t			badFramesPercentage100Counter = 0;					// Counter for the array
 uint32_t			badFramesPercentage100Array[100] = { 0 };		// Holds the result of good or bad for the last 100 frames
 byte					badFramesMonitoringChannel1 = 0;						// Channel found in channels 1-8 with a pre defined wave output that the code uses to check transmission quality
 byte					badFramesMonitoringChannel2 = 0;						// Channel found in channels 9-16 with a pre defined wave output that the code uses to check transmission quality
-uint32_t			channelsStartHoldMillis = 0 ;								// Stores millis() when hold is first detected 
+unsigned long	channelsStartHoldMillis = 0 ;								// Stores millis() when hold is first detected 
 bool					channelHoldTriggered[3] = { false };				// Tracks current status of upto 2 wave channels (leave at [3] unless going to test all monitoring types)
 uint8_t				channelMaxHold100Counter = 0;								// Counter for the array
 uint32_t			channelsMaxHoldMillis100Arra[100] = { 0 };	// Holds the ms of a hold that ends on that frame, otherwise 0.
@@ -44,13 +46,17 @@ bool					failSafeDetected = false;										// True if the fail safe flag is set
 unsigned long failSafeStartMillis = 0;										// Stores millis() when fail safe flag on Rx is first set 
 uint32_t			failSafeCounter = 0;												// Constantly increments on each fail safe as indicated by the Rx Flag
 uint32_t			failSafeLongestMillis = 0;									// Stores the longest time is ms that the fail safe flag is set
+unsigned long sbusFrameStartMicros = 0;										// Stores micros() when an SBUS frame is received, for calculting SBUS frame rate
+uint8_t				sbusFrame100Counter = 0;										// Counter for array
+uint16_t			sbusFrame100Array[100] = { 0 };							// Holds the time between each SBUS frame
 
 
-//TODO - Fix the wave values that are transmitted on telemetry
-//TODO - Add the Min / Max SBUS Refresh Rates over last 100 frames
-//TODO - Align Badframes with LQBB4 calculation -- testing !!
-//TODO - Allow sending of the Test Wave Forms over Telemetry (possible two channels)
-//TODO - Add an overall SBUS quality indicator, i.e. SBUS refresh rate, SBUS channel holds, SBUS Frame Sync Errors etc into one formula in every 100 frames to detect "new Rx" not acting like X4RSB.
+
+// TODO - Fix the wave values that are transmitted on telemetry by increasing the Telemetery send rate to 100ms
+// TODO - Calculate the Min / Max SBUS Refresh Rates over last 100 frames 
+// TODO - Align Badframes with LQBB4 calculation -- testing !!
+// TODO - Add an overall SBUS quality indicator, i.e. SBUS refresh rate, SBUS channel holds, SBUS Frame Sync Errors etc into one formula in every 100 frames to detect "new Rx" not acting like X4RSB.
+// TODO - SBUS Frame rate needs to consider long loops
 
 
 // begin the SBUS communication
@@ -78,12 +84,30 @@ void rxLinkQuality_ActivateSBUS() {
 	// Given these only print once then we always allow.
 	Serial.print("SBUS Startup Cleared with "); Serial.print(counter); Serial.print(" reads");
 	Serial.print(" in (ms) "); Serial.println(millis() - maxWaitTimeMillis);
+
+	// stop errors on SBUS frame rates
+	sbusFrameStartMicros = micros();
 }
 
 
 // Main control loop to determine the Quality of the Rx SBUS signal
 void rxLinkQuality_Scan() {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
+
+		// Calculate the SBUS Frame Rate since last frame
+		sbusFrame100Array[sbusFrame100Counter] = micros() - sbusFrameStartMicros;
+		sbusFrame100Counter++;
+		if (sbusFrame100Counter == 100) { sbusFrame100Counter= 0; }
+		sbusFrameStartMicros = micros();
+
+		// Work out the lowest and highest value in the last 100 frames
+		sbusFrameLowMillis = 65535;
+		sbusFrameHighMillis = 0;
+		for (uint8_t i = 0; i < 100; i++) {
+			// TODO - COnsider a Long Loop and try to "not capture" or "erase" if we had a long loop
+			if (sbusFrame100Array[i] < sbusFrameLowMillis) { sbusFrameLowMillis = sbusFrame100Array[i]; }
+			if (sbusFrame100Array[i] > sbusFrameHighMillis) { sbusFrameHighMillis = sbusFrame100Array[i]; }
+		}
 
 		// Increase total frames received
 		totalFrames++;

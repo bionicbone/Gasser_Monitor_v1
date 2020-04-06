@@ -28,6 +28,7 @@ FrSkySportSensorRpm rpm;																// Create RPM sensor with default ID of 
 FrSkySportSensorRpm rpm2(FrSkySportSensor::ID15);       // Create RPM sensor with given ID
 FrSkySportSensorRpm rpm3(FrSkySportSensor::ID16);       // Create RPM sensor with given ID
 FrSkySportSensorRpm rpm4(FrSkySportSensor::ID17);       // Create RPM sensor with given ID
+FrSkySportSensorRpm rpm5(FrSkySportSensor::ID18);       // Create RPM sensor with given ID
 FrSkySportSensorSp2uart sp2uart;												// Create SP2UART Type B sensor with default ID
 FrSkySportTelemetry telemetry;													// Create telemetry object without polling
 //FrSkySportSensorAss ass;                              // Create ASS sensor with default ID
@@ -100,6 +101,10 @@ void telemetry_SendTelemetry() {
 		wave1,											// Wave Form 1
 		wave2);											// Wave Form 2
 
+	rpm5.setData(999,														// ID 18 - Spare
+		sbusFrameLowMillis,												// SBUS Lowest Frame Rate in last 100 frames
+		sbusFrameHighMillis);											// SBUS Highest Frame Rate in last 100 frames
+
 	// Set SP2UART sensor data
 	// (values from 0.0 to 3.3 are accepted)
 	sp2uart.setData(reg,	// ADC3 voltage in volts
@@ -136,7 +141,7 @@ void telemetry_ActivateTelemetry() {
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
-	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &sp2uart);
+	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &rpm5, &sp2uart);
 #else
 	//telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_12, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_8, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
