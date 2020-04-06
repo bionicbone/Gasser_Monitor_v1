@@ -1,62 +1,51 @@
-// 
-// 
-// 
-
 #include "Config.h"
 #include "RxLinkQuality.h"
 
 
 // Config
 SBUS sbus(Serial1);
-const uint16_t MAX_WAIT_TIME_MS = 200;
+const uint16_t MAX_WAIT_TIME_MS = 200;										// Maximum wait time for a valid SBUS signal when activating SBUS or looking for a valid wave
 
 
 // Public Variables
-uint16_t	lostFramesPercentage100Result = 0;
-uint16_t	badFramesPercentage100Result = 0;
-uint32_t	totalFrames = 0;
-byte			badFramesMonitoringChannel1 = 0;
-byte			badFramesMonitoringChannel2 = 0;
-uint32_t	failSafeCounter = 0;
-uint32_t	failSafeLongestMillis = 0;
-uint16_t	wave1 = 0;																			// Used to pass current value to telemetry
-uint16_t	wave2 = 0;																			// Used to pass current value to telemetry
-uint32_t  channelsMaxHoldMillis100Resul = 0;							// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
-float			channel16chFrameSyncSuccessRate = 0;						// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
+uint32_t			totalFrames = 0;														// Total SBUS frames received and processed
+uint16_t			lostFramesPercentage100Result = 0;					// The current percentage based on last 100 frames processed
+uint16_t			badFramesPercentage100Result = 0;						// The current percentage based on last 100 frames processed
+uint16_t			wave1 = 0;																	// Used to pass current value to telemetry
+uint16_t			wave2 = 0;																	// Used to pass current value to telemetry
+uint32_t			channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
+float					channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
 
 
 // Private Variables
-uint16_t channels[16];
-uint16_t channelsPrevious[16];
-bool lostFrame = false;
-bool failSafe = false;
-
-uint16_t badFramesDifference = 0;
-uint32_t badFramesPercentage100Counter = 0;
-uint32_t badFramesPercentage100Array[100] = { 0 };
-byte badFramesMonitoringType = 0;
-
-uint32_t		channelsStartHoldMillis = 0 ;						// Stores millis() when hold is first detected 
-bool				channelHoldTriggered[3] = { false };		// Tracks current status
-uint8_t			channelHoldCounter = 0;									// Tracks reset after 100 readings
-uint32_t		channelsMaxHoldMillis = 0;							// Stores max millis() for every 100 readings (for some reason this has to be [3] not [2])
-uint32_t		channelsMaxHoldMillis100Arra[100] = { 0 };	//
-bool				channel16chFrameSync = false;						// True if the 1-8ch frame is expected next
-bool				channel16chFrameSyncError = false;			// True if sync is incorrect or both frames change or both frames hold
-uint32_t		channel16chFrameSyncErrorCounter = 0;		// increaments on each error, channel16chFrameSyncErrorCounter / totalFrames * 100 = %
-
-uint32_t lostFrameCounter = 0;
-bool lostFrameDetected = false;
-unsigned long lostFrameStartMillis = 0;
-uint32_t lostFrameLongestMillis = 0;
-uint32_t lostFramesPercentage100Counter = 0;
-uint32_t lostFramesPercentage100Array[100] = { 0 };
-
-bool failSafeDetected = false;
-unsigned long failSafeStartMillis = 0;
+uint16_t			channels[16];																// SBUS Library updates this
+uint16_t			channelsPrevious[16];												// Stores channels from SBUS for analysis on next frame
+bool					lostFrame = false;													// SBUS Library updates this, true if a frame was lost (manufacturer may beautify this flag)
+bool					failSafe = false;														// SBUS Library updates this, true if a fail safe has occured (can be unreliable)
+byte					badFramesMonitoringType = 0;								// 1=8ch mode, 2=16ch mode wave 1-8, 3=16ch mode wave 9-16, 4=16ch mode wave 1-8 & 9-16
+uint32_t			badFramesPercentage100Counter = 0;					// Counter for the array
+uint32_t			badFramesPercentage100Array[100] = { 0 };		// Holds the result of good or bad for the last 100 frames
+byte					badFramesMonitoringChannel1 = 0;						// Channel found in channels 1-8 with a pre defined wave output that the code uses to check transmission quality
+byte					badFramesMonitoringChannel2 = 0;						// Channel found in channels 9-16 with a pre defined wave output that the code uses to check transmission quality
+uint32_t			channelsStartHoldMillis = 0 ;								// Stores millis() when hold is first detected 
+bool					channelHoldTriggered[3] = { false };				// Tracks current status of upto 2 wave channels (leave at [3] unless going to test all monitoring types)
+uint8_t				channelMaxHold100Counter = 0;								// Counter for the array
+uint32_t			channelsMaxHoldMillis100Arra[100] = { 0 };	// Holds the ms of a hold that ends on that frame, otherwise 0.
+bool					channel16chFrameSync = false;								// True if the 1-8ch frame is expected next
+bool					channel16chFrameSyncError = false;					// True if sync is incorrect or both frames change or both frames hold
+uint32_t			channel16chFrameSyncErrorCounter = 0;				// increaments on each error, channel16chFrameSyncErrorCounter / totalFrames * 100 = %
+uint32_t			lostFrameCounter = 0;												// Constantly increments on each lost frame as indicated by the Rx Flag
+bool					lostFrameDetected = false;									// True if the lost frame flag is set on the Rx
+unsigned long lostFrameStartMillis = 0;										// Stores millis() when lost frame flag on Rx is first set 
+uint32_t			lostFrameLongestMillis = 0;									// Stores the longest time is ms that the lost frame flag is set
+uint32_t			lostFramesPercentage100Counter = 0;					// Counter for the array
+uint32_t			lostFramesPercentage100Array[100] = { 0 };	// Holds the result of good or lost frame as indicated by Rx for the last 100 frames
+bool					failSafeDetected = false;										// True if the fail safe flag is set on the Rx
+unsigned long failSafeStartMillis = 0;										// Stores millis() when fail safe flag on Rx is first set 
+uint32_t			failSafeCounter = 0;												// Constantly increments on each fail safe as indicated by the Rx Flag
+uint32_t			failSafeLongestMillis = 0;									// Stores the longest time is ms that the fail safe flag is set
 
 
-//TODO - Add the Maximum Channels Held over last 100 frames 
 //TODO - Fix the wave values that are transmitted on telemetry
 //TODO - Add the Min / Max SBUS Refresh Rates over last 100 frames
 //TODO - Align Badframes with LQBB4 calculation -- testing !!
@@ -77,15 +66,16 @@ void rxLinkQuality_ActivateSBUS() {
 			- During start up sometimes Ch15 would have a value of 1187 for several frames
 			- During start up many frames or randomly for one frame during flights all channels may contain the following values
 					CH9 = 0, CH10 = 40, CH11 = 1496, CH12 = 64 (v1) or 72 (v2.1.0), CH13 102, CH14 = 82, CH15 1250, CH16 = 1920
-		Given that this can happen randomly "for one frame" we have to add a coutner when detecting 16ch mode.
+		Given that this can happen randomly "for one frame" we have to add a counter when detecting 16ch mode.
 		Other Rx were not tested
 	*/
-	
+
 	uint16_t maxWaitTime = MAX_WAIT_TIME_MS * 2;
 	while (counter < 300 && millis() - maxWaitTimeMillis < maxWaitTime) {
 		sbus.read(&channels[0], &failSafe, &lostFrame);
 		counter++;
 	}
+	// Given these only print once then we always allow.
 	Serial.print("SBUS Startup Cleared with "); Serial.print(counter); Serial.print(" reads");
 	Serial.print(" in (ms) "); Serial.println(millis() - maxWaitTimeMillis);
 }
@@ -94,9 +84,11 @@ void rxLinkQuality_ActivateSBUS() {
 // Main control loop to determine the Quality of the Rx SBUS signal
 void rxLinkQuality_Scan() {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
+
 		// Increase total frames received
 		totalFrames++;
 
+		// These are just for debugging purposes
 #if defined(REPORT_FS_LF_ERRORS) || defined(DEBUG_WAVE_CHANNEL_DATA)
 		if (failSafe) { Serial.print("millis():"); Serial.print(millis()); Serial.print("   failSafe = "); Serial.println(failSafe); }
 		if (lostFrame) { Serial.print("millis():"); Serial.print(millis()); Serial.print("   lostFrame = "); Serial.println(lostFrame); }
@@ -107,16 +99,17 @@ void rxLinkQuality_Scan() {
 #if defined(DEBUG_WAVE_CHANNEL_DATA)
 		debug_Wave_Data();
 #endif
-		
+
 		check_FailSafe();
+
 		calculate_LostFrames();
-		
+
 		// Call Frame Sync if in a 16ch mode
 		if (badFramesMonitoringType > 0) { sync_16chFrame(); }
-				
+
 		calculate_FrameHolds();
-		
-		calculate_BB_Bits();		// must run last because previous channels is updated
+
+		calculate_BB_Bits();
 
 		// Capture the current channel value for Telemetry
 		wave1 = channels[badFramesMonitoringChannel1 - 1];
@@ -129,17 +122,22 @@ void rxLinkQuality_Scan() {
 }
 
 
+
+
 // Internal Calls Only
 
 
 // Check the "real" lost frames by monitoring a wave form and chacking the data increases on each SBUS update
 // Also determines the correct Tx / Rx mode (8ch or 16ch)
 void calculate_BB_Bits() {
+	bool goodFrame = true;
+	uint16_t badFramesDifference = 0;
+	uint16_t MaxTriangleDiff = 0;
+
 #if defined(REPORT_CURRENT_BFP)	
 	uint16_t lastbadFramesPercentage100Result = badFramesPercentage100Result;
 #endif
 
-	uint16_t MaxTriangleDiff = 0;
 	// check we know the correct scan channel before attempting to scan
 	if (badFramesMonitoringType == 0) { find_WaveChannel_New(badFramesMonitoringChannel1, badFramesMonitoringChannel2, badFramesMonitoringType); }
 
@@ -150,7 +148,6 @@ void calculate_BB_Bits() {
 		badFramesMonitoringType == 4 - 16ch mode, wave on Ch1 - Ch16
 	*/
 
-	bool goodFrame = true;
 	// Did SBUS channel increase by more than an expected amount for 8 Channels
 	badFramesDifference = abs(channels[badFramesMonitoringChannel1 - 1] - channelsPrevious[badFramesMonitoringChannel1 - 1]);
 
@@ -162,7 +159,7 @@ void calculate_BB_Bits() {
 	// determine BB_Bit threshold based on BB Link Quality	
 	if (badFramesMonitoringType == 1) {														// 8ch mode.
 		//Serial.println("8ch Mode");
-		MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_1;												//  11
+		MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_1;												// 11
 		if (badFramesPercentage100Result < TRSHLD_8CH_1_CHNG) {			// <75			
 			MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_2;											// 9
 			if (badFramesPercentage100Result < TRSHLD_8CH_2_CHNG) {		// <50
@@ -173,15 +170,14 @@ void calculate_BB_Bits() {
 	else {																													// 16ch mode.
 		// determine BB_Bit threshold based on BB Link Quality						
 		//Serial.println("16ch Mode");
-		MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_1;												//  11
+		MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_1;												// 19
 		if (badFramesPercentage100Result < TRSHLD_16CH_1_CHNG) {			// <75			
-			MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_2;											// 9
+			MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_2;											// 18
 			if (badFramesPercentage100Result < TRSHLD_16CH_2_CHNG) {		// <50
-				MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_3;										// 9
+				MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_3;										// 17
 			}
 		}
 	}
-
 
 #if defined(REPORT_BAD_FRAME_ERRORS)	
 	Serial.println("Monitor Bad Frames");
@@ -189,13 +185,6 @@ void calculate_BB_Bits() {
 	Serial.print("badFramesDifference   "); Serial.println(badFramesDifference);
 	Serial.print("MaxTriangleDiff   "); Serial.println(MaxTriangleDiff);
 #endif
-
-
-	/*
-		MaxDiff has to be > 11 if badFramesPercentage100Result is >=75
-		MaxDiff has to be > 9 if badFramesPercentage100Result is <75
-		MaxDiff has to be > 9 if badFramesPercentage100Result is <50
-	*/
 	
 	if (badFramesMonitoringType == 1) {															// 8ch mode
 		if (badFramesDifference > MaxTriangleDiff) {
@@ -282,8 +271,10 @@ void calculate_BB_Bits() {
 
 // Calculate the longest FrameHold in every 100 frames
 // at least one channel should transmit the wave, check all 16 channels for movement.
-// TODO - Add 16ch modes
 void calculate_FrameHolds() {
+	uint16_t diff = millis() - channelsStartHoldMillis;
+	uint32_t channelsMaxHoldMillis = 0;
+
 	/*
 	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
 	badFramesMonitoringType == 2 - 16ch mode, 1 wave on Ch1 - Ch8
@@ -301,23 +292,17 @@ void calculate_FrameHolds() {
 	Serial.print("Checking Hold on 9-16? = "); Serial.println(channel16chFrameSync);
 #endif
 
-
 	// only run if the frames are in sync.
 	if (channel16chFrameSyncError == false) {
-		
-		Serial.print("channelHoldCounter = "); Serial.println(channelHoldCounter);
-		Serial.print("channelHoldTriggered = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
 
-		// check when in 16ch 1 wave mode we are scanning the correct channel with the wave
+		// check when in 16ch 1 wave mode we are scanning the correct channel with the wave, if not exit early due to sync error
 		if (badFramesMonitoringType == 2 && channel16chFrameSync == true) goto RETURN_EARLY;
 		if (badFramesMonitoringType == 3 && channel16chFrameSync == false) goto RETURN_EARLY;
 
-		// Scan all channels to see if anything has changed
-		// TODO - Use badFramesMonitoringType and channel16chFrameSync to just scan the correct channel !!
+		// Check if the wave channel(s) being monitored
 		bool held = true;
-		for (int ch = 0; ch < 16; ch++) {
-			if (channels[ch] != channelsPrevious[ch]) { held = false; }
-		}
+		if (badFramesMonitoringType <= 2 && channels[badFramesMonitoringChannel1 - 1] != channelsPrevious[badFramesMonitoringChannel1 - 1]) { held = false; }
+		if (badFramesMonitoringType >= 3 && channels[badFramesMonitoringChannel2 - 1] != channelsPrevious[badFramesMonitoringChannel2 - 1]) { held = false; }
 
 		// Detect a new hold
 		if (held == true && channelHoldTriggered[channel16chFrameSync] == false) {
@@ -330,30 +315,31 @@ void calculate_FrameHolds() {
 
 		// Detect when a hold ends
 		if (held == false && channelHoldTriggered[channel16chFrameSync] == true) {
-			uint16_t diff = millis() - channelsStartHoldMillis;
-			
-			if (badFramesMonitoringType == 1) { diff += 9; } else { diff += 18; } // add time before first missing frame detected.
+
+			if (badFramesMonitoringType == 1) { diff += 9; }
+			else { diff += 18; } // add time before first missing frame detected.
 			channelsMaxHoldMillis = diff;
-		
+
 #if defined(REPROT_CHANNEL_HOLD_DATA)
-			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms"); 
+			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms");
 #endif
 			channelHoldTriggered[channel16chFrameSync] = false;
 		}
 	}
 RETURN_EARLY:
 	// update the Telemetry value with the highest value of both frames
-	channelsMaxHoldMillis100Arra[channelHoldCounter] = channelsMaxHoldMillis;
+	channelsMaxHoldMillis100Arra[channelMaxHold100Counter] = channelsMaxHoldMillis;
 
-	channelHoldCounter++;
-	if (channelHoldCounter == 100) { channelHoldCounter = 0; }
+	// update the array counter
+	channelMaxHold100Counter++;
+	if (channelMaxHold100Counter == 100) { channelMaxHold100Counter = 0; }
 
 	// Find the highest value in the array
 	channelsMaxHoldMillis100Resul = 0;
 	for (int i = 0; i < 100; i++) {
 		if (channelsMaxHoldMillis100Arra[i] > channelsMaxHoldMillis100Resul) { channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
 	}
-	
+
 #if defined(REPROT_CHANNEL_HOLD_DATA)
 	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
@@ -475,7 +461,7 @@ void sync_16chFrame() {
 // Checks the Rx Lost Frame flag in the SBUS
 // Increments the counter, times it, and calculates result based on last 100 frames.
 void calculate_LostFrames() {
-	
+
 	// Detect new Rx reported Lost Frame
 	if (lostFrame == true && lostFrameDetected == false) {
 		lostFrameStartMillis = millis();
@@ -569,7 +555,7 @@ void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMoni
 	while (counter < 20 && millis() - maxWaitTimeMillis < MAX_WAIT_TIME_MS) {
 		delay(5);
 		if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
-			for (int ch = 8; ch < 16; ch++) { 
+			for (int ch = 8; ch < 16; ch++) {
 				if (channels[ch] > 0 && activity_16ch == false) { activity_16ch_Counter++; }		// First find increase the counter only
 				if (channels[ch] > 0 && activity_16ch_Counter > 10) { activity_16ch = true; }	// Second find consider true 16 channel mode is active
 				if (abs(channels[ch] - channelsPrevious[ch]) >= 12 && abs(channels[ch] - channelsPrevious[ch]) <= 20) {
@@ -636,7 +622,6 @@ void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMoni
 	if (badFramesMonitoringChannel1 != 0) { Serial.print("Wave Channel Found in Ch1-8: "); Serial.println(badFramesMonitoringChannel1); }
 	if (badFramesMonitoringChannel2 != 0) { Serial.print("Wave Channel Found in Ch9-16: "); Serial.println(badFramesMonitoringChannel2); }
 	if (badFramesMonitoringChannel1 == 0 && badFramesMonitoringChannel2 == 0) { Serial.println("Wave Channel not Found"); }
-
 }
 
 
