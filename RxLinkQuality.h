@@ -36,10 +36,6 @@
 extern uint16_t lostFramesPercentage100Result;
 extern uint16_t badFramesPercentage100Result;
 extern uint32_t totalFrames;
-extern byte			badFramesMonitoringChannel1;
-extern byte			badFramesMonitoringChannel2;
-extern uint32_t failSafeCounter;
-extern uint32_t failSafeLongestMillis;
 extern uint16_t wave1;																		// Used to pass current value to telemetry
 extern uint16_t wave2;																		// Used to pass current value to telemetry
 extern uint32_t channelsMaxHoldMillis100Resul;						// Stores max millis() for every 100 readings
