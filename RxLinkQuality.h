@@ -42,7 +42,7 @@ extern uint32_t failSafeCounter;
 extern uint32_t failSafeLongestMillis;
 extern uint16_t wave1;																		// Used to pass current value to telemetry
 extern uint16_t wave2;																		// Used to pass current value to telemetry
-extern uint32_t channelsMaxHoldMillis100Result[];					// Stores max millis() for every 100 readings
+extern uint32_t channelsMaxHoldMillis100Resul;						// Stores max millis() for every 100 readings
 extern float		channel16chFrameSyncSuccessRate;					// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
 
 // Public Functions
