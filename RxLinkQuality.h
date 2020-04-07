@@ -40,8 +40,8 @@ extern uint16_t wave1;																		// Used to pass current value to telemet
 extern uint16_t wave2;																		// Used to pass current value to telemetry
 extern uint32_t channelsMaxHoldMillis100Resul;						// Stores max millis() for every 100 readings
 extern float		channel16chFrameSyncSuccessRate;					// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-extern uint16_t	sbusFrameLowMillis;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
-extern uint16_t	sbusFrameHighMillis;										// Stores the SBUS highest time before next refresh over the last 100 frames
+extern uint16_t	sbusFrameLowMicros;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
+extern uint16_t	sbusFrameHighMicros;										// Stores the SBUS highest time before next refresh over the last 100 frames
 
 // Public Functions
 void rxLinkQuality_ActivateSBUS();

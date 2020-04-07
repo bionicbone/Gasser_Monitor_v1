@@ -61,13 +61,13 @@ void loop() {
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
 
-	// TODO - Add a long loop warning
+	if (lastLoopMicros > 9000) { Serial.print("Long Loop @ "); Serial.print(lastLoopMicros); Serial.print("ms"); }
 
 	// Format and Send the telemetry data using the FrSky S.Port solution
 		// Must be the last thing in the loop !!!
-	while (micros() < timeLoopMicros + 9000) {
+	//while (micros() < timeLoopMicros + 9000) {
 		telemetry_SendTelemetry();
-	}
+	//}
 	// *** !!! Place nothing else here !!! ***
 }
 
