@@ -102,8 +102,8 @@ void telemetry_SendTelemetry() {
 		wave2);											// Wave Form 2
 
 	rpm5.setData(999,														// ID 18 - Spare
-		sbusFrameLowMillis,												// SBUS Lowest Frame Rate in last 100 frames
-		sbusFrameHighMillis);											// SBUS Highest Frame Rate in last 100 frames
+		sbusFrameLowMicros,												// SBUS Lowest Frame Rate in last 100 frames
+		sbusFrameHighMicros);											// SBUS Highest Frame Rate in last 100 frames
 
 	// Set SP2UART sensor data
 	// (values from 0.0 to 3.3 are accepted)

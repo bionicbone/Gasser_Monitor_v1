@@ -15,8 +15,8 @@ uint16_t			wave1 = 0;																	// Used to pass current value to telemetry
 uint16_t			wave2 = 0;																	// Used to pass current value to telemetry
 uint32_t			channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
 float					channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-uint16_t			sbusFrameLowMillis = 0;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
-uint16_t			sbusFrameHighMillis = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
+uint16_t			sbusFrameLowMicros = 0;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
+uint16_t			sbusFrameHighMicros = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
 
 
 // Private Variables
@@ -47,8 +47,7 @@ unsigned long failSafeStartMillis = 0;										// Stores millis() when fail saf
 uint32_t			failSafeCounter = 0;												// Constantly increments on each fail safe as indicated by the Rx Flag
 uint32_t			failSafeLongestMillis = 0;									// Stores the longest time is ms that the fail safe flag is set
 unsigned long sbusFrameStartMicros = 0;										// Stores micros() when an SBUS frame is received, for calculting SBUS frame rate
-uint8_t				sbusFrame100Counter = 0;										// Counter for array
-uint16_t			sbusFrame100Array[100] = { 0 };							// Holds the time between each SBUS frame
+uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 
 
 
@@ -94,20 +93,24 @@ void rxLinkQuality_ActivateSBUS() {
 void rxLinkQuality_Scan() {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 
-		// Calculate the SBUS Frame Rate since last frame
-		sbusFrame100Array[sbusFrame100Counter] = micros() - sbusFrameStartMicros;
 		sbusFrame100Counter++;
-		if (sbusFrame100Counter == 100) { sbusFrame100Counter= 0; }
-		sbusFrameStartMicros = micros();
-
-		// Work out the lowest and highest value in the last 100 frames
-		sbusFrameLowMillis = 65535;
-		sbusFrameHighMillis = 0;
-		for (uint8_t i = 0; i < 100; i++) {
-			// TODO - COnsider a Long Loop and try to "not capture" or "erase" if we had a long loop
-			if (sbusFrame100Array[i] < sbusFrameLowMillis) { sbusFrameLowMillis = sbusFrame100Array[i]; }
-			if (sbusFrame100Array[i] > sbusFrameHighMillis) { sbusFrameHighMillis = sbusFrame100Array[i]; }
+		if (sbusFrame100Counter == 100) {
+			sbusFrame100Counter = 0;
+#if defined (REPROT_SBUS_FRAME_TIME)
+			Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
+			Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
+#endif
+			sbusFrameLowMicros = 9000;
+			sbusFrameHighMicros = 9000;
 		}
+
+		if (micros() - sbusFrameStartMicros < sbusFrameLowMicros) {
+			sbusFrameLowMicros = micros() - sbusFrameStartMicros;
+		}
+		if (micros() - sbusFrameStartMicros > sbusFrameHighMicros) {
+			sbusFrameHighMicros = micros() - sbusFrameStartMicros;
+		}
+		sbusFrameStartMicros = micros();
 
 		// Increase total frames received
 		totalFrames++;
