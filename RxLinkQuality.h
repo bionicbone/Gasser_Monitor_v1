@@ -45,13 +45,13 @@ extern uint16_t	sbusFrameHighMicros;										// Stores the SBUS highest time be
 
 // Public Functions
 void rxLinkQuality_ActivateSBUS();
-void rxLinkQuality_Scan();
+void rxLinkQuality_Scan(bool firstRun);
 
 
 // Private Functions
 void calculate_BB_Bits();
 void calculate_FrameHolds();
-void sync_16chFrame();
+void sync_16chFrame(bool firstRun);
 void calculate_LostFrames();
 void check_FailSafe();
 void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMonitoringChannel2, byte &badFramesMonitoringType);
