@@ -52,10 +52,8 @@ uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 
 
 // TODO - Fix the wave values that are transmitted on telemetry by increasing the Telemetery send rate to 100ms
-// TODO - Calculate the Min / Max SBUS Refresh Rates over last 100 frames 
 // TODO - Align Badframes with LQBB4 calculation -- testing !!
 // TODO - Add an overall SBUS quality indicator, i.e. SBUS refresh rate, SBUS channel holds, SBUS Frame Sync Errors etc into one formula in every 100 frames to detect "new Rx" not acting like X4RSB.
-// TODO - SBUS Frame rate needs to consider long loops
 
 
 // begin the SBUS communication
