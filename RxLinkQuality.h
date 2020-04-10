@@ -30,7 +30,12 @@
 #define MAX_TRIANGLE_DIFF_16CH_3  17      // for 50 <  badFramesPercentage100Result
 #define TRSHLD_16CH_1_CHNG        75
 #define TRSHLD_16CH_2_CHNG        50  
-#define MAX_16CH_ESTIMATED_BB_Bits 12			// over this the remainder will be added to the next frame
+#define MAX_16CH_ESTIMATED_BB_Bits 12			// over this the remainder will be added to the next frame in 16ch 1 wave mode.
+
+// these parameters are mainly to stop weird values on first starting up which effect charting the data
+#define SBUS_MIN_FRAME_RATE				4000		// If the SBUS frame is determined under this value it will be set to this
+#define SBUS_MAX_FRAME_RATE				24000		// If the SBUS frame is determined under this value it will be set to this
+#define SBUS_DEFAULT_FRAME_RATE		10000		// If below min or above max it will be set to this
 
 // Public Variables
 extern uint16_t lostFramesPercentage100Result;
@@ -57,3 +62,4 @@ void check_FailSafe();
 void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMonitoringChannel2, byte &badFramesMonitoringType);
 void debug_Data();
 void debug_Wave_Data();
+void sbus_FrameRate();
