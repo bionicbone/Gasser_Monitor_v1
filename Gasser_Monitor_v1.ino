@@ -18,8 +18,10 @@
 #include "RxLinkQuality.h"
 #include "RPM.h"
 
-unsigned long		timeLoopMicros;								// Used to remember micros() at the start of the main loop.
-unsigned long		lastLoopMicros;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us
+unsigned long		timeLoopMicros = 0;								// Used to remember micros() at the start of the main loop.
+unsigned long		lastLoopMicros = 0;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us
+uint16_t				firstRunCounter = 0;							// counts the first loops
+bool						firstRun = true;									// Resets to false when firstRunCounter hits its target
 
 
 void setup() {
@@ -28,7 +30,7 @@ void setup() {
 	delay(500);
 
 	// Start RPM for Engine and Clutch sensor monitoring
-	rpm_ActivateInterrupts(); 
+	rpm_ActivateInterrupts();
 
 	// Start the RX Link Quality monitoring
 	rxLinkQuality_ActivateSBUS();
@@ -39,6 +41,7 @@ void setup() {
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
 }
+
 
 
 void loop() {
@@ -55,20 +58,25 @@ void loop() {
 	// Calculate the Rx Quality Indicators
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
-	rxLinkQuality_Scan();
+	rxLinkQuality_Scan(firstRun);
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
 
-	if (lastLoopMicros > 9000) { Serial.print("Long Loop @ "); Serial.print(lastLoopMicros); Serial.print("ms"); }
+	if (firstRun == MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
+		Serial.print(millis()); Serial.print(": Long Loop @ "); Serial.print(lastLoopMicros); Serial.println("us");
+	}
 
 	// Format and Send the telemetry data using the FrSky S.Port solution
-		// Must be the last thing in the loop !!!
-	//while (micros() < timeLoopMicros + 9000) {
-		telemetry_SendTelemetry();
-	//}
+	telemetry_SendTelemetry();
+	// Deal with the first run that inhibits errors etc.
+	if (firstRunCounter < MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS) { 
+		firstRunCounter++; 
+		if (firstRunCounter == MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS) { firstRun = false; }
+	}
 	// *** !!! Place nothing else here !!! ***
+
 }
 
 

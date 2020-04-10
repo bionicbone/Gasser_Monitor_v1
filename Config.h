@@ -1,6 +1,22 @@
 #pragma once
 
 
+#ifndef _CONFIG_h
+#define _CONFIG_h
+
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
+
+#endif
+
+const uint16_t	MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS = 5000;		// Must do x loops before triggering any loop errors
+const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the Long Loop Error - May need to increase
+
+
 // DEVELOPER - Program debug options
 
 //#define REPORT_FS_LF_ERRORS																	// Activate to report Rx FailSafe and LostFrame Flags on USB Serial

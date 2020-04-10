@@ -93,7 +93,7 @@ void rxLinkQuality_ActivateSBUS() {
 
 
 // Main control loop to determine the Quality of the Rx SBUS signal
-void rxLinkQuality_Scan() {
+void rxLinkQuality_Scan(bool firstRun) {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 
 		// Capture current SBUS Frame Rate
@@ -119,7 +119,7 @@ void rxLinkQuality_Scan() {
 		calculate_LostFrames();
 
 		// Call Frame Sync if in a 16ch mode
-		if (badFramesMonitoringType > 0) { sync_16chFrame(); }
+		if (badFramesMonitoringType > 0) { sync_16chFrame(firstRun); }
 
 		calculate_FrameHolds();
 
@@ -361,7 +361,7 @@ RETURN_EARLY:
 
 
 // 16ch frame sync
-void sync_16chFrame() {
+void sync_16chFrame(bool firstRun) {
 	/*
 	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
 	badFramesMonitoringType == 2 - 16ch mode, 1 wave on Ch1 - Ch8
@@ -456,9 +456,9 @@ void sync_16chFrame() {
 		channel16chFrameSyncSuccessRate = 100 - (float)channel16chFrameSyncErrorCounter / totalFrames * 100;
 
 		// TEMP - Serial Print if the success rate is low
-		if (channel16chFrameSyncSuccessRate < 97.5) {
+		if (firstRun == false && channel16chFrameSyncSuccessRate < 97.5) {
 			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   REPORT_SBUS_16CH_FRAME_SYNC_DATA
-			Serial.print("Low Sync Frame Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
+			Serial.print("Low SBUS Frame Sync Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
 		}
 	}
 
