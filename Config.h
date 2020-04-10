@@ -25,8 +25,9 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 //#define REPORT_BAD_FRAME_ERRORS															// Activate to display the BB_Bits (calculated lost frames) on USB Serial
 //#define REPORT_CURRENT_BFP																	// Activate constent monitoring of BFP value on USB Serial
 //#define REPORT_SBUS_16CH_FRAME_SYNC_DATA										// Activate to display detailed SBUS Frame Sync information
-//#define REPROT_CHANNEL_HOLD_DATA														// Activate to display detailed SBUS Channel Hold information
-//#define REPROT_SBUS_FRAME_TIME															// Activate to display detailed SBUS Frame Timing information
+//#define REPORT_CHANNEL_HOLD_DATA														// Activate to display detailed SBUS Channel Hold information
+//#define REPORT_SBUS_FRAME_TIME															// Activate to display detailed SBUS Frame Timing information
+
 
 #if defined (REPORT_FS_LF_ERRORS)
 #error DONT FLASH WITH REPORT_FS_LF_ERRORS ACTIVATED
@@ -53,10 +54,10 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 #error DONT FLASH WITH REPORT_SBUS_16CH_FRAME_SYNC_DATA ACTIVATED
 #endif
 
-#if defined (REPROT_CHANNEL_HOLD_DATA)
-#error DONT FLASH WITH REPROT_CHANNEL_HOLD_DATA ACTIVATED
+#if defined (REPORT_CHANNEL_HOLD_DATA)
+#error DONT FLASH WITH REPORT_CHANNEL_HOLD_DATA ACTIVATED
 #endif
 
-#if defined (REPROT_SBUS_FRAME_TIME)
-#error DONT FLASH WITH REPROT_SBUS_FRAME_TIME ACTIVATED
+#if defined (REPORT_SBUS_FRAME_TIME)
+#warning DONT FLASH WITH REPORT_SBUS_FRAME_TIME ACTIVATED
 #endif

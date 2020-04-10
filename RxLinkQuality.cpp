@@ -46,6 +46,9 @@ bool					failSafeDetected = false;										// True if the fail safe flag is set
 unsigned long failSafeStartMillis = 0;										// Stores millis() when fail safe flag on Rx is first set 
 uint32_t			failSafeCounter = 0;												// Constantly increments on each fail safe as indicated by the Rx Flag
 uint32_t			failSafeLongestMillis = 0;									// Stores the longest time is ms that the fail safe flag is set
+uint16_t			sbusNormalRefreshRate = 0;									// SBUS normal refresh rate, based on average, used to reset SBUS frame rate analysis every 100 frames 
+uint16_t			sbusPreviousRefreshRate = 0;								// SBUS previous refresh rate, used to work out if we have successfully determined Normal Rate.
+bool					sbusFrameRateOK = false;										// true once SBUS Frame Rate is determined
 unsigned long sbusFrameStartMicros = 0;										// Stores micros() when an SBUS frame is received, for calculting SBUS frame rate
 uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 
@@ -73,10 +76,12 @@ void rxLinkQuality_ActivateSBUS() {
 		Other Rx were not tested
 	*/
 
-	uint16_t maxWaitTime = MAX_WAIT_TIME_MS * 2;
+	// Also useful for determining the SBUS Frame Refresh Rate
+
+	uint16_t maxWaitTime = MAX_WAIT_TIME_MS * 4;
 	while (counter < 300 && millis() - maxWaitTimeMillis < maxWaitTime) {
-		sbus.read(&channels[0], &failSafe, &lostFrame);
 		counter++;
+		sbus.read(&channels[0], &failSafe, &lostFrame);
 	}
 	// Given these only print once then we always allow.
 	Serial.print("SBUS Startup Cleared with "); Serial.print(counter); Serial.print(" reads");
@@ -91,24 +96,8 @@ void rxLinkQuality_ActivateSBUS() {
 void rxLinkQuality_Scan(bool firstRun) {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 
-		sbusFrame100Counter++;
-		if (sbusFrame100Counter == 100) {
-			sbusFrame100Counter = 0;
-#if defined (REPROT_SBUS_FRAME_TIME)
-			Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
-			Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
-#endif
-			sbusFrameLowMicros = 9000;
-			sbusFrameHighMicros = 9000;
-		}
-
-		if (micros() - sbusFrameStartMicros < sbusFrameLowMicros) {
-			sbusFrameLowMicros = micros() - sbusFrameStartMicros;
-		}
-		if (micros() - sbusFrameStartMicros > sbusFrameHighMicros) {
-			sbusFrameHighMicros = micros() - sbusFrameStartMicros;
-		}
-		sbusFrameStartMicros = micros();
+		// Capture current SBUS Frame Rate
+		sbus_FrameRate();
 
 		// Increase total frames received
 		totalFrames++;
@@ -307,7 +296,7 @@ void calculate_FrameHolds() {
 	badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
 	*/
 
-#if defined(REPROT_CHANNEL_HOLD_DATA)
+#if defined(REPORT_CHANNEL_HOLD_DATA)
 	Serial.println("Frame Holds Monitoring");
 	debug_Wave_Data();
 	Serial.print("FrameSyncError = "); Serial.println(channel16chFrameSyncError);
@@ -331,7 +320,7 @@ void calculate_FrameHolds() {
 
 		// Detect a new hold
 		if (held == true && channelHoldTriggered[channel16chFrameSync] == false) {
-#if defined(REPROT_CHANNEL_HOLD_DATA)
+#if defined(REPORT_CHANNEL_HOLD_DATA)
 			Serial.print("_____HoldTrigger = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
 #endif
 			channelHoldTriggered[channel16chFrameSync] = true;
@@ -345,7 +334,7 @@ void calculate_FrameHolds() {
 			else { diff += 18; } // add time before first missing frame detected.
 			channelsMaxHoldMillis = diff;
 
-#if defined(REPROT_CHANNEL_HOLD_DATA)
+#if defined(REPORT_CHANNEL_HOLD_DATA)
 			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms");
 #endif
 			channelHoldTriggered[channel16chFrameSync] = false;
@@ -365,7 +354,7 @@ RETURN_EARLY:
 		if (channelsMaxHoldMillis100Arra[i] > channelsMaxHoldMillis100Resul) { channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
 	}
 
-#if defined(REPROT_CHANNEL_HOLD_DATA)
+#if defined(REPORT_CHANNEL_HOLD_DATA)
 	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
 }
@@ -678,4 +667,44 @@ void debug_Data() {
 		Serial.print(" = "); Serial.println(channelsPrevious[ch] - channels[ch]);
 	}
 #endif
+}
+
+
+// Determines current SBUS frame Rate & updates sbusFrameLowMicros & sbusFrameHighMicros
+// Also sets sbusFrameRateOK = true once we have a fixed value
+void sbus_FrameRate() {
+	sbusFrame100Counter++;
+	if (sbusFrame100Counter == 100) {
+		sbusFrame100Counter = 0;
+
+#if defined (REPORT_SBUS_FRAME_TIME)
+		Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
+		Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
+		if (sbusFrameRateOK == false) {
+			sbusNormalRefreshRate = (sbusNormalRefreshRate + (sbusFrameLowMicros + ((sbusFrameHighMicros - sbusFrameLowMicros) / 2))) / 2;
+			if (sbusPreviousRefreshRate >= sbusNormalRefreshRate - 10 && sbusPreviousRefreshRate <= sbusNormalRefreshRate + 10) {
+				sbusFrameRateOK = true;
+				sbusNormalRefreshRate = int((sbusNormalRefreshRate + 50) / 100) * 100;
+			}
+		}
+		Serial.print("sbusFrameRateOK = "); Serial.print(sbusFrameRateOK); Serial.print("  :  sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
+#endif
+
+		sbusPreviousRefreshRate = sbusNormalRefreshRate;
+		sbusFrameLowMicros = sbusNormalRefreshRate;
+		sbusFrameHighMicros = sbusNormalRefreshRate;
+	}
+
+	if (micros() - sbusFrameStartMicros < sbusFrameLowMicros) {
+		sbusFrameLowMicros = micros() - sbusFrameStartMicros;
+		if (sbusFrameLowMicros < SBUS_MIN_FRAME_RATE) { sbusFrameLowMicros = SBUS_DEFAULT_FRAME_RATE; }
+	}
+	if (micros() - sbusFrameStartMicros > sbusFrameHighMicros) {
+		sbusFrameHighMicros = micros() - sbusFrameStartMicros;
+		if (sbusFrameHighMicros > SBUS_MAX_FRAME_RATE) { sbusFrameHighMicros = SBUS_DEFAULT_FRAME_RATE; }
+	}
+
+
+
+	sbusFrameStartMicros = micros();
 }
