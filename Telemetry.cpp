@@ -95,11 +95,11 @@ void telemetry_SendTelemetry() {
 	
 	rpm3.setData(error,													// ID 16 - Error Number, 0 = OK
 		error1,																		// Will contain the error data 1
-		channelsMaxHoldMillis100Resul);					// Longest Channel Hold in last 100 Frames
+		channelsMaxHoldMillis100Resul);						// Longest Channel Hold in last 100 Frames
 
-	rpm4.setData(999,							// ID 17 - Spare
-		wave1,											// Wave Form 1
-		wave2);											// Wave Form 2
+	rpm4.setData(999,														// ID 17 - Spare
+		overallE2EQuality,												// Overall End to End Quality Indicator (0-100)
+		wave2);																		// Wave Form 2
 
 	rpm5.setData(999,														// ID 18 - Spare
 		sbusFrameLowMicros,												// SBUS Lowest Frame Rate in last 100 frames
