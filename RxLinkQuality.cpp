@@ -17,6 +17,7 @@ uint32_t			channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for eve
 float					channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
 uint16_t			sbusFrameLowMicros = 0;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
 uint16_t			sbusFrameHighMicros = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
+int8_t				overallE2EQuality = 0;											// A complex calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
 
 
 // Private Variables
@@ -56,7 +57,6 @@ uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 
 // TODO - Fix the wave values that are transmitted on telemetry by increasing the Telemetery send rate to 100ms
 // TODO - Align Badframes with LQBB4 calculation -- testing !!
-// TODO - Add an overall SBUS quality indicator, i.e. SBUS refresh rate, SBUS channel holds, SBUS Frame Sync Errors etc into one formula in every 100 frames to detect "new Rx" not acting like X4RSB.
 
 
 // begin the SBUS communication
@@ -124,6 +124,8 @@ void rxLinkQuality_Scan(bool firstRun) {
 		calculate_FrameHolds();
 
 		calculate_BB_Bits();
+
+		calculate_Overall_EndToEnd_Quality();
 
 		// Capture the current channel value for Telemetry
 		wave1 = channels[badFramesMonitoringChannel1 - 1];
@@ -677,9 +679,6 @@ void sbus_FrameRate() {
 	if (sbusFrame100Counter == 100) {
 		sbusFrame100Counter = 0;
 
-#if defined (REPORT_SBUS_FRAME_TIME)
-		Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
-		Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
 		if (sbusFrameRateOK == false) {
 			sbusNormalRefreshRate = (sbusNormalRefreshRate + (sbusFrameLowMicros + ((sbusFrameHighMicros - sbusFrameLowMicros) / 2))) / 2;
 			if (sbusPreviousRefreshRate >= sbusNormalRefreshRate - 10 && sbusPreviousRefreshRate <= sbusNormalRefreshRate + 10) {
@@ -687,6 +686,10 @@ void sbus_FrameRate() {
 				sbusNormalRefreshRate = int((sbusNormalRefreshRate + 50) / 100) * 100;
 			}
 		}
+
+#if defined (REPORT_SBUS_FRAME_TIME)
+		Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
+		Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
 		Serial.print("sbusFrameRateOK = "); Serial.print(sbusFrameRateOK); Serial.print("  :  sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
 #endif
 
@@ -707,4 +710,65 @@ void sbus_FrameRate() {
 
 
 	sbusFrameStartMicros = micros();
+}
+
+
+// Calculate the End to End quality of the Tx Rx and Sbus
+void calculate_Overall_EndToEnd_Quality() {
+	overallE2EQuality = 100;
+	int16_t calc = 0;
+
+	// Reduce for the SBUS frame rate deviation
+	calc = (sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
+	if (calc < 0) calc = 0;
+	overallE2EQuality -= calc;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+	//Serial.print("sbusFrameHighMicros = "); Serial.println(sbusFrameHighMicros);
+	//Serial.print("sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
+	Serial.print("SBUS Frame Rate QI = "); Serial.println(calc);
+#endif
+
+	// Reduce for the Lost Frames %
+	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;
+	if (calc < 0) calc = 0;
+	overallE2EQuality -= calc;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+	//Serial.print("lostFramesPercentage100Result = "); Serial.println(lostFramesPercentage100Result);
+	Serial.print("lostFramesPercentage100Result QI = "); Serial.println(calc);
+#endif
+
+	// Reduce for the Bad Frames %
+	calc = (E2E_QI_BADFRAME_ALLOWED_MIN - badFramesPercentage100Result) * E2E_QI_BADFRAME_MULTIPLIER;
+	if (calc < 0) calc = 0;
+	overallE2EQuality -= calc;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+	//Serial.print("badFramesPercentage100Result = "); Serial.println(badFramesPercentage100Result);
+	Serial.print("badFramesPercentage100Result QI = "); Serial.println(calc);
+#endif
+
+	// Reduce for the 16ch SBUS Sync Success Rate %
+	if (badFramesMonitoringType > 1) {
+		calc = (E2E_QI_16CHSYNC_ALLOWED_MIN - channel16chFrameSyncSuccessRate) * E2E_QI_16CHSYNC_MULTIPLIER;
+		if (calc < 0) calc = 0;
+		overallE2EQuality -= calc;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+		//Serial.print("channel16chFrameSyncSuccessRate = "); Serial.println(channel16chFrameSyncSuccessRate);
+		Serial.print("channel16chFrameSyncSuccessRate QI = "); Serial.println(calc);
+#endif
+	}
+
+	// Reduce for the the frame Holds %
+	calc = channelsMaxHoldMillis100Resul - E2E_QI_FRAMEHOLD_ALLOWED_MAX;
+	if (calc < 0) calc = 0;
+	overallE2EQuality -= calc;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+	//Serial.print("channelsMaxHoldMillis100Resul = "); Serial.println(channelsMaxHoldMillis100Resul);
+	Serial.print("channelsMaxHoldMillis100Resul QI = "); Serial.println(calc);
+#endif
+
+	if (overallE2EQuality < 0 || failSafe == true) overallE2EQuality = 0;
+	if (overallE2EQuality > 100) overallE2EQuality = 100;
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+	Serial.print("overallE2EQuality = "); Serial.println(overallE2EQuality);
+#endif
 }

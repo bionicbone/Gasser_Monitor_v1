@@ -27,6 +27,7 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 //#define REPORT_SBUS_16CH_FRAME_SYNC_DATA										// Activate to display detailed SBUS Frame Sync information
 //#define REPORT_CHANNEL_HOLD_DATA														// Activate to display detailed SBUS Channel Hold information
 //#define REPORT_SBUS_FRAME_TIME															// Activate to display detailed SBUS Frame Timing information
+//#define REPORT_E2E_OVERALL_QUALITY													// Activate to display the individual results that make up the End to End QI  Value
 
 
 #if defined (REPORT_FS_LF_ERRORS)
@@ -59,5 +60,9 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 #endif
 
 #if defined (REPORT_SBUS_FRAME_TIME)
-#warning DONT FLASH WITH REPORT_SBUS_FRAME_TIME ACTIVATED
+#error DONT FLASH WITH REPORT_SBUS_FRAME_TIME ACTIVATED
+#endif
+
+#if defined (REPORT_E2E_OVERALL_QUALITY)
+#warning DONT FLASH WITH REPORT_SBUS_OVERALL_QUALITY ACTIVATED
 #endif
