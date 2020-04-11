@@ -110,12 +110,14 @@
     <ClInclude Include="RPM.h" />
     <ClInclude Include="RxLinkQuality.h" />
     <ClInclude Include="Telemetry.h" />
+    <ClInclude Include="Temperature.h" />
     <ClInclude Include="__vm\.Gasser_Monitor_v1.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RPM.cpp" />
     <ClCompile Include="RxLinkQuality.cpp" />
     <ClCompile Include="Telemetry.cpp" />
+    <ClCompile Include="Temperature.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
