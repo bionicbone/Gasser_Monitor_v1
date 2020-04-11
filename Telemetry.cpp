@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Telemetry.h"
+#include "Temperature.h"
 
 #include <FrSkySportDecoder.h>
 #include "FrSkySportSensor.h"
@@ -29,6 +30,7 @@ FrSkySportSensorRpm rpm2(FrSkySportSensor::ID15);       // Create RPM sensor wit
 FrSkySportSensorRpm rpm3(FrSkySportSensor::ID16);       // Create RPM sensor with given ID
 FrSkySportSensorRpm rpm4(FrSkySportSensor::ID17);       // Create RPM sensor with given ID
 FrSkySportSensorRpm rpm5(FrSkySportSensor::ID18);       // Create RPM sensor with given ID
+FrSkySportSensorRpm rpm6(FrSkySportSensor::ID19);       // Create RPM sensor with given ID
 FrSkySportSensorSp2uart sp2uart;												// Create SP2UART Type B sensor with default ID
 FrSkySportTelemetry telemetry;													// Create telemetry object without polling
 //FrSkySportSensorAss ass;                              // Create ASS sensor with default ID
@@ -47,9 +49,7 @@ FrSkySportTelemetry telemetry;													// Create telemetry object without po
 
 // TODO - Look at the LQBB4 way of transmitting data
 // TODO - Try changing the Telem send rates and Esc sensor https://www.rcgroups.com/forums/showpost.php?p=35507210&postcount=498
-// TODO - Review the RxLinkQuality variables to see if anything useful could be sent via telemetry
 // TODO - Activate cell1 and cell2 and remove temporary variable declarations below
-// TODO - Activate enginTemp and remove temporary variable declaration below
 // TODO - Activate error and error1 and remove temporary variable declarations below
 // TODO - Activate reg and bec and remove temporary variable declarations below
 // TODO - Tidy code and check comments
@@ -63,9 +63,6 @@ void telemetry_SendTelemetry() {
 	//that are being polled at given moment
 	float cell1 = 3.01;
 	float cell2 = 3.02;
-	//ambientTemp = 20;
-	//canopyTemp = 35;
-	int engineTemp = 999;
 	//mainRPMSensorDetectedRPM = 14500;
 	//clutchRPMSensorDetectedRPM = 14400;
 	//clutchFullyEngagedRPM = 8995;
@@ -90,7 +87,7 @@ void telemetry_SendTelemetry() {
 		badFramesPercentage100Result);						// Total SBUS Lost Frames
 
 	rpm2.setData(clutchRPMSensorDetectedRPM,		// ID 15 - Rotations per minute
-		engineTemp,																// Temperature #1 in degrees Celsuis (can be negative, will be rounded)
+		999,																	// SPARE
 		lostFramesPercentage100Result);						// Bad Frames Detected
 	
 	rpm3.setData(error,													// ID 16 - Error Number, 0 = OK
@@ -104,6 +101,10 @@ void telemetry_SendTelemetry() {
 	rpm5.setData(999,														// ID 18 - Spare
 		sbusFrameLowMicros,												// SBUS Lowest Frame Rate in last 100 frames
 		sbusFrameHighMicros);											// SBUS Highest Frame Rate in last 100 frames
+
+	rpm6.setData(ambientTemp,										// ID 19 - Ambient Temperature
+		canopyTemp,																// Canopy Temperature
+		engineTemp);															// Engine Temperature
 
 	// Set SP2UART sensor data
 	// (values from 0.0 to 3.3 are accepted)
@@ -141,7 +142,7 @@ void telemetry_ActivateTelemetry() {
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
-	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &rpm5, &sp2uart);
+	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &rpm5, &rpm6, &sp2uart);
 #else
 	//telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_12, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
 	telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_8, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);

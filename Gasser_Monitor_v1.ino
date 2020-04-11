@@ -11,6 +11,7 @@
 		Not for commercial use
 */
 
+#include "Temperature.h"
 #include "Config.h"
 #include <FrSkySportDecoder.h>
 #include "Telemetry.h"
@@ -27,6 +28,11 @@ bool						firstRun = true;									// Resets to false when firstRunCounter hits 
 void setup() {
 	// Start the USB serial for debugging
 	Serial.begin(115200);
+	
+	// Set analogue reference voltage to 3.3v
+	analogReference(DEFAULT);
+	analogReadResolution(12);
+	
 	delay(500);
 
 	// Start RPM for Engine and Clutch sensor monitoring
@@ -37,6 +43,9 @@ void setup() {
 
 	// Start the Telemetry Sensors
 	telemetry_ActivateTelemetry();
+
+	// Start the Temperature Readings
+	temperature_Setup();
 
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
@@ -59,6 +68,9 @@ void loop() {
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
 	rxLinkQuality_Scan(firstRun);
+
+	// read the temperatures (ambient/canopy/engine)
+	read_temperatures();
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data

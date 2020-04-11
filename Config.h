@@ -28,6 +28,7 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 //#define DEBUG_CHANNEL_HOLD_DATA															// Activate to display detailed SBUS Channel Hold information
 //#define DEBUG_SBUS_FRAME_TIME																// Activate to display detailed SBUS Frame Timing information
 //#define DEBUG_E2E_OVERALL_QUALITY														// Activate to display the individual results that make up the End to End QI  Value
+//#define DEBUG_LM35_TEMPERATURE_READINGS											// Activate to display LM35 Temperature information
 
 
 #if defined (DEBUG_FS_LF_ERRORS)
@@ -65,4 +66,8 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 #error DONT FLASH WITH REPORT_SBUS_OVERALL_QUALITY ACTIVATED
+#endif
+
+#if defined (DEBUG_LM35_TEMPERATURE_READINGS)
+#error DONT FLASH WITH DEBUG_LM35_TEMPERATURE_READINGS ACTIVATED
 #endif
