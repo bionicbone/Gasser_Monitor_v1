@@ -103,7 +103,7 @@ void rxLinkQuality_Scan(bool firstRun) {
 		totalFrames++;
 
 		// These are just for debugging purposes
-#if defined(REPORT_FS_LF_ERRORS) || defined(DEBUG_WAVE_CHANNEL_DATA)
+#if defined(DEBUG_FS_LF_ERRORS) || defined(DEBUG_WAVE_CHANNEL_DATA)
 		if (failSafe) { Serial.print("millis():"); Serial.print(millis()); Serial.print("   failSafe = "); Serial.println(failSafe); }
 		if (lostFrame) { Serial.print("millis():"); Serial.print(millis()); Serial.print("   lostFrame = "); Serial.println(lostFrame); }
 #endif
@@ -150,7 +150,7 @@ void calculate_BB_Bits() {
 	uint16_t badFramesDifference = 0;
 	uint16_t MaxTriangleDiff = 0;
 
-#if defined(REPORT_CURRENT_BFP)	
+#if defined(DEBUG_CURRENT_BFP)	
 	uint16_t lastbadFramesPercentage100Result = badFramesPercentage100Result;
 #endif
 
@@ -195,7 +195,7 @@ void calculate_BB_Bits() {
 		}
 	}
 
-#if defined(REPORT_BAD_FRAME_ERRORS)	
+#if defined(DEBUG_BAD_FRAME_ERRORS)	
 	Serial.println("Monitor Bad Frames");
 	debug_Wave_Data();
 	Serial.print("badFramesDifference   "); Serial.println(badFramesDifference);
@@ -206,7 +206,7 @@ void calculate_BB_Bits() {
 		if (badFramesDifference > MaxTriangleDiff) {
 			// calculate how many frames were skipped
 			uint16_t BB_Bits = badFramesDifference / MaxTriangleDiff;
-#if defined(REPORT_BAD_FRAME_ERRORS)		
+#if defined(DEBUG_BAD_FRAME_ERRORS)		
 			Serial.print(BB_Bits); Serial.println(" BB_Bits found (8ch mode)");
 #endif
 			// Add number of bad frames to the array
@@ -221,7 +221,7 @@ void calculate_BB_Bits() {
 			// Add number of bad frames to the array
 			if (badFramesMonitoringType == 4) {
 				badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits;				// Exact
-#if defined(REPORT_BAD_FRAME_ERRORS)		
+#if defined(DEBUG_BAD_FRAME_ERRORS)		
 				Serial.print(BB_Bits); Serial.println(" BB_Bits found (16ch mode - Exact)");
 #endif
 			}
@@ -233,7 +233,7 @@ void calculate_BB_Bits() {
 				else {
 					badFramesPercentage100Array[badFramesPercentage100Counter] = BB_Bits * 2;		// Estimate
 				}
-#if defined(REPORT_BAD_FRAME_ERRORS)		
+#if defined(DEBUG_BAD_FRAME_ERRORS)		
 				Serial.print(badFramesPercentage100Array[badFramesPercentage100Counter]); Serial.println(" BB_Bits found (16ch mode - *2 Estimated)");
 #endif
 			}
@@ -276,7 +276,7 @@ void calculate_BB_Bits() {
 	if (totalFrames >= 1000 && totalFrames < 2000 && badFramesMonitoringType != 3) { badFramesPercentage100Result = badFramesMonitoringChannel1; }
 	if (totalFrames >= 1500 && totalFrames < 2000 && badFramesMonitoringType == 4) { badFramesPercentage100Result = badFramesMonitoringChannel2; }
 
-#if defined(REPORT_CURRENT_BFP)		
+#if defined(DEBUG_CURRENT_BFP)		
 	if (badFramesPercentage100Result != lastbadFramesPercentage100Result) {
 		Serial.print("millis(): "); Serial.print(millis()); Serial.print("   ");
 		Serial.print("BFP: "); Serial.println(badFramesPercentage100Result);
@@ -298,7 +298,7 @@ void calculate_FrameHolds() {
 	badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
 	*/
 
-#if defined(REPORT_CHANNEL_HOLD_DATA)
+#if defined(DEBUG_CHANNEL_HOLD_DATA)
 	Serial.println("Frame Holds Monitoring");
 	debug_Wave_Data();
 	Serial.print("FrameSyncError = "); Serial.println(channel16chFrameSyncError);
@@ -322,7 +322,7 @@ void calculate_FrameHolds() {
 
 		// Detect a new hold
 		if (held == true && channelHoldTriggered[channel16chFrameSync] == false) {
-#if defined(REPORT_CHANNEL_HOLD_DATA)
+#if defined(DEBUG_CHANNEL_HOLD_DATA)
 			Serial.print("_____HoldTrigger = "); Serial.println(channelHoldTriggered[channel16chFrameSync]);
 #endif
 			channelHoldTriggered[channel16chFrameSync] = true;
@@ -336,7 +336,7 @@ void calculate_FrameHolds() {
 			else { diff += 18; } // add time before first missing frame detected.
 			channelsMaxHoldMillis = diff;
 
-#if defined(REPORT_CHANNEL_HOLD_DATA)
+#if defined(DEBUG_CHANNEL_HOLD_DATA)
 			Serial.print("_____Channel Hold Recovered "); Serial.print(diff); Serial.println("ms");
 #endif
 			channelHoldTriggered[channel16chFrameSync] = false;
@@ -356,7 +356,7 @@ RETURN_EARLY:
 		if (channelsMaxHoldMillis100Arra[i] > channelsMaxHoldMillis100Resul) { channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
 	}
 
-#if defined(REPORT_CHANNEL_HOLD_DATA)
+#if defined(DEBUG_CHANNEL_HOLD_DATA)
 	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
 }
@@ -371,7 +371,7 @@ void sync_16chFrame(bool firstRun) {
 	badFramesMonitoringType == 4 - 16ch mode, 2 waves, 1 on Ch1 - Ch8 and 1 on ch9 - Ch16
 	*/
 
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 	Serial.println("Start Frame Sync");
 	debug_Wave_Data();
 #endif
@@ -398,7 +398,7 @@ void sync_16chFrame(bool firstRun) {
 			// Set false because when both frames change more often than not the next update is on ch9-16 on X4R_LBT_2.1.0
 			channel16chFrameSync = false;
 
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 			Serial.println("Sync Error");
 #endif
 		}
@@ -410,7 +410,7 @@ void sync_16chFrame(bool firstRun) {
 			// When both frames are held then the next updated frame can be either on X4R_LBT_v2.1.0 so just leave current sequencing.
 			// However, to ensure frameHolds timing is calculated correctly then must keep the frames in sync.
 			channel16chFrameSync = !channel16chFrameSync;
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 			Serial.println("Sync Hold");
 #endif
 		}
@@ -424,12 +424,12 @@ void sync_16chFrame(bool firstRun) {
 				if (channel16chFrameSync == true) {
 					if (channelsPrevious[badFramesMonitoringChannel1 - 1] != channels[badFramesMonitoringChannel1 - 1]) {
 						channel16chFrameSync = false;  // expect 9-16ch next
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 						Serial.println("1-8ch OK");
 #endif
 					}
 					else {
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 						Serial.println("1-8ch Out of Sync");
 #endif
 						channel16chFrameSyncError = true;
@@ -440,12 +440,12 @@ void sync_16chFrame(bool firstRun) {
 				else {
 					if (channelsPrevious[badFramesMonitoringChannel2 - 1] != channels[badFramesMonitoringChannel2 - 1]) {
 						channel16chFrameSync = true;  // expect 1-8ch next
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 						Serial.println("9-16ch OK");
 #endif
 					}
 					else {
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 						Serial.println("9-16ch Out of Sync");
 #endif
 						channel16chFrameSyncError = true;
@@ -459,12 +459,12 @@ void sync_16chFrame(bool firstRun) {
 
 		// TEMP - Serial Print if the success rate is low
 		if (firstRun == false && channel16chFrameSyncSuccessRate < 97.5) {
-			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   REPORT_SBUS_16CH_FRAME_SYNC_DATA
+			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   DEBUG_SBUS_16CH_FRAME_SYNC_DATA
 			Serial.print("Low SBUS Frame Sync Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
 		}
 	}
 
-#if defined(REPORT_SBUS_16CH_FRAME_SYNC_DATA)
+#if defined(DEBUG_SBUS_16CH_FRAME_SYNC_DATA)
 	Serial.print("FrameSyncError? = "); Serial.println(channel16chFrameSyncError);
 	Serial.print("FrameSyncValue = "); Serial.println(channel16chFrameSync);
 	Serial.print("Next Frame expected on  1-8? = "); Serial.println(channel16chFrameSync);
@@ -483,7 +483,7 @@ void calculate_LostFrames() {
 		lostFrameStartMillis = millis();
 		lostFrameCounter++;
 
-#if defined(REPORT_FS_LF_ERRORS)
+#if defined(DEBUG_FS_LF_ERRORS)
 		Serial.println("");
 		Serial.print("lostFrames Reported = "); Serial.println(lostFrameCounter);
 		Serial.println("");
@@ -503,7 +503,7 @@ void calculate_LostFrames() {
 		uint32_t recoveryTime = millis() - lostFrameStartMillis;
 		if (recoveryTime > lostFrameLongestMillis)  lostFrameLongestMillis = recoveryTime;
 
-#if defined(REPORT_FS_LF_ERRORS)
+#if defined(DEBUG_FS_LF_ERRORS)
 		Serial.println("");
 		Serial.print("lostFrame Recovered = "); Serial.print(recoveryTime); Serial.println("ms");
 		Serial.println("");
@@ -534,7 +534,7 @@ void check_FailSafe() {
 	if (failSafe == true && failSafeDetected == false) {
 		failSafeStartMillis = millis();
 		failSafeCounter++;
-#if defined(REPORT_FS_LF_ERRORS)
+#if defined(DEBUG_FS_LF_ERRORS)
 		Serial.print("failSafes Detected = "); Serial.println(failSafeCounter);
 #endif
 		failSafeDetected = true;
@@ -544,7 +544,7 @@ void check_FailSafe() {
 	if (failSafe == false && failSafeDetected == true) {
 		uint32_t recoveryTime = millis() - failSafeStartMillis;
 		if (recoveryTime > failSafeLongestMillis)  failSafeLongestMillis = recoveryTime;
-#if defined(REPORT_FS_LF_ERRORS)
+#if defined(DEBUG_FS_LF_ERRORS)
 		Serial.print("FailSafe Recovered = "); Serial.print(recoveryTime); Serial.println("ms");
 #endif
 		failSafeDetected = false;
@@ -687,7 +687,7 @@ void sbus_FrameRate() {
 			}
 		}
 
-#if defined (REPORT_SBUS_FRAME_TIME)
+#if defined (DEBUG_SBUS_FRAME_TIME)
 		Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
 		Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
 		Serial.print("sbusFrameRateOK = "); Serial.print(sbusFrameRateOK); Serial.print("  :  sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
@@ -722,7 +722,7 @@ void calculate_Overall_EndToEnd_Quality() {
 	calc = (sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
 	if (calc < 0) calc = 0;
 	overallE2EQuality -= calc;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("sbusFrameHighMicros = "); Serial.println(sbusFrameHighMicros);
 	//Serial.print("sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
 	Serial.print("SBUS Frame Rate QI = "); Serial.println(calc);
@@ -732,7 +732,7 @@ void calculate_Overall_EndToEnd_Quality() {
 	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;
 	if (calc < 0) calc = 0;
 	overallE2EQuality -= calc;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("lostFramesPercentage100Result = "); Serial.println(lostFramesPercentage100Result);
 	Serial.print("lostFramesPercentage100Result QI = "); Serial.println(calc);
 #endif
@@ -741,7 +741,7 @@ void calculate_Overall_EndToEnd_Quality() {
 	calc = (E2E_QI_BADFRAME_ALLOWED_MIN - badFramesPercentage100Result) * E2E_QI_BADFRAME_MULTIPLIER;
 	if (calc < 0) calc = 0;
 	overallE2EQuality -= calc;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("badFramesPercentage100Result = "); Serial.println(badFramesPercentage100Result);
 	Serial.print("badFramesPercentage100Result QI = "); Serial.println(calc);
 #endif
@@ -751,7 +751,7 @@ void calculate_Overall_EndToEnd_Quality() {
 		calc = (E2E_QI_16CHSYNC_ALLOWED_MIN - channel16chFrameSyncSuccessRate) * E2E_QI_16CHSYNC_MULTIPLIER;
 		if (calc < 0) calc = 0;
 		overallE2EQuality -= calc;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 		//Serial.print("channel16chFrameSyncSuccessRate = "); Serial.println(channel16chFrameSyncSuccessRate);
 		Serial.print("channel16chFrameSyncSuccessRate QI = "); Serial.println(calc);
 #endif
@@ -761,14 +761,14 @@ void calculate_Overall_EndToEnd_Quality() {
 	calc = channelsMaxHoldMillis100Resul - E2E_QI_FRAMEHOLD_ALLOWED_MAX;
 	if (calc < 0) calc = 0;
 	overallE2EQuality -= calc;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("channelsMaxHoldMillis100Resul = "); Serial.println(channelsMaxHoldMillis100Resul);
 	Serial.print("channelsMaxHoldMillis100Resul QI = "); Serial.println(calc);
 #endif
 
 	if (overallE2EQuality < 0 || failSafe == true) overallE2EQuality = 0;
 	if (overallE2EQuality > 100) overallE2EQuality = 100;
-#if defined (REPORT_E2E_OVERALL_QUALITY)
+#if defined (DEBUG_E2E_OVERALL_QUALITY)
 	Serial.print("overallE2EQuality = "); Serial.println(overallE2EQuality);
 #endif
 }
