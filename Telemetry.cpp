@@ -99,7 +99,7 @@ void telemetry_SendTelemetry() {
 
 	rpm4.setData(999,														// ID 17 - Spare
 		overallE2EQuality,												// Overall End to End Quality Indicator (0-100)
-		wave2);																		// Wave Form 2
+		wave1);																		// Wave Form 1
 
 	rpm5.setData(999,														// ID 18 - Spare
 		sbusFrameLowMicros,												// SBUS Lowest Frame Rate in last 100 frames
