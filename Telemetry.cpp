@@ -1,6 +1,8 @@
-// 
-// 
-// 
+/*
+		Uses FrSky S-Port Telemetry library 
+		(c) Pawelsky (RcGroups)
+		Not for commercial use !!
+*/
 
 #include "Config.h"
 #include "Telemetry.h"
