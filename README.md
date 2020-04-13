@@ -52,7 +52,7 @@ All sensors are at different levels of development:-
  For more information see the WiKi    https://github.com/bionicbone/Gasser_Monitor_v1/wiki
 
 **Acknowledgements:**
-* Pawelsky - For the FrSky telemetry library (can be downloaded from here https://www.rcgroups.com/forums/showthread.php?2245978-FrSky-S-Port-telemetry-library-easy-to-use-and-configurable&perpage=1)
+* Pawelsky - For the FrSky telemetry library (can be downloaded from here https://www.rcgroups.com/forums/showthread.php?2245978-FrSky-S-Port-telemetry-library-easy-to-use-and-configurable&perpage=1 - not bungled with this due to licencing issues)
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library (arduino library)
 * @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
 
