@@ -59,7 +59,7 @@ All sensors are at different levels of development:-
 **Licencing:** 
 * Licencing requirements of any code used under Acknowledgements section should be considered
 * My licencing requirements do not allow profit from commercial use of this software without permission in writing from myself.
-* My licencing does allow people to build and supply the sensors including pre-flashed Teensy for a small profit to allow others to benefit from this software.
+* My licencing does allow people to build and supply the sensors for a small profit to allow others to benefit from this software, the Teensy must not be supplied pre-flashed for profit as this breaks Pawelsky's licencing.
 
 **Disclaimer:** 
 
