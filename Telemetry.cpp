@@ -119,13 +119,13 @@ void updateValue(byte sensorNumber) {
 		}
 		break;
 	case 3:														// 5103 - SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames
-		if (badFramesPercentage100Result != frSkyTeensySensors.SensorValue[sensorNumber]) {
+		if ((uint32_t)badFramesPercentage100Result != frSkyTeensySensors.SensorValue[sensorNumber]) {
 			frSkyTeensySensors.SensorValue[sensorNumber] = badFramesPercentage100Result;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 4:														// 5104 - SBUS - End to End Quality as calculated from SBUS data @bionicbone method in last 100 frames
-		if (overallE2EQuality != frSkyTeensySensors.SensorValue[sensorNumber]) {
+		if ((uint32_t)overallE2EQuality != frSkyTeensySensors.SensorValue[sensorNumber]) {
 			frSkyTeensySensors.SensorValue[sensorNumber] = overallE2EQuality;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
@@ -143,20 +143,20 @@ void updateValue(byte sensorNumber) {
 		}
 		break;
 	case 7:														// 5107 - Temperature - Ambient
-		if (ambientTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = ambientTemp;
+		if ((uint32_t)ambientTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)ambientTemp;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 8:														// 5108 - Temperature - Canopy
-		if (canopyTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = canopyTemp;
+		if ((uint32_t)canopyTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)canopyTemp;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 9:														// 5109 - Temperature - Engine
-		if (engineTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = engineTemp;
+		if ((uint32_t)engineTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)engineTemp;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
