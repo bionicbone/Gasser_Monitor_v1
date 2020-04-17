@@ -54,7 +54,7 @@ SensorID | ist | Name | Description
 -------- | ----| -----| -----------
 5100 | 19 | ERR | Error - Info / Error Number(see error page)
 5101 | 19 | ErrD | Error - Info / Error Extra(see error page)
-5102 | 19 | TFC | SBUS - Total SBUS Frames Received(*1000)
+5102 | 19 | TFCK | SBUS - Total SBUS Frames Received(*1000)
 5103 | 19 | BFP | SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames.To add a comparison for those using Reinhard LQBB sensor
 5104 | 19 | E2EQ | SBUS - End to End Quality as calculated from SBUS data @bionicbone method in last 100 frames
 5105 | 19 | MAIN | RPM - Main Engine RPM
