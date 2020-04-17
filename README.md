@@ -52,14 +52,12 @@ All sensors are at different levels of development:-
  For more information see the WiKi    https://github.com/bionicbone/Gasser_Monitor_v1/wiki
 
 **Acknowledgements:**
-* Pawelsky - For the FrSky telemetry library (can be downloaded from here https://www.rcgroups.com/forums/showthread.php?2245978-FrSky-S-Port-telemetry-library-easy-to-use-and-configurable&perpage=1 - not bungled with this due to licencing issues)
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library (arduino library)
 * @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
 
 **Licencing:** 
-* Licencing requirements of any code used under Acknowledgements section should be considered
-* My licencing requirements do not allow profit from commercial use of this software without permission in writing from myself.
-* My licencing does allow people to build and supply the sensors for a small profit to allow others to benefit from this software, the Teensy must not be supplied pre-flashed for profit as this breaks Pawelsky's licencing.
+* My licencing requirements do not allow commercial use of this software without permission in writing from myself. By means of clarity this includes anyone using this software or specific hardware sensor design for any activity where there will be a financial or other reward whether that results in a financial profit or not.
+* My licencing does allow people to make a "small profit" by helping other RC hobbyists, this includes pre-flashing a Teensy, building and suppling sensors and even fully fitting to an RC model. By means of clarity "small profit" is deemed to be not more than $35 overall profit for services provided to any individual RC Hobbyist.
 
 **Disclaimer:** 
 
