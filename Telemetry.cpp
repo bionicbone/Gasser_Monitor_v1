@@ -49,6 +49,43 @@ Stream* sportFlusher;											// Must flush to write otherwise we crash!!
 #error "Unsupported processor! 5V 16MHz Arduino ProMini, Nano or Teensy v3.2 required";
 #endif
 
+/*
+SensorID | ist | Name | Description
+-------- | ----| -----| -----------
+5100 | 19 | ERR | Error - Info / Error Number(see error page)
+5101 | 19 | ErrD | Error - Info / Error Extra(see error page)
+5102 | 19 | TFC | SBUS - Total SBUS Frames Received(*1000)
+5103 | 19 | BFP | SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames.To add a comparison for those using Reinhard LQBB sensor
+5104 | 19 | E2EQ | SBUS - End to End Quality as calculated from SBUS data @bionicbone method in last 100 frames
+5105 | 19 | MAIN | RPM - Main Engine RPM
+5106 | 19 | CLUT | RPM - Clutch RPM
+5107 | 19 | AmbT | Temperature - Ambient
+5108 | 19 | CanT | Temperature - Canopy
+5109 | 19 | EngT | Temperature - Engine
+510A | 19  |      | Not Used
+510B | 19  |      | Not Used
+510C | 19  |      | Not Used
+510D | 19  |      | Not Used
+510E | 19  |      | Not Used
+510F | 19  |      | Not Used
+5110 | 19  |      | Not Used
+5111 | 19  |      | Not Used
+5112 | 19  |      | Not Used
+5113 | 19  |      | Not Used
+5114 | 19  |      | Not Used
+5115 | 19  |      | Not Used
+5116 | 19  |      | Not Used
+5117 | 19  |      | Not Used
+5118 | 19  |      | Not Used
+5119 | 19  |      | TEST DATA
+511A | 19  |      | TEST DATA
+511B | 19  |      | TEST DATA
+511C | 19  |      | TEST DATA
+511D | 19  |      | TEST DATA
+511E | 19  |      | TEST DATA
+511F | 19  |      | TEST DATA
+*/
+
 // Active Sensors and current value store
 // Each sensor only has one value, LUA will set the types (RPM, Voltage, Amps, Temperature etc) and rename the sensors on discovery
 // Each active sensor adds 24ms to the refresh rate, thus
