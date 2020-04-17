@@ -1,15 +1,33 @@
-/*
+		/*
     Name:       Gasser_Monitor_v1.ino
     Created:		15/03/2020 16:19:35
     Author:     (c) Kevin Guest - AKA The Bionicbone on RCGroups.
 		Decription:	Migrating code from the Gasser Charger Module and placing into cpp & h files.
-*/
+		Use:				No Commercial Activities
 
-/*
-		FrSky S-Port Telemetry library example
-		(c) Pawelsky 20180402
-		Not for commercial use
-*/
+		Licensing GPL & note the following:
+		My licencing requirements do not allow commercial use of this software without permission in writing from myself.
+			By means of clarity this includes anyone using this software or specific hardware sensor design for any activity
+			where there will be a financial or other reward whether that results in a financial profit or not.
+		My licencing does allow people to make a "small profit" by helping other RC hobbyists, this includes pre-flashing a Teensy,
+		building and suppling sensors and even fully fitting to an RC model.
+			By means of clarity "small profit" is deemed to be not more than $35 overall profit for services provided to any individual RC Hobbyist.
+		Where misalignments occure between the above and the GPL attached then you should seek further clarification for myself
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+		*/
+
 
 #include "Temperature.h"
 #include "Config.h"
