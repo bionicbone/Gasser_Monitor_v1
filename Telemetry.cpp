@@ -241,16 +241,10 @@ void telemetry_ActivateTelemetry() {
 
 void telemetry_SendTelemetry() {
 	// Read SPort bytes
-	byte val = 0;
+
 	while (sport.available()) {
+		byte val = 0;
 		val = sport.read();
-		
-		// get the next active sensor number
-		nextSensorNumber = lastSensorNumber + 1; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
-		while (frSkyTeensySensors.SensorActive[nextSensorNumber] == false) {
-			nextSensorNumber++; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
-		}
-		updateValue(nextSensorNumber);
 		NewValueSport(val);             //Pass it to the SPort handler
 	}
 }
@@ -270,6 +264,15 @@ void NewValueSport(byte val) {
 
 		if (physicalID == SENSOR_PHYSICAL_ID) {
 			//Needs my data so send it 
+
+			// get the next active sensor number
+			nextSensorNumber = lastSensorNumber + 1; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+			while (frSkyTeensySensors.SensorActive[nextSensorNumber] == false) {
+				nextSensorNumber++; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+			}
+			updateValue(nextSensorNumber);
+
+
 			sendFrame();
 		}
 	}
