@@ -1,152 +1,338 @@
+/*-------------------------------------------------------------------------------
+ * While almost redesigned the concept for this Telemetry code was taken 
+ * from the FrameLost Sensor by Tadango.
+ * The FrameLost Sensor was redesigned by Reinhard to make the LQBB sensor.
+ *-------------------------------------------------------------------------------*/
+
 /*
-		Uses FrSky S-Port Telemetry library 
-		(c) Pawelsky (RcGroups)
-		Not for commercial use !!
-*/
+TODO List:-
+	- add sensor timing to allow "key sensors" to be sent more often than others
+	- calculate "no data" skips timer based on number of sensors rather than hard code max 5 "SensorDataSkip"
+	- tidy code, check flow etc.
+*/ 
 
-#include "Config.h"
-#include "Telemetry.h"
-#include "Temperature.h"
 
-#include <FrSkySportDecoder.h>
-#include "FrSkySportSensor.h"
-#include "FrSkySportSensorFlvss.h"
-#include "FrSkySportSensorRpm.h"
-#include "FrSkySportSensorSp2uart.h"
-#include "FrSkySportSingleWireSerial.h"
-#include "FrSkySportTelemetry.h"
-#if !defined(__MK20DX128__) && !defined(__MK20DX256__) && !defined(__MKL26Z64__) && !defined(__MK66FX1M0__) && !defined(__MK64FX512__)
-#include "SoftwareSerial.h"
+
+ #include "Config.h"
+ #include "Telemetry.h"
+ #include "Temperature.h"
+
+
+#define SPORT_START 0x7E
+#define SPORT_HEADER_DATA 0x10								// Data frame
+#define SENSOR_PHYSICAL_ID 0x12								// (0xF2 on SPort Bus)
+#define SPORT_HEADER_NODATA 0x00							// Signal no refresh required
+
+bool			physIDnext = false;									// flag
+uint16_t	sportCRC = 0;												// S.PORT CRC calculation
+byte			lastSensorNumber = -1;							// Increaments after each sensor transmits, steps through sensor array
+byte			nextSensorNumber = 0;								// Used to calculate the next sesnor number at the begining of send sensor process
+unsigned long	lastSensorMillis = millis();		// Used to calcualte the sensor refresh rate
+unsigned long	sensorRefreshRate = 0;					// Sensor refresh rate
+
+// Helper for long / byte conversion
+typedef union {
+	char byteValue[4];
+	long longValue;
+} longHelper;
+
+ // Required for Teensy V3.2 or v4.0 support
+#if defined (__MK20DX256__)								// Teensy v3.2
+#define SPORT 10													// Digital Teensy Serial2 pin for SPort (bidirectional mode)
+volatile uint8_t *uartSingleTxRx = 0;	// Controls the Single Wire mode (Tx / Rx), 8 bit for Teensy v3.2, 32 bit for Teensy v4.0
+Stream* sportFlusher;											// Must flush to write otherwise we crash!!
+#elif defined(__IMXRT1062__)							// Teensy v4.0
+#define SPORT 10													// Digital Teensy Serial2 pin for SPort (bidirectional mode)
+volatile uint32_t *uartSingleTxRx = NULL;	// Controls the Single Wire mode (Tx / Rx), 8 bit for Teensy v3.2, 32 bit for Teensy v4.0
+Stream* sportFlusher;											// Must flush to write otherwise we crash!!
+#else
+#error "Unsupported processor! 5V 16MHz Arduino ProMini, Nano or Teensy v3.2 required";
 #endif
-//#include <FrSkySportPolling.h>
-//#include "FrSkySportSensorAss.h"
-//#include "FrSkySportSensorFcs.h"
-//#include "FrSkySportSensorGps.h"
-//#include "FrSkySportSensorVario.h"
 
-
-// Config
-FrSkySportSensorFlvss flvss1;														// Create FLVSS sensor with default ID
-FrSkySportSensorRpm rpm;																// Create RPM sensor with default ID of 5
-FrSkySportSensorRpm rpm2(FrSkySportSensor::ID15);       // Create RPM sensor with given ID
-FrSkySportSensorRpm rpm3(FrSkySportSensor::ID16);       // Create RPM sensor with given ID
-FrSkySportSensorRpm rpm4(FrSkySportSensor::ID17);       // Create RPM sensor with given ID
-FrSkySportSensorRpm rpm5(FrSkySportSensor::ID18);       // Create RPM sensor with given ID
-FrSkySportSensorRpm rpm6(FrSkySportSensor::ID19);       // Create RPM sensor with given ID
-FrSkySportSensorSp2uart sp2uart;												// Create SP2UART Type B sensor with default ID
-FrSkySportTelemetry telemetry;													// Create telemetry object without polling
-//FrSkySportSensorAss ass;                              // Create ASS sensor with default ID
-//FrSkySportSensorFcs fcs;                              // Create FCS-40A sensor with default ID (use ID8 for FCS-150A)
-//FrSkySportSensorFlvss flvss2(FrSkySportSensor::ID15); // Create FLVSS sensor with given ID
-//FrSkySportSensorGps gps;                              // Create GPS sensor with default ID
-//FrSkySportSensorVario vario;                          // Create Variometer sensor with default ID
-
-
-// Public Variables
+// Active Sensors and current value store
+// Each sensor only has one value, LUA will set the types (RPM, Voltage, Amps, Temperature etc) and rename the sensors on discovery
+// Each active sensor adds 24ms to the refresh rate, thus
+// one sensor active the refresh rate will be 24ms, with all 32 sensors active the refresh rate will be 768ms
+// *** Maintain void updateValue(byte sensorNumber) when new sensors are added ***
+struct frSkyTeensySensorArray {
+	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  true,   true,   true,   true,   true,   true,   true };
+	uint32_t	SensorID[32]			= { 0x5100, 0x5101, 0x5102, 0x5103, 0x5104, 0x5105, 0x5106, 0x5107, 0x5108, 0x5109, 0x510A, 0x510B, 0x510C, 0x510D, 0x510E, 0x510F, 0x5110, 0x5111, 0x5112, 0x5113, 0x5114, 0x5115, 0x5116, 0x5117, 0x5118, 0x5119, 0x511A, 0x511B, 0x511C, 0x511D, 0x511E, 0x511F };
+	uint32_t	SensorValue[32]		= { 0 };
+	bool			SensorDataChanged[32] = { {false} };
+	byte			SensorDataSkip[32] = { 0 };						// Used to ensure each sensor sends regular updates even if the data does not change
+};
+frSkyTeensySensorArray frSkyTeensySensors;
+const byte SENSOR_ARRAY_SIZE = sizeof(frSkyTeensySensors.SensorID) / sizeof(frSkyTeensySensors.SensorID[0]);
 
 
 
-// Private Variables
-
-
-// TODO - Look at the LQBB4 way of transmitting data
-// TODO - Try changing the Telem send rates and Esc sensor https://www.rcgroups.com/forums/showpost.php?p=35507210&postcount=498
-// TODO - Activate cell1 and cell2 and remove temporary variable declarations below
-// TODO - Activate error and error1 and remove temporary variable declarations below
-// TODO - Activate reg and bec and remove temporary variable declarations below
-// TODO - Tidy code and check comments
-
-
-void telemetry_SendTelemetry() {
-	// Procedure will populate the telemetry control and then call the send data routine
-	// Several controls are not used and are commented out to save memory / timing.
-
-	//Send the telemetry data, note that the data will only be sent for sensors
-	//that are being polled at given moment
-	float cell1 = 3.01;
-	float cell2 = 3.02;
-	//mainRPMSensorDetectedRPM = 14500;
-	//clutchRPMSensorDetectedRPM = 14400;
-	//clutchFullyEngagedRPM = 8995;
-	//clutchFullyEngaged = true;
-	int error = 99;
-	int error1 = 998;
-	float reg = 28.1;
-	float bec = 6.9;
-
-	// Set LiPo voltage sensor (FLVSS) data (we use two sensors to simulate 8S battery 
-	// (set Voltage source to Cells in menu to use this data for battery voltage)
-	// (each cell must be above 0.5v to be counted)
-	// (set any cell to 0.01 to stop transmission)
-	flvss1.setData(cell1, cell2, 0.00, 0.00, 0.00, 0.00);  // Cell voltages in volts (cells 1-6)
-	//flvss2.setData(4.13, 4.14);                          // Cell voltages in volts (cells 7-8) - Not Used
-
-	// Set RPM/temperature sensor data
-	// (set number of blades to 2 in telemetry menu to get correct rpm value)
+//		 Updates the values in the Sensor Array
+// *** Must be maintained when new sensors are added ***
+void updateValue(byte sensorNumber) {
 	uint32_t totalFrames1K = totalFrames / 1000;
-	rpm.setData(mainRPMSensorDetectedRPM,				// ID5 - Rotations per minute
-		totalFrames1K,														// Total SBUS Frames / 1000
-		badFramesPercentage100Result);						// Total SBUS Lost Frames
+	switch (sensorNumber) {
+	case 0:														// 5100 - Error - Last Error Number, 0 if none, 99 if paused
+		break;
+	case 1:														// 5101 - Error - Additional Information
+		break;
+	case 2:														// 5102 - SBUS - Total Frames / 1000
+		if (totalFrames1K != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = totalFrames1K;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 3:														// 5103 - SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames
+		if (badFramesPercentage100Result != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = badFramesPercentage100Result;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 4:														// 5104 - SBUS - End to End Quality as calculated from SBUS data @bionicbone method in last 100 frames
+		if (overallE2EQuality != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = overallE2EQuality;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 5:														// 5105 RPM - Main Engine RPM
+		if (mainRPMSensorDetectedRPM != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = mainRPMSensorDetectedRPM;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 6:														// 5106 - RPM - Clutch RPM
+		if (clutchRPMSensorDetectedRPM != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = clutchRPMSensorDetectedRPM;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 7:														// 5107 - Temperature - Ambient
+		if (ambientTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = ambientTemp;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 8:														// 5108 - Temperature - Canopy
+		if (canopyTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = canopyTemp;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 9:														// 5109 - Temperature - Engine
+		if (engineTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = engineTemp;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 10:													// 510A - Use Next
+		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
 
-	rpm2.setData(clutchRPMSensorDetectedRPM,		// ID 15 - Rotations per minute
-		999,																	// SPARE
-		lostFramesPercentage100Result);						// Bad Frames Detected
-	
-	rpm3.setData(error,													// ID 16 - Error Number, 0 = OK
-		error1,																		// Will contain the error data 1
-		channelsMaxHoldMillis100Resul);						// Longest Channel Hold in last 100 Frames
 
-	rpm4.setData(999,														// ID 17 - Spare
-		overallE2EQuality,												// Overall End to End Quality Indicator (0-100)
-		wave1);																		// Wave Form 1
-
-	rpm5.setData(999,														// ID 18 - Spare
-		sbusFrameLowMicros,												// SBUS Lowest Frame Rate in last 100 frames
-		sbusFrameHighMicros);											// SBUS Highest Frame Rate in last 100 frames
-
-	rpm6.setData(ambientTemp,										// ID 19 - Ambient Temperature
-		canopyTemp,																// Canopy Temperature
-		engineTemp);															// Engine Temperature
-
-	// Set SP2UART sensor data
-	// (values from 0.0 to 3.3 are accepted)
-	sp2uart.setData(reg,	// ADC3 voltage in volts
-		bec);	// ADC4 voltage in volts
-
-// Set variometer data
-// (set Variometer source to VSpd in menu to use the vertical speed data from this sensor for variometer).
-//vario.setData(250.5,  // Altitude in meters (can be negative)
-//              -1.5);  // Vertical speed in m/s (positive - up, negative - down)
-
-// Set airspeed sensor (ASS) data
-//ass.setData(76.5);	// Airspeed in km/h
-
-// Set current/voltage sensor (FCS) data
-// (set Voltage source to FAS in menu to use this data for battery voltage,
-//  set Current source to FAS in menu to use this data for current readins)
-//fcs.setData(25.3,		// Current consumption in amps
-//            12.6);	// Battery voltage in volts
-
-// Set GPS data
-//gps.setData(48.858289, 2.294502,  // Latitude and longitude in degrees decimal (positive for N/E, negative for S/W)
-//            245.5,                // Altitude in m (can be negative)
-//            100.0,                // Speed in m/s
-//            90.23,                // Course over ground in degrees (0-359, 0 = north)
-//            14, 9, 14,            // Date (year - 2000, month, day)
-//            12, 00, 00);          // Time (hour, minute, second) - will be affected by timezone setings in your radio
-	telemetry.send();
+	// 25 onwards used for temporary testing values
+	case 25:														// 5119 - TEST DATA - SBUS Lost Frames as reported by Rx in last 100 frames
+		if (lostFramesPercentage100Result != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = lostFramesPercentage100Result;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 26:														// 511A - TEST DATA - SBUS Longest frame hold as calculated from SBUS data @bionicbone method in last 100 frames
+		if (channelsMaxHoldMillis100Resul != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = channelsMaxHoldMillis100Resul;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 27:														// 511B - TEST DATA - SBUS Wave
+		if (wave1 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = wave1;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 28:														// 511C - TEST DATA - SBUS low Refresh Rate over last 100 frames
+		if (sbusFrameLowMicros != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = sbusFrameLowMicros;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 29:														// 511D - TEST DATA - SBUS high Refresh Rate over last 100 frames
+		if (sbusFrameHighMicros != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = sbusFrameHighMicros;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 30:														// 511E - TEST DATA - 
+		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 31:														// 511F - TEST DATA -
+		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	}
 }
 
 
+
 void telemetry_ActivateTelemetry() {
-	// The full range of possible FrSky telemetry is not required so a new line has been added, uncommented original for reference.
-	// Configure the telemetry serial port and sensors (remember to use & to specify a pointer to sensor)
-#if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MKL26Z64__) || defined(__MK66FX1M0__) || defined(__MK64FX512__)
-	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
-	//telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
-	telemetry.begin(FrSkySportSingleWireSerial::SERIAL_2, &flvss1, &rpm, &rpm2, &rpm3, &rpm4, &rpm5, &rpm6, &sp2uart);
-#else
-	//telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_12, &ass, &fcs, &flvss1, &flvss2, &gps, &rpm, &sp2uart, &vario);
-	telemetry.begin(FrSkySportSingleWireSerial::SOFT_SERIAL_PIN_8, &flvss1, &rpm, &rpm2, &rpm3, &sp2uart);
+	//Sport UART 8N1 57K6
+#if defined (__AVR_ATmega328P__)
+	sport.begin(57600);
+#elif defined (__MK20DX256__)
+#define sport Serial2
+	sportFlusher = &Serial2;
+	sport.begin(57600, SERIAL_8N1_RXINV_TXINV);
+	// Teensy Serial2 needs to be single wire Tx/Rx
+	uartSingleTxRx = &UART1_C3;
+	UART1_C1 |= (UART_C1_LOOPS | UART_C1_RSRC);
+#elif defined (__IMXRT1062__)
+#define sport Serial2
+	sportFlusher = &Serial2;
+	sport.begin(57600, SERIAL_8N1_RXINV_TXINV);
+	// Teensy Serial2 needs to be single wire Tx/Rx
+	uartSingleTxRx = &LPUART4_CTRL;
+	LPUART4_CTRL |= (LPUART_CTRL_LOOPS | LPUART_CTRL_RSRC);
+	IOMUXC_LPUART4_TX_SELECT_INPUT = 2;
 #endif
+}
+
+
+void telemetry_SendTelemetry() {
+	// Read SPort bytes
+	byte val = 0;
+	while (sport.available()) {
+		val = sport.read();
+		
+		// get the next active sensor number
+		nextSensorNumber = lastSensorNumber + 1; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+		while (frSkyTeensySensors.SensorActive[nextSensorNumber] == false) {
+			nextSensorNumber++; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+		}
+		updateValue(nextSensorNumber);
+		NewValueSport(val);             //Pass it to the SPort handler
+	}
+}
+
+
+void NewValueSport(byte val) {
+	byte physicalID;
+
+	if (val == SPORT_START) {
+		// next byte is physical ID
+		physIDnext = true;
+	}
+	else if (physIDnext) {
+		//Get physical id without CRC bits
+		physicalID = val & 0x1F;
+		physIDnext = false;
+
+		if (physicalID == SENSOR_PHYSICAL_ID) {
+			//Needs my data so send it 
+			sendFrame();
+		}
+	}
+}
+
+
+void sendByte(byte b) {
+	if (b == 0x7E)
+	{
+		sport.write(0x7D);
+		sport.write(0x5E);
+		sportCRC += b; sportCRC += sportCRC >> 8; sportCRC &= 0x00ff;
+	}
+	else if (b == 0x7D)
+	{
+		sport.write(0x7D);
+		sport.write(0x5D);
+		sportCRC += b; sportCRC += sportCRC >> 8; sportCRC &= 0x00ff;
+	}
+	else
+	{
+		sport.write(b);
+		sportCRC += b; sportCRC += sportCRC >> 8; sportCRC &= 0x00ff;
+	}
+}
+
+
+void sendFrame() {
+
+	longHelper lh;
+	byte frame[8];
+	sportCRC = 0;
+
+#if defined (__AVR_ATmega328P__)
+	pinMode(SPORT, OUTPUT);
+	delay(1);  //Wait for output to be available
+#elif defined (__MK20DX256__)
+	//Teensy Serial2 Tx Mode
+	*uartSingleTxRx |= UART_C3_TXDIR;
+#elif defined (__IMXRT1062__)
+	//Teensy v4.0 Serial2 Tx Mode
+	*uartSingleTxRx |= LPUART_CTRL_TXDIR;
+#endif
+
+
+	if (nextSensorNumber == 0) {
+		sensorRefreshRate = millis() - lastSensorMillis;
+		Serial.print("Sensor Refresh Rate "); Serial.print(sensorRefreshRate); Serial.println("ms");
+		lastSensorMillis = millis();
+		Serial.println(nextSensorNumber);
+	}
+
+	// If data has changed or long time since last data send an update, otherwise signal data not changed
+	if (frSkyTeensySensors.SensorDataChanged[nextSensorNumber] || frSkyTeensySensors.SensorDataSkip[nextSensorNumber] > 5) {
+		// prepare data frame for an update
+		frame[0] = SPORT_HEADER_DATA;
+		// Get the next SensorID from the sensor array
+		frame[1] = lowByte(frSkyTeensySensors.SensorID[nextSensorNumber]);
+		frame[2] = highByte(frSkyTeensySensors.SensorID[nextSensorNumber]);
+		// Get the 32Bit value from the sensor array
+		lh.longValue = frSkyTeensySensors.SensorValue[nextSensorNumber];
+		frame[3] = lh.byteValue[0];
+		frame[4] = lh.byteValue[1];
+		frame[5] = lh.byteValue[2];
+		frame[6] = lh.byteValue[3];
+		// Data will be transmitted so reset the data changed flag
+		frSkyTeensySensors.SensorDataChanged[nextSensorNumber] = false;
+	}
+	else {
+		// prepare data frame for no data update signal
+		// Use with caution !! 
+		//		- this can cause "sensor loss" warnings on values that do not update regularily
+		//    - this will casue sensors not to be discovered
+		frame[0] = SPORT_HEADER_NODATA;
+		frame[1] = 0x00;
+		frame[2] = 0x00;
+		frame[3] = 0x00;
+		frame[4] = 0x00;
+		frame[5] = 0x00;
+		frame[6] = 0x00;
+		frSkyTeensySensors.SensorDataSkip[nextSensorNumber]++;
+	}
+
+	//Send the frame
+	for (short i = 0; i < 8; i++) {
+		frame[7] = 0xFF - sportCRC;  // Keep re-calculating CRC as we send each each byte
+		sendByte(frame[i]);
+	}
+
+	lastSensorNumber = nextSensorNumber;
+
+	//Switch back to input
+#if defined (__AVR_ATmega328P__)
+	pinMode(SPORT, INPUT);
+#elif defined (__MK20DX256__)
+	sportFlusher->flush();
+	//Teensy v3.2 Serial2 Rx Mode
+	*uartSingleTxRx &= ~UART_C3_TXDIR;
+#elif defined (__IMXRT1062__)
+//Teensy v4.0 Serial2 Rx Mode
+	*uartSingleTxRx &= ~LPUART_CTRL_TXDIR;
+#endif  
 }
