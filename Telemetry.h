@@ -11,16 +11,17 @@
 	#include "WProgram.h"
 #endif
 
-
 #endif
+
 
 // Links to "extern" variables
 #include "RPM.h"
 #include "RxLinkQuality.h"
 
 
-// Public Variables
 
+// Public Variables
+// none
 
 
 // Public Functions
@@ -29,3 +30,8 @@ void telemetry_SendTelemetry();
 
 
 // Private Functions
+void NewValueSport(byte val);
+void sendByte(byte b);
+void sendFrame();
+void updateValue(byte sensorNumber);
+
