@@ -29,6 +29,7 @@
 		*/
 
 
+#include "Power.h"
 #include "Temperature.h"
 #include "Config.h"
 #include "Telemetry.h"
@@ -46,7 +47,8 @@ void setup() {
 	// Start the USB serial for debugging
 	Serial.begin(115200);
 	
-	// Set analogue reference voltage to 3.3v
+	// Set analogue reference voltage to 3.3v with 12 bit resolution
+	// ** DO NOT ALTER **
 	analogReference(DEFAULT);
 	analogReadResolution(12);
 	
@@ -63,6 +65,9 @@ void setup() {
 
 	// Start the Temperature Readings
 	temperature_Setup();
+
+	// Start the Power (Volts / Current) readings
+	power_Setup();
 
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());

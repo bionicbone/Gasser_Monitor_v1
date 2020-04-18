@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Power.h" />
     <ClInclude Include="RPM.h" />
     <ClInclude Include="RxLinkQuality.h" />
     <ClInclude Include="Telemetry.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="__vm\.Gasser_Monitor_v1.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Power.cpp" />
     <ClCompile Include="RPM.cpp" />
     <ClCompile Include="RxLinkQuality.cpp" />
     <ClCompile Include="Telemetry.cpp" />
