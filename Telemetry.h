@@ -11,7 +11,7 @@
 	#include "WProgram.h"
 #endif
 
-#endif
+
 
 
 // Links to "extern" variables
@@ -21,7 +21,9 @@
 
 
 // Public Variables
-// none
+extern float					cell[6];										// Final cell voltage store
+extern unsigned long	sensorRefreshRate;					// Sensor refresh rate
+extern unsigned long	FLVSSRefreshRate;						// Sensor refresh rate
 
 
 // Public Functions
@@ -30,8 +32,10 @@ void telemetry_SendTelemetry();
 
 
 // Private Functions
-void NewValueSport(byte val);
+void updateValue(byte sensorNumber);
+void sendValueData(byte val);
 void sendByte(byte b);
 void sendFrame();
-void updateValue(byte sensorNumber);
+void getFLVSSdata();
 
+#endif

@@ -31,7 +31,6 @@
 
 #include "Temperature.h"
 #include "Config.h"
-#include <FrSkySportDecoder.h>
 #include "Telemetry.h"
 #include <SBUS.h>
 #include "RxLinkQuality.h"
