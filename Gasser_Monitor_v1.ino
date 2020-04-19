@@ -29,6 +29,7 @@
 		*/
 
 
+#include "ErrorHandling.h"
 #include "Power.h"
 #include "Temperature.h"
 #include "Config.h"
@@ -69,6 +70,9 @@ void setup() {
 	// Start the Power (Volts / Current) readings
 	power_Setup();
 
+	// Start the Error Handling Processes
+	errorHandling_Setup();
+
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
 }
@@ -93,6 +97,9 @@ void loop() {
 
 	// read the temperatures (ambient/canopy/engine)
 	read_temperatures();
+
+	// check for errors and report
+	errorHandling_checkErrors();
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
