@@ -29,6 +29,7 @@
 		*/
 
 
+#include "ErrorHandling.h"
 #include "Power.h"
 #include "Temperature.h"
 #include "Config.h"
