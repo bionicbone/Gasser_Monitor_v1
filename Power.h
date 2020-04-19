@@ -15,10 +15,13 @@ const int PIN_REGULATOR_VOLTAGE = A2;				// Analog
 const int PIN_BEC_VOLTAGE = A3;							// Analog
 
 // Public Variables
+extern float	reg, bec;											// Regulator and BEC voltages
+extern float	dischargeTotalMAH;						// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 
 
 // Public Functions
 void power_Setup();
+
 
 // Private Functions
 void read_chargeVoltages();

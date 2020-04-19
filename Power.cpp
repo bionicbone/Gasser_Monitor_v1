@@ -16,16 +16,16 @@ const float		amps_offfset_ASC714_Calibration = 0.006862;	// ASC714 offset to 0 A
 
 
 // Public Variables
+float					reg, bec;													// Regulator and BEC voltages
+float					dischargeTotalMAH = 0;						// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 
 
 // Private Variables
-float					reg, bec;													// Regulator and BEC voltages
 float					avgReg, avgBec;										// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
 int						chargeReadings = 0;								// Number of Regulator and BEC voltage readings for calculating the average
 unsigned long dischargeLoopTimeMs = 0;					// The last discharge timer value in MS
 unsigned long dischargeStoreTimeMs = millis();	// Sets to millis() each time the MAH has been calculated
 float					dischargeLoopMAH = 0.00;					// The last MAH used during the loop
-float					dischargeTotalMAH = 0;						// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 float					dischargeLoopAmps = 0.00;
 
 
