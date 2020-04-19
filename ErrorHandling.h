@@ -10,5 +10,21 @@
 #endif
 
 
+// Config
+const byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
+
+
+// Public Variables
+
+
+// Public Functions
+void errorHandling_Setup();
+void errorHandling_checkErrors();
+void errorHandling_errorLEDsOn(bool status);
+
+
+// Private Functions
+
+
 #endif
 
