@@ -69,9 +69,12 @@ TODO List:-
 #define SPORT_HEADER_NODATA 0x00							// Signal no refresh required
 #define SENSOR_FLVSS_ID 0xA1									// (0xA1 on SPort Bus)
 #define SENSOR_FLVSS_DECODE_DELAY 680					// 680 allows a 708ms decode of the FLVSS data while ensuring the encoding rates of the telemetry data is not impacted
+constexpr auto SMOOTH_MULTIPLIER = 0.25;			// used to smooth the cell value, 0.1 maxmum smoothing and 0.1 minimum smoothing
+constexpr auto SMOOTH_OVER_RIDE = 0.3;				// Over rides the smooth function and follow new value istantly if the change is more than this
 
 // Public Variables
 float					cell[6] = { 0 };								// Final cell voltage store
+float cellSmoothed[6] = { 0 };								// Final cell voltage after smoothing
 unsigned long	sensorRefreshRate = 0;					// Sensor refresh rate
 unsigned long	FLVSSRefreshRate = 0;						// Sensor refresh rate
 
@@ -456,15 +459,20 @@ void getFLVSSdata() {
 				// Work out each cell value using 12 bits.
 				// This got me the value appears to be multiplied by 500
 				cell[frameStartCell] = (value & 0x0FFF) / 500.0;
+				smoothFLVXXdata(frameStartCell);
 				value >>= 12; // loose 12 bits
 				cell[frameStartCell + 1] = (value & 0x0FFF) / 500.0;
+				smoothFLVXXdata(frameStartCell + 1);
+				
 				//  TODO - I've not done anything with the CRC at this point data[7] !! 
 				FLVSSRefreshRate = millis() - lastFLVSSMillis; lastFLVSSMillis = millis();
 
+				if (frameStartCell == 2) { Serial.print(cell[frameStartCell]); Serial.print(", "); Serial.println(cellSmoothed[frameStartCell]); }
+
 #if defined (DEBUG_FLVSS_CALCULATION) 
 				Serial.print("frameStartCell "); Serial.println(frameStartCell, HEX);
-				Serial.print("cell "); Serial.print(frameStartCell); Serial.print(" = "); Serial.println(cell[frameStartCell]);
-				Serial.print("cell "); Serial.print(frameStartCell + 1); Serial.print(" = "); Serial.println(cell[frameStartCell + 1]);
+				Serial.print("cell "); Serial.print(frameStartCell); Serial.print(" = "); Serial.print(cell[frameStartCell]); Serial.print(" & smoothed = "); Serial.println(cellSmoothed[frameStartCell]);
+				Serial.print("cell "); Serial.print(frameStartCell + 1); Serial.print(" = "); Serial.print(cell[frameStartCell + 1]); Serial.print(" & smoothed = "); Serial.println(cellSmoothed[frameStartCell + 1]);
 				Serial.print("FLVSS Refresh Rate "); Serial.print(FLVSSRefreshRate); Serial.println("ms");
 #endif
 #if defined (DEBUG_TELEMETRY_REFRESH_RATES)
@@ -472,6 +480,19 @@ void getFLVSSdata() {
 #endif
 			}
 		}
+	}
+}
+
+
+void smoothFLVXXdata(byte cellArrayNumber) {
+	// Initialize the smoothing on first run or if the voltage change is high then just follow it.
+	// After bench testing 0.3 seems a fair compromise, but it may need to be higher once flight testing starts. 
+	if (abs(cell[cellArrayNumber] - cellSmoothed[cellArrayNumber]) > SMOOTH_OVER_RIDE)
+	{
+		cellSmoothed[cellArrayNumber] = cell[cellArrayNumber];
+	}
+	else {
+		cellSmoothed[cellArrayNumber] += (cell[cellArrayNumber] - cellSmoothed[cellArrayNumber]) * SMOOTH_MULTIPLIER;
 	}
 }
 

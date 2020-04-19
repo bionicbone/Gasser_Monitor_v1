@@ -37,5 +37,6 @@ void sendValueData(byte val);
 void sendByte(byte b);
 void sendFrame();
 void getFLVSSdata();
+void smoothFLVXXdata(byte cellArrayNumber);
 
 #endif
