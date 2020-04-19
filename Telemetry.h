@@ -21,7 +21,8 @@
 
 
 // Public Variables
-extern float					cell[6];										// Final cell voltage store
+extern float				 cell[6];											// Final cell voltage store
+extern float cellSmoothed[6];											// Final cell voltage after smoothing
 extern unsigned long	sensorRefreshRate;					// Sensor refresh rate
 extern unsigned long	FLVSSRefreshRate;						// Sensor refresh rate
 

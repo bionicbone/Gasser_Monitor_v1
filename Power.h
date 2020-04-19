@@ -1,5 +1,7 @@
 // Power.h
 
+#pragma once
+
 #ifndef _POWER_h
 #define _POWER_h
 
