@@ -10,15 +10,15 @@
 byte status = 0;  // 0=off, 1=charge, 2=discharge, 3=pluse discharge
 unsigned long storedDataTimer = millis();  // millis(), every 30 seconds write data to array.
 unsigned long this_dischargeStoreTimeMs = millis();	// Sets to millis() each time the MAH has been calculated
-float this_dischargeLoopMAH = 0.00;					// The last MAH used during the loop
-float this_dischargeTotalMAH = 0.00;					// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+//float this_dischargeLoopMAH = 0.00;					// The last MAH used during the loop
+// this_dischargeTotalMAH = 0.00;					// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 int aCounter = 0;						// Array Counter for the next reading, incremented just before adding new value.
 unsigned long startOfTestTimer;			// millis() at the start of the test.
 float stabilityVoltageDelta = 0.0000;	// voltage change during stability reporting loop
 int stabiltyCount = 0;
 constexpr auto REPORT_TIMER = 10000;			// default report time, in  millis(), 30000 = 30 seconds
-constexpr auto PULSE_TIMER = 500;					//	default pulse time, in millis(), 1000 = 1 second
-
+constexpr auto PULSE_TIMER = 2000;					//	default pulse time, in millis(), 1000 = 1 second
+byte tCounter = 0;												// Stability Counter
 
 void chargingTestOnly_Setup() {
 	pinMode(PIN_CHARGE_RELAY, OUTPUT);
@@ -48,14 +48,27 @@ void chargingTestOnly_Setup() {
 	Serial.print("Amps,");
 	Serial.print("Cycle mAh,");
 	Serial.print("BEC Ouptut Voltage,");
-	Serial.println("BAT Input Voltage,");
-
+	Serial.print("BAT Input Voltage,");
+	Serial.println("Stability Counter");
 	startOfTestTimer = millis();
 }
 
 
 void chargingTestOnly_Control() {
-	chargeBattery();
+	
+/*
+		I need to test a 5 main routines next in this order
+		stabiliseVoltages(100, 0.0040, true);			// good stabilty (needs to be 100 @ 0.0040 with FLVSS data smoothed at 0.25)
+		stabiliseVoltages(40, 0.0040, true);			// reasonable stability
+		pulseDischargeReading(5, PULSE_TIMER, 1);		// 0=PD with Good Stab, 1=PD with reasonable Stab, 2=PULSE_TIMER*5, 3=1 Sec 
+		discharge_mAh(100);
+		stabiliseVoltages(40, 0.0012, true);			// reasonable stability (with old cell read reoutines)
+		chargeBattery();
+*/
+	discharge_mAh(100);
+	digitalWrite(PIN_DISCHARGE_RELAY, HIGH);
+	read_Amps_ASC714();
+	delay(300);
 }
 
 
@@ -65,7 +78,7 @@ void chargeBattery() {
 		storedDataTimer = millis();
 
 		// If we think we have charged more than 1900mAH then stop the charge
-		if (this_dischargeTotalMAH > 1900) {
+		if (dischargeTotalMAH > 1900) {
 			storeDataInArrays(10);
 			break;
 		}
@@ -119,18 +132,18 @@ void discharge_mAh(float mAh) {
 		// battery capacity.
 		// this takes into account that the pulse discharge
 		// effects the remaining capacity.
-		thismAh = mAh - (((this_dischargeTotalMAH / mAh) - int(this_dischargeTotalMAH / mAh)) * mAh);
+		thismAh = mAh - (((dischargeTotalMAH / mAh) - int(dischargeTotalMAH / mAh)) * mAh);
 
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
 			read_temperatures();
 			read_Amps_ASC714();
 			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-			thisDischargeMAH += this_dischargeLoopMAH;
+			thisDischargeMAH += dischargeLoopMAH;
 			//Serial.println(thisDischargeMAH);
 			// delayLowVoltageCounterOnStartUp allows battery to stabilise at start of a discharge
 			// otherwise it can be detected as a flat battery way before its actaully flat
-			if ((cellSmoothed[0] <= 3.0 || cellSmoothed[1] <= 3.0 || cellSmoothed[2] <=3.0) && delayLowVoltageCounterOnStartUp >= 10) {
+			if ((cellSmoothed[0] <= 3.0 || cellSmoothed[1] <= 3.0) && delayLowVoltageCounterOnStartUp >= 10) {
 				lowVoltage = true;
 				break;
 			}
@@ -160,22 +173,22 @@ void discharge_mAh(float mAh) {
 void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 	float sCell1 = 0.0000;
 	float sCell2 = 0.0000;
-	float sCell3 = 0.0000;
+	//float sCell3 = 0.0000;
 	float dCell1 = 0.0000;
 	float dCell2 = 0.0000;
-	float dCell3 = 0.0000;
+	//float dCell3 = 0.0000;
 	float fCell1 = 0.0000;
 	float fCell2 = 0.0000;
-	float fCell3 = 0.0000;
+	//float fCell3 = 0.0000;
 
 	for (int i = 0; i < attempts; i++) {
 		stabiltyCount = PULSE_TIMER;
 		stabilityVoltageDelta = 0.0000;
 		if (stabilise == 0) {
-			stabiliseVoltages(100, 0.0009, true);
+			stabiliseVoltages(100, 0.0040, true);
 		}
 		else if (stabilise == 1) {
-			stabiliseVoltages(40, 0.0012, true);
+			stabiliseVoltages(40, 0.0040, true);
 		}
 		else if (stabilise == 2) {
 			delay(milliseconds * 5);
@@ -190,8 +203,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		storedDataTimer = millis();
 		sCell1 = cellSmoothed[0];
 		sCell2 = cellSmoothed[1];
-		sCell3 = cellSmoothed[3];
-		stabilityVoltageDelta = (cellSmoothed[0] + cellSmoothed[1] + cellSmoothed[2]) - (sCell1 + sCell2 + sCell3);
+		stabilityVoltageDelta = (cellSmoothed[0] + cellSmoothed[1]) - (sCell1 + sCell2);
 		stabiltyCount = PULSE_TIMER;
 		storeDataInArrays(5);
 		//Serial.print("Cell1: start "); Serial.println(sCell1);
@@ -212,8 +224,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		storedDataTimer = millis();
 		dCell1 = cellSmoothed[0];
 		dCell2 = cellSmoothed[1];
-		dCell3 = cellSmoothed[2];
-		stabilityVoltageDelta = (dCell1 + dCell2 + dCell3) - (sCell1 + sCell2 + sCell3);
+		stabilityVoltageDelta = (dCell1 + dCell2) - (sCell1 + sCell2);
 		stabiltyCount = PULSE_TIMER;
 		storeDataInArrays(6);
 		// Stop the discharge
@@ -235,8 +246,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		storedDataTimer = millis();
 		fCell1 = cellSmoothed[0];
 		fCell2 = cellSmoothed[1];
-		fCell3 = cellSmoothed[2];
-		stabilityVoltageDelta = (fCell1 + fCell2 + fCell3) - (dCell1 + dCell2 + dCell2);
+		stabilityVoltageDelta = (fCell1 + fCell2) - (dCell1 + dCell2);
 		stabiltyCount = PULSE_TIMER;
 		storeDataInArrays(7);
 	}
@@ -263,24 +273,23 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 // reportEvery30Seconds = true to report status by Serial.print
 void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds) {
 	unsigned long startMillis = 0;
+	tCounter = 0;
 	// Wait for voltage to stabilise before the test is started.
 	float tCell1 = 0.0000;
 	float tCell2 = 0.0000;
-	float tCell3 = 0.0000;
-	byte tCounter = 0;
+	//float tCell3 = 0.0000;
 
 	// check every second until we have "howStable" readings all the same.
 	while (tCounter < howStable) {
 		startMillis = millis();
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		// if not the same as the previous reading start counter again.
-		float answer = (cellSmoothed[0] + cellSmoothed[1] + cellSmoothed[2]) - (tCell1 + tCell2 + tCell3);
+		float answer = (cellSmoothed[0] + cellSmoothed[1]) - (tCell1 + tCell2);
 		if (abs(stabilityVoltageDelta) < abs(answer) && tCell1 != 0) stabilityVoltageDelta = answer;
 		if (answer <= -accuracy || answer >= accuracy) tCounter = 0;
 		tCounter++;
 		tCell1 = cellSmoothed[0];
 		tCell2 = cellSmoothed[1];
-		tCell3 = cellSmoothed[2];
 		//Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(tCounter); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		// Create a delay for 1 second, triggering the update if need be
 		while (millis() - startMillis < 1000) {
@@ -348,10 +357,11 @@ void storeDataInArrays(byte cycleType) {
 	Serial.print(cellSmoothed[0], 4); Serial.print(",");
 	Serial.print(cellSmoothed[1], 4); Serial.print(",");
 	Serial.print(cellSmoothed[2], 4); Serial.print(",");
-	Serial.print(this_dischargeTotalMAH); Serial.print(",");
-	Serial.print(this_dischargeTotalMAH); Serial.print(",");
+	Serial.print(dischargeLoopAmps); Serial.print(",");
+	Serial.print(dischargeTotalMAH); Serial.print(",");
 	Serial.print(bec); Serial.print(",");
-	Serial.println(reg);
+	Serial.print(reg); Serial.print(",");
+	Serial.println(tCounter);
 	aCounter++;
 }
 

@@ -117,6 +117,7 @@ void loop() {
 	//*******************************
 
 	chargingTestOnly_Control();
+	//Serial.println("End...");
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
