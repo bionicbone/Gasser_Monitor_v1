@@ -61,14 +61,11 @@ void chargingTestOnly_Control() {
 		stabiliseVoltages(100, 0.0040, true);			// good stabilty (needs to be 100 @ 0.0040 with FLVSS data smoothed at 0.25)
 		stabiliseVoltages(40, 0.0040, true);			// reasonable stability
 		pulseDischargeReading(5, PULSE_TIMER, 1);		// 0=PD with Good Stab, 1=PD with reasonable Stab, 2=PULSE_TIMER*5, 3=1 Sec 
-		discharge_mAh(100);
+		discharge_mAh(105);
 		stabiliseVoltages(40, 0.0012, true);			// reasonable stability (with old cell read reoutines)
 		chargeBattery();
 */
-	discharge_mAh(100);
-	digitalWrite(PIN_DISCHARGE_RELAY, HIGH);
-	read_Amps_ASC714();
-	delay(300);
+	discharge_mAh(105);
 }
 
 
@@ -104,22 +101,23 @@ void chargeBattery() {
 }
 
 
-// Discharges x mAH from the battery
+// Discharges in step of x mAH from the battery with Pulse Discharging in between to monitor battery recovery
+// with flat battery cut off.
 // Use discharge_mAh(105) for final code
-// mAh = milliamphour to discharge
 void discharge_mAh(float mAh) {
-	// Discharges a fix amount of mAh on each call
+	// Discharges a fix amount of mAh
 	// Then after battery recovery completes a Pulse Discharge 
 	// Cuts out if battery Cell voltage falls < 3.0v
 	// Validated as working after Voltage and AMPs calibration
 
 	byte lowVoltage = false;
 	float thisDischargeMAH = 0.000;
-	float thismAh = 0.000;
+	float thismAh = 0.000; 
+	dischargeLoopAmps = 0.000;
 
 	// pulse discharge so we get a first reading, ultimately this is the data needed
 	// what is the voltage drop and recovery when the battery has x % remaining
-	//pulseDischargeReading(5, PULSE_TIMER, 0);
+	pulseDischargeReading(5, PULSE_TIMER, 0);
 
 	while (!lowVoltage) {
 		// Start the discharge.
@@ -133,7 +131,7 @@ void discharge_mAh(float mAh) {
 		// this takes into account that the pulse discharge
 		// effects the remaining capacity.
 		thismAh = mAh - (((dischargeTotalMAH / mAh) - int(dischargeTotalMAH / mAh)) * mAh);
-
+		//Serial.println(thismAh);
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
 			read_temperatures();
@@ -148,7 +146,7 @@ void discharge_mAh(float mAh) {
 				break;
 			}
 			if (delayLowVoltageCounterOnStartUp < 1000) delayLowVoltageCounterOnStartUp++;
-			storeDataInArrays(2);
+			//storeDataInArrays(2);
 		}
 		// Stop the discharge
 		digitalWrite(PIN_DISCHARGE_RELAY, LOW);
@@ -161,6 +159,10 @@ void discharge_mAh(float mAh) {
 		else {
 			storeDataInArrays(4);
 		}
+		
+		// pulse discharge so we get a first reading, ultimately this is the data needed
+		// what is the voltage drop and recovery when the battery has x % remaining
+		pulseDischargeReading(5, PULSE_TIMER, 0);
 	}
 }
 
