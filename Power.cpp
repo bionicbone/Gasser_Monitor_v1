@@ -5,28 +5,29 @@
 #include "Power.h"
 
 // Config
-const float		REG_CALIBRATION = -0.70;
-const float		BEC_CALIBRATION = -0.10; 
-const float		AMPS_CALIBRATION = 0.095;										// Amps calibration for Current discharging the battery
-const float		AMPS_CALIBRATION_NEG = -0.115;							// Amps calibration for Current charging the battery (if lagging behind actual make this figure more negative)
-const int			adcRaw_Precision = 4096;										// DO NOT ALTER
-const float		VrefCalculationVoltage = 4.128496405;				// 
-const float		amps_offfset_ASC714 = -2.50;								// ASC714 offset to 0 Amps as per datasheet
-const float		amps_offfset_ASC714_Calibration = 0.006862;	// ASC714 offset to 0 Amps as required
-
+const float		REG_CALIBRATION = 0.00;
+const float		BEC_CALIBRATION = 0.00; 
+const int			ADCRAW_PRECISION = 4096;										// DO NOT ALTER, Teensy 12 bit
+const float		VREF_CALCULATION_VOLTAGE = 3.3;							// 3.3v for  Teensy, measured and perfect with 5v to Teensy
+const float		ASC714_0_AMPS_OFFSET = -2.50;								// ASC714 offset to 0 Amps as per datasheet
+const float		ASC714_0_AMPS_OFFSET_CALIBRATION = 0.00;		// ASC714 offset to 0 Amps as required, in case of slight variation
+const float		VOLTAGE_DIVIDER_MULTIPLIER = 1.00;					// Teensy is only 3.3v, if a divider circuit is used we 
+																													// need to recaluate the voltage back to 2.5v @ 0 AMPS
+																													// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
 
 // Public Variables
 float					reg, bec;													// Regulator and BEC voltages
 float					dischargeTotalMAH = 0;						// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-
+float					dischargeLoopAmps = 0.00;
+float					dischargeLoopMAH = 0.00;					// The last MAH used during the loop
 
 // Private Variables
 float					avgReg, avgBec;										// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
 int						chargeReadings = 0;								// Number of Regulator and BEC voltage readings for calculating the average
 unsigned long dischargeLoopTimeMs = 0;					// The last discharge timer value in MS
 unsigned long dischargeStoreTimeMs = millis();	// Sets to millis() each time the MAH has been calculated
-float					dischargeLoopMAH = 0.00;					// The last MAH used during the loop
-float					dischargeLoopAmps = 0.00;
+
+
 
 
 void power_Setup() {
@@ -47,28 +48,27 @@ void read_Amps_ASC714() {
 	}
 	// Make the average
 	result = adcRaw / 100;
-	// Calculate the voltage from the ASC714
-	result = (result * (VrefCalculationVoltage / (float)adcRaw_Precision));  // reading as actual voltage
-	// Compensate for the voltage divider
-	result = result * 1.55625;
+	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
+	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));  		
+#if defined(DEBUG_ASC714_AMPS_CALCULATION)
+	Serial.print("Pin Volts "); Serial.print(result);
+#endif
+	// Compensate for the voltage divider circuit, make back to 2.5v @ 0 AMPS
+	// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
+	result = result * VOLTAGE_DIVIDER_MULTIPLIER;
+#if defined(DEBUG_ASC714_AMPS_CALCULATION)
+	Serial.print("   Multi. Volts "); Serial.print(result);
+#endif
 	// Remove the ASC714 offest and Calculate the AMPs
-	result = result + amps_offfset_ASC714 + amps_offfset_ASC714_Calibration;			// remove the offset to 0v = zero current
-	//result += amps_offfset_ASC714_Calibration;
+	result = result + ASC714_0_AMPS_OFFSET + ASC714_0_AMPS_OFFSET_CALIBRATION;			// remove the offset to 0v = zero current
+#if defined(DEBUG_ASC714_AMPS_CALCULATION)
+	Serial.print("   OffSet Volts "); Serial.print(result);
+#endif																																								// Stop the drifting when there is very little usage 
 	if (result >= -0.01 && result <= 0.01) result = 0.00;
-	result = result / 0.066;							// 30A version / 0.066 & 20A version / 0.100
-	// Calibrate final AMPs
-	if (result != 0) {
-		if (result > 0) {
-			result += AMPS_CALIBRATION;
-		}
-		else {
-			result += AMPS_CALIBRATION_NEG;
-
-		}
-	}
-
+	
+	result = result / (0.066 / VOLTAGE_DIVIDER_MULTIPLIER);							// 30A version / 0.066 & 20A version / 0.100
+	
 	//Calculate the AMPs and MAH used since last call
-	//Serial.print("myAMPs "); Serial.println(result);
 	dischargeLoopTimeMs = (millis() - dischargeStoreTimeMs);
 	dischargeStoreTimeMs = millis();
 	float myFloat = (float)dischargeLoopTimeMs;
@@ -76,7 +76,10 @@ void read_Amps_ASC714() {
 	dischargeLoopMAH = dischargeLoopMAH * 1000000;
 	dischargeTotalMAH += dischargeLoopMAH;
 	dischargeLoopAmps = result;
-	//Serial.print("dischargeTotalMAH "); Serial.println(int(dischargeTotalMAH));
+#if defined(DEBUG_ASC714_AMPS_CALCULATION)
+	Serial.print("   myAMPs "); Serial.print(result);
+	Serial.print("   dischargeTotalMAH "); Serial.println(int(dischargeTotalMAH));
+#endif
 }
 
 

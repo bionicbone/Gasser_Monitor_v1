@@ -73,10 +73,11 @@ constexpr auto SMOOTH_MULTIPLIER = 0.25;			// used to smooth the cell value, 0.1
 constexpr auto SMOOTH_OVER_RIDE = 0.3;				// Over rides the smooth function and follow new value istantly if the change is more than this
 
 // Public Variables
-float					cell[6] = { 0 };								// Final cell voltage store
-float cellSmoothed[6] = { 0 };								// Final cell voltage after smoothing
+float					cell[6] = { 0.0000 };								// Final cell voltage store
+float cellSmoothed[6] = { 0.0000 };								// Final cell voltage after smoothing
 unsigned long	sensorRefreshRate = 0;					// Sensor refresh rate
 unsigned long	FLVSSRefreshRate = 0;						// Sensor refresh rate
+
 
 // Private variables
 bool					physIDnext = false;							// flag
@@ -240,7 +241,7 @@ void telemetry_ActivateTelemetry() {
 #elif defined (__MK20DX256__)
 #define sport Serial2
 	sportFlusher = &Serial2;
-	sport.begin(57600, SERIAL_8N1_RXINV_TXINV);
+	sport.begin(57600, SERIAL_8N1_RXINV_TXINV);   // 58824  // 56376
 	// Teensy Serial2 needs to be single wire Tx/Rx
 	uartSingleTxRx = &UART1_C3;
 	UART1_C1 |= (UART_C1_LOOPS | UART_C1_RSRC);
@@ -281,18 +282,18 @@ void sendValueData(byte val) {
 		switch (physicalID)
 		{
 		case SENSOR_GASSER_ID:					// Send a value
-			// get the next active value number for the array
-			nextSensorNumber = lastSensorNumber + 1; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
-			while (frSkyTeensySensors.SensorActive[nextSensorNumber] == false) {
-				nextSensorNumber++; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
-			}
-			updateValue(nextSensorNumber);
-			sendFrame();
+				// get the next active value number for the array
+				nextSensorNumber = lastSensorNumber + 1; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+				while (frSkyTeensySensors.SensorActive[nextSensorNumber] == false) {
+					nextSensorNumber++; if (nextSensorNumber > SENSOR_ARRAY_SIZE) nextSensorNumber = 0;
+				}
+				updateValue(nextSensorNumber);
+				sendFrame();
 			break;
 
 		case SENSOR_FLVSS_ID:						// Get a value from an attachec FrSky FLVSS module
 			// only allow FLVSS decoding once every 708ms, otherwise sending of values will be significantly effected
-			if(millis() - lastFLVSSMillis > SENSOR_FLVSS_DECODE_DELAY)	getFLVSSdata();
+			if (millis() - lastFLVSSMillis > SENSOR_FLVSS_DECODE_DELAY) getFLVSSdata(); 
 			break;
 		
 		default:
@@ -456,6 +457,9 @@ void getFLVSSdata() {
 				((uint8_t*)&value)[0] = data[4];
 				((uint8_t*)&value)[1] = data[5];
 				((uint8_t*)&value)[2] = data[6];
+				
+				//  TODO - must check CRC at this point data[7] before accepting data into cell[] or cellSmoothed[]!! 
+				
 				// Work out each cell value using 12 bits.
 				// This got me the value appears to be multiplied by 500
 				cell[frameStartCell] = (value & 0x0FFF) / 500.0;
@@ -464,10 +468,16 @@ void getFLVSSdata() {
 				cell[frameStartCell + 1] = (value & 0x0FFF) / 500.0;
 				smoothFLVXXdata(frameStartCell + 1);
 				
-				//  TODO - I've not done anything with the CRC at this point data[7] !! 
 				FLVSSRefreshRate = millis() - lastFLVSSMillis; lastFLVSSMillis = millis();
 
-				if (frameStartCell == 2) { Serial.print(cell[frameStartCell]); Serial.print(", "); Serial.println(cellSmoothed[frameStartCell]); }
+				//if (frameStartCell == 0) {
+				//	Serial.print(cell[frameStartCell]); Serial.print(", ");
+				//	Serial.print(cell[frameStartCell + 1]); Serial.print(", ");
+				//	Serial.print(cell[frameStartCell + 2]); Serial.print(", ");
+				//	Serial.print(cellSmoothed[frameStartCell]); Serial.print(", ");
+				//	Serial.print(cellSmoothed[frameStartCell + 1]); Serial.print(", ");
+				//	Serial.println(cellSmoothed[frameStartCell + 2]);
+				//}
 
 #if defined (DEBUG_FLVSS_CALCULATION) 
 				Serial.print("frameStartCell "); Serial.println(frameStartCell, HEX);
