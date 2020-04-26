@@ -67,9 +67,9 @@ void chargingTestOnly_Control() {
 */
 	//discharge_mAh(105);
 	while (true) {
-		read_Amps_ASC714();
-		read_chargeVoltages();
-		Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    AMPS "); Serial.println(dischargeLoopAmps, 6);
+		power_Battery_Amps_ASC714();
+		power_chargeVoltages();
+		Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    AMPS "); Serial.println(becDischargeLoopAmps, 6);
 		delay(300);
 	}
 }
@@ -81,7 +81,7 @@ void chargeBattery() {
 		storedDataTimer = millis();
 
 		// If we think we have charged more than 1900mAH then stop the charge
-		if (dischargeTotalMAH > 1900) {
+		if (batteryDischargeTotalMAH > 1900) {
 			storeDataInArrays(10);
 			break;
 		}
@@ -100,7 +100,7 @@ void chargeBattery() {
 		storedDataTimer = millis();
 		
 		// Read the current AMPS going into the battery
-		read_Amps_ASC714();
+		power_Battery_Amps_ASC714();
 		storeDataInArrays(8);
 	}
 	digitalWrite(PIN_CHARGE_RELAY, LOW);
@@ -119,7 +119,7 @@ void discharge_mAh(float mAh) {
 	byte lowVoltage = false;
 	float thisDischargeMAH = 0.000;
 	float thismAh = 0.000; 
-	dischargeLoopAmps = 0.000;
+	batteryDischargeLoopAmps = 0.000;
 
 	// pulse discharge so we get a first reading, ultimately this is the data needed
 	// what is the voltage drop and recovery when the battery has x % remaining
@@ -136,14 +136,14 @@ void discharge_mAh(float mAh) {
 		// battery capacity.
 		// this takes into account that the pulse discharge
 		// effects the remaining capacity.
-		thismAh = mAh - (((dischargeTotalMAH / mAh) - int(dischargeTotalMAH / mAh)) * mAh);
+		thismAh = mAh - (((batteryDischargeTotalMAH / mAh) - int(batteryDischargeTotalMAH / mAh)) * mAh);
 		//Serial.println(thismAh);
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
 			read_temperatures();
-			read_Amps_ASC714();
+			power_Battery_Amps_ASC714();
 			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-			thisDischargeMAH += dischargeLoopMAH;
+			thisDischargeMAH += batteryDischargeLoopMAH;
 			//Serial.println(thisDischargeMAH);
 			// delayLowVoltageCounterOnStartUp allows battery to stabilise at start of a discharge
 			// otherwise it can be detected as a flat battery way before its actaully flat
@@ -206,7 +206,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		}
 		// Prime everything and write data
 		read_temperatures();
-		read_Amps_ASC714();
+		power_Battery_Amps_ASC714();
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		storedDataTimer = millis();
 		sCell1 = cellSmoothed[0];
@@ -227,7 +227,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		//	Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(millis()); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		}
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-		read_Amps_ASC714();
+		power_Battery_Amps_ASC714();
 		read_temperatures();
 		storedDataTimer = millis();
 		dCell1 = cellSmoothed[0];
@@ -249,7 +249,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		}
 		// Take recovery readings
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-		read_Amps_ASC714();
+		power_Battery_Amps_ASC714();
 		read_temperatures();
 		storedDataTimer = millis();
 		fCell1 = cellSmoothed[0];
@@ -290,7 +290,7 @@ void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds
 	// check every second until we have "howStable" readings all the same.
 	while (tCounter < howStable) {
 		startMillis = millis();
-		read_chargeVoltages();
+		power_chargeVoltages();
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		// if not the same as the previous reading start counter again.
 		float answer = (cellSmoothed[0] + cellSmoothed[1]) - (tCell1 + tCell2);
@@ -366,8 +366,8 @@ void storeDataInArrays(byte cycleType) {
 	Serial.print(cellSmoothed[0], 4); Serial.print(",");
 	Serial.print(cellSmoothed[1], 4); Serial.print(",");
 	Serial.print(cellSmoothed[2], 4); Serial.print(",");
-	Serial.print(dischargeLoopAmps); Serial.print(",");
-	Serial.print(dischargeTotalMAH); Serial.print(",");
+	Serial.print(batteryDischargeLoopAmps); Serial.print(",");
+	Serial.print(batteryDischargeTotalMAH); Serial.print(",");
 	Serial.print(bec); Serial.print(",");
 	Serial.print(reg); Serial.print(",");
 	Serial.println(tCounter);

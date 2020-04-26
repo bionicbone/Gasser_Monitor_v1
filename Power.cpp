@@ -16,40 +16,40 @@ const float		VOLTAGE_DIVIDER_MULTIPLIER = 1.00;					// Teensy is only 3.3v, if a
 																													// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
 
 // Public Variables
-float					reg, bec;													// Regulator and BEC voltages
-float					dischargeTotalMAH = 0;						// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-float					dischargeLoopAmps = 0.00;
-float					dischargeLoopMAH = 0.00;					// The last MAH used during the loop
+float					reg, bec;																		// Regulator and BEC voltages
+float					batteryDischargeTotalMAH = 0;								// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+float					batteryDischargeLoopAmps = 0.00;						// The current AMPS measured when function called
+float					batteryDischargeLoopMAH = 0.00;							// The last MAH used during the loop
 
 // Private Variables
 float					avgReg, avgBec;										// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
 int						chargeReadings = 0;								// Number of Regulator and BEC voltage readings for calculating the average
-unsigned long dischargeLoopTimeMs = 0;					// The last discharge timer value in MS
-unsigned long dischargeStoreTimeMs = millis();	// Sets to millis() each time the MAH has been calculated
+unsigned long batteryDischargeLoopTimeMs = 0;					// The last discharge timer value in MS
+unsigned long batteryDischargeStoreTimeMs = millis();	// Sets to millis() each time the MAH has been calculated
 
 
 
-
+// Set up the Power Reading Pins on teh Teensy
 void power_Setup() {
-	pinMode(PIN_AMPS, INPUT);
+	pinMode(PIN_BATTERY_AMPS, INPUT);
 	pinMode(PIN_REGULATOR_VOLTAGE, INPUT);
 	pinMode(PIN_BEC_VOLTAGE, INPUT);
 }
 
 
-// this was bench tested on a Teensy and found to be very close
-void read_Amps_ASC714() {
+// Read the Battery Current Flow with a bidirectional Hall Effect Sensor
+void power_Battery_Amps_ASC714() {
 	int adcRaw = 0;
 	float result = 0.000;
 
 	// Take 100 readings
 	for (int i = 0; i < 100; i++) {
-		adcRaw += analogRead(PIN_AMPS);			// Raw ADC Reading
+		adcRaw += analogRead(PIN_BATTERY_AMPS);			// Raw ADC Reading
 	}
 	// Make the average
 	result = adcRaw / 100;
 	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
-	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));  		
+	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 #if defined(DEBUG_ASC714_AMPS_CALCULATION)
 	Serial.print("Pin Volts "); Serial.print(result);
 #endif
@@ -59,32 +59,34 @@ void read_Amps_ASC714() {
 #if defined(DEBUG_ASC714_AMPS_CALCULATION)
 	Serial.print("   Multi. Volts "); Serial.print(result);
 #endif
-	// Remove the ASC714 offest and Calculate the AMPs
-	result = result + ASC714_0_AMPS_OFFSET + ASC714_0_AMPS_OFFSET_CALIBRATION;			// remove the offset to 0v = zero current
+	// Remove the ASC714 offset to make 0v = zero current and Calculate the AMPs
+	result = result + ASC714_0_AMPS_OFFSET + ASC714_0_AMPS_OFFSET_CALIBRATION;
 #if defined(DEBUG_ASC714_AMPS_CALCULATION)
 	Serial.print("   OffSet Volts "); Serial.print(result);
-#endif																																								// Stop the drifting when there is very little usage 
+#endif							
+	// Stop the drifting when there is very little usage 
 	if (result >= -0.01 && result <= 0.01) result = 0.00;
-	
-	result = result / (0.066 / VOLTAGE_DIVIDER_MULTIPLIER);							// 30A version / 0.066 & 20A version / 0.100
-	
+
+	// 30A version / 0.066 & 20A version / 0.100
+	result = result / (0.066 / VOLTAGE_DIVIDER_MULTIPLIER);
+
 	//Calculate the AMPs and MAH used since last call
-	dischargeLoopTimeMs = (millis() - dischargeStoreTimeMs);
-	dischargeStoreTimeMs = millis();
-	float myFloat = (float)dischargeLoopTimeMs;
-	dischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
-	dischargeLoopMAH = dischargeLoopMAH * 1000000;
-	dischargeTotalMAH += dischargeLoopMAH;
-	dischargeLoopAmps = result;
+	batteryDischargeLoopTimeMs = (millis() - batteryDischargeStoreTimeMs);
+	batteryDischargeStoreTimeMs = millis();
+	float myFloat = (float)batteryDischargeLoopTimeMs;
+	batteryDischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
+	batteryDischargeLoopMAH = batteryDischargeLoopMAH * 1000000;
+	batteryDischargeTotalMAH += batteryDischargeLoopMAH;
+	batteryDischargeLoopAmps = result;
 #if defined(DEBUG_ASC714_AMPS_CALCULATION)
 	Serial.print("   myAMPs "); Serial.print(result);
-	Serial.print("   dischargeTotalMAH "); Serial.println(int(dischargeTotalMAH));
+	Serial.print("   batteryDischargeTotalMAH "); Serial.println(int(batteryDischargeTotalMAH));
 #endif
 }
 
 
-
-void read_chargeVoltages() {
+// Read the Regulator and BEC Voltages
+void power_chargeVoltages() {
 	// takes the average of 3 readings and populates reg and bec global variables.
 	int adcRaw = 0;
 
@@ -96,8 +98,6 @@ void read_chargeVoltages() {
 	adcRaw = analogRead(PIN_BEC_VOLTAGE);
 	avgBec += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 
-	//avgReg += (analogRead(PIN_REGULATOR_VOLTAGE) * (40.5 / 4096.0) + REG_CALIBRATION);
-	//avgBec += (analogRead(PIN_BEC_VOLTAGE) * (7.5 / 4096.0) + BEC_CALIBRATION);
 	chargeReadings++;
 	if (chargeReadings > 3) {
 		reg = (avgReg / chargeReadings) * 16.41920578;
