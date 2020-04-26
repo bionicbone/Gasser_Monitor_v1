@@ -65,7 +65,13 @@ void chargingTestOnly_Control() {
 		stabiliseVoltages(40, 0.0012, true);			// reasonable stability (with old cell read reoutines)
 		chargeBattery();
 */
-	discharge_mAh(105);
+	//discharge_mAh(105);
+	while (true) {
+		read_Amps_ASC714();
+		read_chargeVoltages();
+		Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    AMPS "); Serial.println(dischargeLoopAmps, 6);
+		delay(300);
+	}
 }
 
 
@@ -82,7 +88,7 @@ void chargeBattery() {
 
 		// If any cell > 3.5 then stop the charge
 		// We use the actual result of th FLVSS sensor for this, otherwise the smoothing lowers the value too much
-		if ((cell[0] > 3.6) || (cell[1] > 3.6) || (cell[2] > 3.6)) {
+		if ((cell[0] > 3.6) || (cell[1] > 3.6)) {
 			storeDataInArrays(9);
 			break;
 		}
@@ -284,6 +290,7 @@ void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds
 	// check every second until we have "howStable" readings all the same.
 	while (tCounter < howStable) {
 		startMillis = millis();
+		read_chargeVoltages();
 		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		// if not the same as the previous reading start counter again.
 		float answer = (cellSmoothed[0] + cellSmoothed[1]) - (tCell1 + tCell2);

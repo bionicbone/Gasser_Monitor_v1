@@ -86,48 +86,55 @@ void read_Amps_ASC714() {
 
 void read_chargeVoltages() {
 	// takes the average of 3 readings and populates reg and bec global variables.
+	int adcRaw = 0;
 
 	// Flash built in LED so we know Arduino is still responding
 	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
-	avgReg += (analogRead(PIN_REGULATOR_VOLTAGE) * (40.5 / 4096.0) + REG_CALIBRATION);
-	avgBec += (analogRead(PIN_BEC_VOLTAGE) * (7.5 / 4096.0) + BEC_CALIBRATION);
+	adcRaw = analogRead(PIN_REGULATOR_VOLTAGE);
+	avgReg += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+	adcRaw = analogRead(PIN_BEC_VOLTAGE);
+	avgBec += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+
+	//avgReg += (analogRead(PIN_REGULATOR_VOLTAGE) * (40.5 / 4096.0) + REG_CALIBRATION);
+	//avgBec += (analogRead(PIN_BEC_VOLTAGE) * (7.5 / 4096.0) + BEC_CALIBRATION);
 	chargeReadings++;
 	if (chargeReadings > 3) {
-		reg = avgReg / chargeReadings;
-		bec = avgBec / chargeReadings;
+		reg = (avgReg / chargeReadings) * 16.41920578;
+		bec = (avgBec / chargeReadings) * 7.739580311;
 		chargeReadings = 0;
 		if (reg == REG_CALIBRATION) reg = 0;
 		if (bec == BEC_CALIBRATION) bec = 0;
 		avgReg = 0;
 		avgBec = 0;
 
-	// ********************************************************
-	// TODO - Activate code to write min / max values to EEPROM
-	// ********************************************************
+	//	Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.println(bec, 6);
+
+		// ********************************************************
+		// TODO - Activate code to write min / max values to EEPROM
+		// ********************************************************
 
 
-		//if (millis() > PROG_DELAY_BEFORE_FLIGHT_STAT_UPDATES) { // only perform updates once stable
-		//	// update voltage regulator flight stats
-		//	if (reg < customFlightSatistics.MinRegulatorVoltage) {
-		//		customFlightSatistics.MinRegulatorVoltage = reg; eepromUpdateRequired = true;
-		//	}
-		//	else if (reg > customFlightSatistics.MaxRegulatorVoltage) {
-		//		customFlightSatistics.MaxRegulatorVoltage = reg; eepromUpdateRequired = true;
-		//	}
+			//if (millis() > PROG_DELAY_BEFORE_FLIGHT_STAT_UPDATES) { // only perform updates once stable
+			//	// update voltage regulator flight stats
+			//	if (reg < customFlightSatistics.MinRegulatorVoltage) {
+			//		customFlightSatistics.MinRegulatorVoltage = reg; eepromUpdateRequired = true;
+			//	}
+			//	else if (reg > customFlightSatistics.MaxRegulatorVoltage) {
+			//		customFlightSatistics.MaxRegulatorVoltage = reg; eepromUpdateRequired = true;
+			//	}
 
-		//	// update BEC voltage flight stats
-		//	if (bec < customFlightSatistics.MinBECVoltage) {
-		//		customFlightSatistics.MinBECVoltage = bec; eepromUpdateRequired = true;
-		//	}
-		//	else if (bec > customFlightSatistics.MaxBECVoltage) {
-		//		customFlightSatistics.MaxBECVoltage = bec; eepromUpdateRequired = true;
-		//	}
+			//	// update BEC voltage flight stats
+			//	if (bec < customFlightSatistics.MinBECVoltage) {
+			//		customFlightSatistics.MinBECVoltage = bec; eepromUpdateRequired = true;
+			//	}
+			//	else if (bec > customFlightSatistics.MaxBECVoltage) {
+			//		customFlightSatistics.MaxBECVoltage = bec; eepromUpdateRequired = true;
+			//	}
 
-		//	// check if we need to update the EEPROM
-		//	if (eepromUpdateRequired == true) eeprom_WriteFilghtDataStats();
-		//}
+			//	// check if we need to update the EEPROM
+			//	if (eepromUpdateRequired == true) eeprom_WriteFilghtDataStats();
+			//}
 	}
 }
-
 
