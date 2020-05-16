@@ -33,7 +33,7 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 //#define DEBUG_FLVSS_CALCULATION															// Activate to display how the Cell voltages are being calculated from the FLVSS sensor
 //#define DEBUG_ASC714_BATTERY_AMPS_CALCULATION								// Activate to display how the AMPS are being calculated from the ASC714 hall effect sensor
 //#define DEBUG_ASC713_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC713 hall effect sensor
-#define DEBUG_ASC712_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
+//#define DEBUG_ASC712_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
 //#define DEBUG_ASC712_BATTERY_AMPS_CALCULATION								// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
 
 
@@ -87,17 +87,17 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 #endif
 
 #if defined (DEBUG_ASC714_BATTERY_AMPS_CALCULATION)
-#warning DONT FLASH WITH DEBUG_ASC714_BATTERY_AMPS_CALCULATION ACTIVATED
+#error DONT FLASH WITH DEBUG_ASC714_BATTERY_AMPS_CALCULATION ACTIVATED
 #endif
 
 #if defined (DEBUG_ASC713_BEC_AMPS_CALCULATION)
-#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#error DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
 #endif
 
 #if defined (DEBUG_ASC712_BEC_AMPS_CALCULATION)
-#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#error DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
 #endif
 
 #if defined (DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
-#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#error DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
 #endif
