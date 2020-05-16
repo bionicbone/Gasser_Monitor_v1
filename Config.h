@@ -31,7 +31,11 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 //#define DEBUG_LM35_TEMPERATURE_READINGS											// Activate to display LM35 Temperature information
 //#define DEBUG_TELEMETRY_REFRESH_RATES												// Activate to display the refresh rates of the Values and FLVSS decoding
 //#define DEBUG_FLVSS_CALCULATION															// Activate to display how the Cell voltages are being calculated from the FLVSS sensor
-//#define DEBUG_ASC714_AMPS_CALCULATION												// Activate to display how the AMPS are being calculated from the ASC714 hall effect sensor
+//#define DEBUG_ASC714_BATTERY_AMPS_CALCULATION								// Activate to display how the AMPS are being calculated from the ASC714 hall effect sensor
+//#define DEBUG_ASC713_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC713 hall effect sensor
+#define DEBUG_ASC712_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
+//#define DEBUG_ASC712_BATTERY_AMPS_CALCULATION								// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
+
 
 #if defined (DEBUG_FS_LF_ERRORS)
 #error DONT FLASH WITH DEBUG_FS_LF_ERRORS ACTIVATED
@@ -82,6 +86,18 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 #error DONT FLASH WITH DEBUG_FLVSS_CALCULATION ACTIVATED
 #endif
 
-#if defined (DEBUG_ASC714_AMPS_CALCULATION)
-#error DONT FLASH WITH DEBUG_ASC714_AMPS_CALCULATION ACTIVATED
+#if defined (DEBUG_ASC714_BATTERY_AMPS_CALCULATION)
+#warning DONT FLASH WITH DEBUG_ASC714_BATTERY_AMPS_CALCULATION ACTIVATED
+#endif
+
+#if defined (DEBUG_ASC713_BEC_AMPS_CALCULATION)
+#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#endif
+
+#if defined (DEBUG_ASC712_BEC_AMPS_CALCULATION)
+#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#endif
+
+#if defined (DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
+#warning DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
 #endif

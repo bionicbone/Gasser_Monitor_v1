@@ -6,6 +6,7 @@
 #include "Telemetry.h"
 #include "Power.h"
 #include "Temperature.h"
+#include "RPM.h"
 
 byte status = 0;  // 0=off, 1=charge, 2=discharge, 3=pluse discharge
 unsigned long storedDataTimer = millis();  // millis(), every 30 seconds write data to array.
@@ -21,10 +22,14 @@ constexpr auto PULSE_TIMER = 2000;					//	default pulse time, in millis(), 1000 
 byte tCounter = 0;												// Stability Counter
 
 void chargingTestOnly_Setup() {
+	power_Setup();
+	
 	pinMode(PIN_CHARGE_RELAY, OUTPUT);
 	pinMode(PIN_DISCHARGE_RELAY, OUTPUT);
 	pinMode(PIN_PULSE_DISCHARGE_MOSFET, OUTPUT);
-
+	startOfTestTimer = millis();
+	storedDataTimer = millis();
+	this_dischargeStoreTimeMs = millis();
 	//for (byte i = 0; i < 20; i++) {
 	//	chargeRelay_Status_Status(true);
 	//	dischargeRelay_Status_Status(true);
@@ -50,7 +55,7 @@ void chargingTestOnly_Setup() {
 	Serial.print("BEC Ouptut Voltage,");
 	Serial.print("BAT Input Voltage,");
 	Serial.println("Stability Counter");
-	startOfTestTimer = millis();
+
 }
 
 
@@ -66,10 +71,51 @@ void chargingTestOnly_Control() {
 		chargeBattery();
 */
 	//discharge_mAh(105);
+	chargingTestOnly_Setup();
+
+		// Place this here to allow Serial to start
+	Serial.println(""); Serial.println(""); Serial.println("Test Started");
+	Serial.print("Headers:,");
+	Serial.print("Counter,");
+	Serial.print("ms,");
+	Serial.print("TeensyV,");
+	Serial.print("RPM,");
+	Serial.print("RecT,");
+	Serial.print("RecV,");
+	Serial.print("BecT,");
+	Serial.print("BecV,");
+	Serial.print("BecA,");
+	Serial.print("BatA,");
+	Serial.print("BatmAH,");
+	Serial.print("Cell1,");
+	Serial.println("Cell2");
+	startOfTestTimer = millis();
+	uint32_t counter = 0;
+
+	//digitalWrite(PIN_DISCHARGE_RELAY, HIGH); 
+	//digitalWrite(PIN_CHARGE_RELAY, HIGH);
+
 	while (true) {
-		power_Battery_Amps_ASC714();
-		power_chargeVoltages();
-		Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    AMPS "); Serial.println(becDischargeLoopAmps, 6);
+		calcualte_RPMSensorPulse();
+		for(int i=0;i<100;i++) read_temperatures();
+		power_Battery_Amps_ASC712();
+		power_BEC_Amps_ASC712();
+		power_chargeVoltages(); 
+		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		//Serial.print("Data:,"); Serial.print(counter); Serial.print(", "); Serial.print(millis() - startOfTestTimer); Serial.print(", ");
+		//Serial.print(teensy); Serial.print(", "); Serial.print(mainRPMSensorDetectedRPM); Serial.print(", ");
+		//Serial.print(engineTemp); Serial.print(", "); Serial.print(reg); Serial.print(", "); 
+		//Serial.print(ambientTemp); Serial.print(", "); Serial.print(bec); Serial.print(", "); 
+		//Serial.print(becDischargeLoopAmps); Serial.print(", "); 
+		//Serial.print(batteryDischargeLoopAmps); Serial.print(", "); Serial.print(0 - batteryDischargeTotalMAH); Serial.print(", ");
+		//Serial.print(cellSmoothed[0]); Serial.print(", "); Serial.println(cellSmoothed[1]);
+		counter++;
+		if (engineTemp >= 35) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (ambientTemp >= 55) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (cellSmoothed[0] <= 3.0) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (cellSmoothed[1] <= 3.0) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (cellSmoothed[0] >= 3.43) { digitalWrite(PIN_CHARGE_RELAY, LOW); }
+		if (cellSmoothed[1] >= 3.43) { digitalWrite(PIN_CHARGE_RELAY, LOW); }
 		delay(300);
 	}
 }

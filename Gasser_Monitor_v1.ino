@@ -116,8 +116,10 @@ void loop() {
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
-	chargingTestOnly_Control();
-	stop();
+	if (!firstRun) {
+		chargingTestOnly_Control();
+		stop();
+	}
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
