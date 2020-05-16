@@ -29,6 +29,7 @@
 		*/
 
 
+#include "ChargingTestsOnly.h"
 #include "ErrorHandling.h"
 #include "Power.h"
 #include "Temperature.h"
@@ -73,6 +74,16 @@ void setup() {
 	// Start the Error Handling Processes
 	errorHandling_Setup();
 
+	//*******************************
+	//*** START - TESTING ONLY !! ***
+	//*******************************
+
+	chargingTestOnly_Setup();
+
+	//*******************************
+	//*** END -  TESTING ONLY !!  ***
+	//*******************************
+
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
 }
@@ -100,6 +111,19 @@ void loop() {
 
 	// check for errors and report
 	errorHandling_checkErrors();
+
+	//*******************************
+	//*** START - TESTING ONLY !! ***
+	//*******************************
+
+	if (!firstRun) {
+		chargingTestOnly_Control();
+		stop();
+	}
+
+	//*******************************
+	//*** END -  TESTING ONLY !!  ***
+	//*******************************
 
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
