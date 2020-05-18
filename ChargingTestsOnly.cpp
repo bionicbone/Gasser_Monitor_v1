@@ -414,8 +414,8 @@ void storeDataInArrays(byte cycleType) {
 	Serial.print(cellSmoothed[2], 4); Serial.print(",");
 	Serial.print(batteryDischargeLoopAmps); Serial.print(",");
 	Serial.print(batteryDischargeTotalMAH); Serial.print(",");
-	Serial.print(bec); Serial.print(",");
-	Serial.print(reg); Serial.print(",");
+	Serial.print(becVoltage); Serial.print(",");
+	Serial.print(recVoltage); Serial.print(",");
 	Serial.println(tCounter);
 	aCounter++;
 }

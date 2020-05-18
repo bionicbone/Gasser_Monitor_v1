@@ -78,7 +78,7 @@ void setup() {
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
-	chargingTestOnly_Setup();
+	//chargingTestOnly_Setup();
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
@@ -101,6 +101,10 @@ void loop() {
 	// also updates variable inFlight
 	calcualte_RPMSensorPulse();
 
+	// Calculate the voltages and current sensors
+	// updates variables 
+	power_ReadSensors();
+
 	// Calculate the Rx Quality Indicators
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
@@ -116,10 +120,10 @@ void loop() {
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
-	if (!firstRun) {
-		chargingTestOnly_Control();
-		stop();
-	}
+	//if (!firstRun) {
+	//	chargingTestOnly_Control();
+	//	stop();
+	//}
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***

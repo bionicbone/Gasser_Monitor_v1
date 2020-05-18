@@ -58,9 +58,12 @@ TODO List:-
 */ 
 
 
- #include "Config.h"
- #include "Telemetry.h"
- #include "Temperature.h"
+#include "Config.h"
+#include "RPM.h"
+#include "RxLinkQuality.h"
+#include "Telemetry.h"
+#include "Temperature.h"
+#include "Power.h"
 
 // Config
 #define SPORT_START 0x7E											// FrSky Start frame indicator
@@ -112,7 +115,7 @@ Stream* sportFlusher;											// Must flush to write otherwise we crash!!
 // Active Sensors and current value store
 // *** Maintain void updateValue(byte sensorNumber) when new sensors are added ***
 struct frSkyTeensySensorArray {
-	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  true,   true,   true,   true,   true,   true,   true };
+	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  true,   true,   true,   true,   true,   true,   true };
 	uint32_t	SensorID[32]			= { 0x5100, 0x5101, 0x5102, 0x5103, 0x5104, 0x5105, 0x5106, 0x5107, 0x5108, 0x5109, 0x510A, 0x510B, 0x510C, 0x510D, 0x510E, 0x510F, 0x5110, 0x5111, 0x5112, 0x5113, 0x5114, 0x5115, 0x5116, 0x5117, 0x5118, 0x5119, 0x511A, 0x511B, 0x511C, 0x511D, 0x511E, 0x511F };
 	uint32_t	SensorValue[32]		= { 0 };
 	bool			SensorDataChanged[32] = { {false} };
@@ -181,52 +184,53 @@ void updateValue(byte sensorNumber) {
 		break;
 	case 10:													// 510A - Use Next
 		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+			frSkyTeensySensors.SensorValue[sensorNumber] = 999;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
+
 
 
 	// 25 onwards used for temporary testing values
-	case 25:														// 5119 - TEST DATA - SBUS Lost Frames as reported by Rx in last 100 frames
-		if (lostFramesPercentage100Result != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = lostFramesPercentage100Result;
+	case 25:														// 5119 - TEST DATA - Teensy Voltage (Ratio 3.0)
+		if (teensyVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = teensyVoltage * 100;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 26:														// 511A - TEST DATA - SBUS Longest frame hold as calculated from SBUS data @bionicbone method in last 100 frames
-		if (channelsMaxHoldMillis100Resul != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = channelsMaxHoldMillis100Resul;
+	case 26:														// 511A - TEST DATA - Rectifier Voltage (Ratio 3.0)
+		if (recVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = recVoltage * 100;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 27:														// 511B - TEST DATA - SBUS Wave
-		if (wave1 != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = wave1;
+	case 27:														// 511B - TEST DATA - BEC voltage (Ratio 3.0)
+		if (becVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = becVoltage * 100;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 28:														// 511C - TEST DATA - SBUS low Refresh Rate over last 100 frames
-		if (sbusFrameLowMicros != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = sbusFrameLowMicros;
+	case 28:														// 511C - TEST DATA - BEC AMPS (Ratio 3.0)
+		if (becDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = becDischargeLoopAmps * 100;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 29:														// 511D - TEST DATA - SBUS high Refresh Rate over last 100 frames
-		if (sbusFrameHighMicros != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = sbusFrameHighMicros;
+	case 29:														// 511D - TEST DATA - Battery AMPS (Ratio 3.0)
+		if (batteryDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = batteryDischargeLoopAmps * 100;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 30:														// 511E - TEST DATA - 
-		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+	case 30:														// 511E - TEST DATA - Battery mAH
+		if (batteryDischargeTotalMAH != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = 0 - batteryDischargeTotalMAH;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 31:														// 511F - TEST DATA -
-		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = 0;
+	case 31:														// 511F - TEST DATA - BEC Temperature
+		if ((float)becTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = becTemp;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
