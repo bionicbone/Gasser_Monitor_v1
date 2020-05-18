@@ -15,8 +15,7 @@
 
 
 // Links to "extern" variables
-#include "RPM.h"
-#include "RxLinkQuality.h"
+
 
 
 

@@ -325,10 +325,11 @@ void power_chargeVoltages() {
 		avgBec = 0;
 		avgTeensy = 0;
 
+
 		// Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    Teensy "); Serial.println(teensy, 6);
 
 		// WARNING if 5v line is < 4.97  or > 5.03
-		if (teensyVoltage < 4.95 || teensyVoltage > 5.08) Serial.println("TEENSY 5v DRIFTING - NEED TO FIX !!!");
+		//if (teensyVoltage < 4.95 || teensyVoltage > 5.08) Serial.println("TEENSY 5v DRIFTING - NEED TO FIX !!!");
 
 		// ********************************************************
 		// TODO - Activate code to write min / max values to EEPROM
