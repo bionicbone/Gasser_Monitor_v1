@@ -15,12 +15,12 @@ const float		ASC714_0_AMPS_OFFSET = -2.4790;							// ASC714 offset to 0 Amps as
 const float		ASC714_0_AMPS_OFFSET_CALIBRATION = -0.07;		// ASC714 offset to 0 Amps as required, in case of slight variation
 const float		ASC713_0_AMPS_OFFSET = -0.4955;							// ASC713 offset to 0 Amps as per datasheet
 const float		ASC713_0_AMPS_OFFSET_CALIBRATION = -0.040;	// ASC713 offset to 0 Amps as required, in case of slight variation
-const float		BATTERY_ASC712_0_AMPS_OFFSET = -2.4948;			// Battery ASC712 offset to 0 Amps as per datasheet
-const float		BATTERY_ASC712_0_AMPS_POS_DIVIDER = 0.175;	// Battery ASC712 mV/A divider, as measured under load
-const float		BATTERY_ASC712_0_AMPS_NEG_DIVIDER = 0.1311;	// Battery ASC712 mV/A divider, as measured under load
-const float		BEC_ASC712_0_AMPS_OFFSET = -2.5100;					// BEC ASC712 offset to 0 Amps as per datasheet
-const float		BEC_ASC712_0_AMPS_POS_DIVIDER = 0.215;			// BEC ASC712 mV/A divider, as measured under load
-const float		BEC_ASC712_0_AMPS_NEG_DIVIDER = 0.1311;			// BEC ASC712 mV/A divider, as measured under load
+const float		BATTERY_ASC712_0_AMPS_OFFSET = -2.53;				// Battery ASC712 offset to 0 Amps as per datasheet
+const float		BATTERY_ASC712_0_AMPS_POS_DIVIDER = 0.165;	// Battery ASC712 mV/A divider, as measured under load
+const float		BATTERY_ASC712_0_AMPS_NEG_DIVIDER = 0.175;	// Battery ASC712 mV/A divider, as measured under load
+const float		BEC_ASC712_0_AMPS_OFFSET = -2.5284;					// BEC ASC712 offset to 0 Amps as per datasheet
+const float		BEC_ASC712_0_AMPS_POS_DIVIDER = 0.150;			// BEC ASC712 mV/A divider, as measured under load
+const float		BEC_ASC712_0_AMPS_NEG_DIVIDER = 0.185;			// BEC ASC712 mV/A divider, as measured under load
 const float		TEENSY_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;		// Teensy is only 3.3v, if a divider circuit is used we ...
 const float		BATTERY_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;  // Teensy is only 3.3v, if a divider circuit is used we ...
 const float		BEC_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;			// Teensy is only 3.3v, if a divider circuit is used we, 
@@ -123,6 +123,8 @@ void power_ReadSensors() {
 
 // Read the Battery Current Flow with a bidirectional Hall Effect Sensor
 void power_Battery_Amps_ASC712() {
+	if (millis() - batteryDischargeStoreTimeMs < 500) return;
+	
 	int adcRaw = 0;
 	float result = 0.000;
 
@@ -132,10 +134,12 @@ void power_Battery_Amps_ASC712() {
 	}
 	// Make the average
 	result = adcRaw / 100;
+
 	// Calculate the voltage from the ASC712, this is the actual voltage on the pin
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+
 #if defined(DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
-	Serial.print("Teensy Volts "); Serial.print(teensy, 2);
+	Serial.print("Teensy Volts "); Serial.print(teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
 	// Compensate for the voltage divider circuit, make back to 2.5v @ 0 AMPS
@@ -232,6 +236,8 @@ void power_Battery_Amps_ASC712() {
 
 // Read the BEC Current Flow with a bidirectional Hall Effect Sensor
 void power_BEC_Amps_ASC712() {
+	if (millis() - becDischargeStoreTimeMs < 500) return;
+	
 	int adcRaw = 0;
 	float result = 0.000;
 
@@ -244,7 +250,7 @@ void power_BEC_Amps_ASC712() {
 	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 #if defined(DEBUG_ASC712_BEC_AMPS_CALCULATION)
-	Serial.print("Teensy Volts "); Serial.print(teensy, 2);
+	Serial.print("Teensy Volts "); Serial.print(teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
 	// Compensate for 5v line supply deviation
@@ -307,9 +313,9 @@ void power_chargeVoltages() {
 
 	chargeReadings++;
 	if (chargeReadings > 3) {
-		recVoltage = (avgRec / chargeReadings) * 16.41920578;
+		recVoltage = (avgRec / chargeReadings) * 16.20;
 		becVoltage = (avgBec / chargeReadings) * 7.739580311;
-		teensyVoltage = (avgTeensy / chargeReadings) * 2;
+		teensyVoltage = (avgTeensy / chargeReadings) * 1.75;
 		chargeReadings = 0;
 		
 		// Calibrate
@@ -317,17 +323,18 @@ void power_chargeVoltages() {
 		becVoltage += BEC_CALIBRATION;
 		teensyVoltage += TEENSY_CALIBRATION;
 		
-		if (recVoltage == REG_CALIBRATION) recVoltage = 0;
-		if (becVoltage == BEC_CALIBRATION) becVoltage = 0;
-		if (teensyVoltage == TEENSY_CALIBRATION) teensyVoltage = 0;
+		// Stop irrelevent data
+		if (recVoltage == REG_CALIBRATION || recVoltage < 1) recVoltage = 0;
+		if (becVoltage == BEC_CALIBRATION || becVoltage < 1) becVoltage = 0;
+		if (teensyVoltage == TEENSY_CALIBRATION || teensyVoltage < 1) teensyVoltage = 0;
 
 		avgRec = 0;
 		avgBec = 0;
 		avgTeensy = 0;
 
+		//Serial.print("Rec "); Serial.print(recVoltage, 6); Serial.print("    Bec "); Serial.print(becVoltage, 6); Serial.print("    Teensy "); Serial.println(teensyVoltage, 6);
 
-		// Serial.print("Reg "); Serial.print(reg, 6); Serial.print("    Bec "); Serial.print(bec, 6); Serial.print("    Teensy "); Serial.println(teensy, 6);
-
+		
 		// WARNING if 5v line is < 4.97  or > 5.03
 		//if (teensyVoltage < 4.95 || teensyVoltage > 5.08) Serial.println("TEENSY 5v DRIFTING - NEED TO FIX !!!");
 

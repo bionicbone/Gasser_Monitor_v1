@@ -45,6 +45,8 @@ uint16_t				firstRunCounter = 0;							// counts the first loops
 bool						firstRun = true;									// Resets to false when firstRunCounter hits its target
 
 
+unsigned long		testMillis = 0;
+
 void setup() {
 	// Start the USB serial for debugging
 	Serial.begin(115200);
@@ -86,6 +88,8 @@ void setup() {
 
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
+
+	testMillis = millis();
 }
 
 
@@ -120,10 +124,10 @@ void loop() {
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
-	//if (!firstRun) {
-	//	chargingTestOnly_Control();
-	//	stop();
-	//}
+	
+	if (millis() - testMillis > 600000) {
+		stop();
+	}
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
