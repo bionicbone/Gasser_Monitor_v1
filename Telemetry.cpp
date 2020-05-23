@@ -194,43 +194,54 @@ void updateValue(byte sensorNumber) {
 	// 25 onwards used for temporary testing values
 	case 25:														// 5119 - TEST DATA - Teensy Voltage (Ratio 3.0)
 		if (teensyVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = teensyVoltage * 100;
+			float calc = teensyVoltage * 100;
+			uint32_t Tx = calc;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 26:														// 511A - TEST DATA - Rectifier Voltage (Ratio 3.0)
 		if (recVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = recVoltage * 100;
+			float calc = recVoltage * 100;
+			uint32_t Tx = calc;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 27:														// 511B - TEST DATA - BEC voltage (Ratio 3.0)
 		if (becVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = becVoltage * 100;
+			float calc = becVoltage * 100;
+			uint32_t Tx = calc;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 28:														// 511C - TEST DATA - BEC AMPS (Ratio 3.0)
 		if (becDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = becDischargeLoopAmps * 100;
+			float calc = becDischargeLoopAmps * 100;
+			uint32_t Tx = calc;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 29:														// 511D - TEST DATA - Battery AMPS (Ratio 3.0)
 		if (batteryDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = batteryDischargeLoopAmps * 100;
+			float calc = batteryDischargeLoopAmps * 100;
+			int32_t Tx = calc;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 30:														// 511E - TEST DATA - Battery mAH
 		if (batteryDischargeTotalMAH != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = 0 - batteryDischargeTotalMAH;
+			int32_t Tx = batteryDischargeTotalMAH;
+			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
 	case 31:														// 511F - TEST DATA - BEC Temperature
 		if ((float)becTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = becTemp;
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)becTemp;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
