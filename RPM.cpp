@@ -4,11 +4,6 @@
 
 #include "RPM.h"
 
-// Config
-const byte			RPM_AVERAGE_DIVIDER = 8;
-const uint32_t	MAX_UPDATE_TIME_MS = 250000;
-const uint8_t		PIN_MAIN_RPM_SENSOR_INTERRUPT_0 = 2;			// Digital Input Pin for RPM Sensor (A3144 Hall Effect Sensor)
-const uint8_t		PIN_CLUTCH_RPM_SENSOR_INTERRUPT_1 = 3;		// Digital Input Pin for RPM Sensor (A3144 Hall Effect Sensor)
 
 // Public Variables
 uint32_t				mainRPMSensorDetectedRPM = 0;				// Holds the main current RPM value (based on an average over several readings)
