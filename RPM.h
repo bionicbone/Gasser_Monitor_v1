@@ -23,7 +23,7 @@ extern uint32_t _clutchRPMSensorDetectedRPM;
 extern bool			_inFlight;
 
 // Public Functions
-void _rpm_calcualte_SensorPulse();
+void _rpm_calculate_SensorPulse();
 void _rpm_ActivateInterrupts();
 
 // Private Functions

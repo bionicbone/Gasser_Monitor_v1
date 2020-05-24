@@ -103,7 +103,7 @@ void loop() {
 	// Calculate the Current RPM data
 	// updates variables mainRPMSensorDetectedRPM & clutchRPMSensorDetectedRPM
 	// also updates variable inFlight
-	_rpm_calcualte_SensorPulse();
+	_rpm_calculate_SensorPulse();
 
 	// Calculate the voltages and current sensors
 	// updates variables 

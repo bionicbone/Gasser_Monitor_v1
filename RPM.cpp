@@ -27,7 +27,7 @@ int							clutchRPMSensorReadings = 0;				// Number of RPM readings for calculat
 
 // Public Functions
 
-void _rpm_calcualte_SensorPulse() {
+void _rpm_calculate_SensorPulse() {
 	// interrupts complete mainRPMSensorReadings++ and clutchRPMSensorReadings++ ONLY
 
 	// Update if 60 or more interrupt signals or it more than MAX_UPDATE_TIME_MS since the last update
