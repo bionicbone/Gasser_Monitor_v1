@@ -7,7 +7,9 @@
 // TODO - Review and activate each error
 // TODO - Ensure we consider the scrolling errors on the Taranis screen etc.
 
-void errorHandling_Setup() {
+// Public Functions
+
+void _errorHandling_Setup() {
 	pinMode(PIN_ERROR_LED, OUTPUT);
 	for (byte i = 0; i < 10; i++) {
 		errorHandling_errorLEDsOn(true);
@@ -18,7 +20,7 @@ void errorHandling_Setup() {
 }
 
 
-void errorHandling_checkErrors() {
+void _errorHandling_checkErrors() {
 	//// Where there is more than one error they are reported in sequnece, i.e. error 1, then 2, then 15 etc.
 	//// Variable "error" is set to 99 when all errors have been reported so that there is a delay before the errors are reported again
 	//// If an error is cleared it is no longer reported.
@@ -178,6 +180,8 @@ void errorHandling_checkErrors() {
 	//}
 }
 
+
+// Private Functions
 
 void errorHandling_errorLEDsOn(bool status) {
 	if (status) digitalWrite(PIN_ERROR_LED, HIGH); else digitalWrite(PIN_ERROR_LED, LOW);

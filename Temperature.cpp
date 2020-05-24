@@ -22,14 +22,16 @@ uint8_t		tempReadings = 0;
 bool			eepromUpdateRequired = false;
 
 
-void temperature_Setup() {
+// Public Functions
+void _temperature_Setup() {
 	pinMode(PIN_AMBIENT_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_CANOPY_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_ENGINE_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_BEC_TEMPERATURE_LM35, INPUT);
 }
 
-void read_temperatures() {
+
+void _temperatures_Read() {
 	// takes the average of 50 readings and populates ambientTemp, canopyTemp &  engineTemp global variables
 
 	avgAmbientTemp += (analogRead(PIN_AMBIENT_TEMPERATURE_LM35) * 3.3 / 4096) * 100 + AMBIENT_TEMP_CALIBRATION;

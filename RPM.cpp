@@ -24,7 +24,10 @@ int							clutchRPMSensorReadings = 0;				// Number of RPM readings for calculat
 
 // TODO - Ideal code to turn into a class
 
-void calcualte_RPMSensorPulse() {
+
+// Public Functions
+
+void _rpm_calcualte_SensorPulse() {
 	// interrupts complete mainRPMSensorReadings++ and clutchRPMSensorReadings++ ONLY
 
 	// Update if 60 or more interrupt signals or it more than MAX_UPDATE_TIME_MS since the last update
@@ -79,20 +82,8 @@ void calcualte_RPMSensorPulse() {
 }
 
 
-// The interrupt routine
-void onMainRPMSensorPulse() {
-	mainRPMSensorReadings++;
-}
-
-
-// The interrupt routine
-void onClutchRPMSensorPulse() {
-	clutchRPMSensorReadings++;
-}
-
-
 // Setup the interrupt pins for the attached RPM sensors
-void rpm_ActivateInterrupts() {
+void _rpm_ActivateInterrupts() {
 
 #if defined(__MK20DX256__)
 	// Pull up the PIN and activate interrupt IRQ 0 (NANO pin2, Teensy pin1) for the RPM sensor
@@ -111,4 +102,19 @@ void rpm_ActivateInterrupts() {
 	attachInterrupt(digitalPinToInterrupt(3), onClutchRPMSensorPulse, CHANGE);
 	Serial.println("Nano Interrupts Setup");
 #endif
+}
+
+
+
+// Private Functions
+
+// The interrupt routine
+void onMainRPMSensorPulse() {
+	mainRPMSensorReadings++;
+}
+
+
+// The interrupt routine
+void onClutchRPMSensorPulse() {
+	clutchRPMSensorReadings++;
 }

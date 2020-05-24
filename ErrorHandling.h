@@ -20,13 +20,12 @@ constexpr byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
 
 
 // Public Functions
-void errorHandling_Setup();
-void errorHandling_checkErrors();
-void errorHandling_errorLEDsOn(bool status);
+void _errorHandling_Setup();
+void _errorHandling_checkErrors();
 
 
 // Private Functions
-
+void errorHandling_errorLEDsOn(bool status);
 
 #endif  // .h #endif
 

@@ -59,22 +59,22 @@ void setup() {
 	delay(500);
 
 	// Start RPM for Engine and Clutch sensor monitoring
-	rpm_ActivateInterrupts();
+	_rpm_ActivateInterrupts();
 
 	// Start the RX Link Quality monitoring
-	rxLinkQuality_ActivateSBUS();
+	_rxLinkQuality_ActivateSBUS();
 
 	// Start the Telemetry Sensors
-	telemetry_ActivateTelemetry();
+	_telemetry_ActivateTelemetry();
 
 	// Start the Temperature Readings
-	temperature_Setup();
+	_temperature_Setup();
 
 	// Start the Power (Volts / Current) readings
-	power_Setup();
+	_power_Setup();
 
 	// Start the Error Handling Processes
-	errorHandling_Setup();
+	_errorHandling_Setup();
 
 	//*******************************
 	//*** START - TESTING ONLY !! ***
@@ -103,22 +103,22 @@ void loop() {
 	// Calculate the Current RPM data
 	// updates variables mainRPMSensorDetectedRPM & clutchRPMSensorDetectedRPM
 	// also updates variable inFlight
-	calcualte_RPMSensorPulse();
+	_rpm_calcualte_SensorPulse();
 
 	// Calculate the voltages and current sensors
 	// updates variables 
-	power_ReadSensors();
+	_power_ReadSensors();
 
 	// Calculate the Rx Quality Indicators
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
-	rxLinkQuality_Scan(firstRun);
+	_rxLinkQuality_Scan(firstRun);
 
 	// read the temperatures (ambient/canopy/engine)
-	read_temperatures();
+	_temperatures_Read();
 
 	// check for errors and report
-	errorHandling_checkErrors();
+	_errorHandling_checkErrors();
 
 	//*******************************
 	//*** START - TESTING ONLY !! ***
@@ -142,7 +142,7 @@ void loop() {
 	}
 
 	// Format and Send the telemetry data using the FrSky S.Port solution
-	telemetry_SendTelemetry();
+	_telemetry_SendTelemetry();
 	// Deal with the first run that inhibits errors etc.
 	if (firstRunCounter < MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS) { 
 		firstRunCounter++; 

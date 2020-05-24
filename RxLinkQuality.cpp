@@ -59,8 +59,10 @@ uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 // TODO - Align Badframes with LQBB4 calculation -- testing !!
 
 
+// Public Functions
+
 // begin the SBUS communication
-void rxLinkQuality_ActivateSBUS() {
+void _rxLinkQuality_ActivateSBUS() {
 	uint32_t maxWaitTimeMillis = millis();
 	byte counter = 0;
 
@@ -93,7 +95,7 @@ void rxLinkQuality_ActivateSBUS() {
 
 
 // Main control loop to determine the Quality of the Rx SBUS signal
-void rxLinkQuality_Scan(bool firstRun) {
+void _rxLinkQuality_Scan(bool firstRun) {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
 
 		// Capture current SBUS Frame Rate
@@ -140,8 +142,7 @@ void rxLinkQuality_Scan(bool firstRun) {
 
 
 
-// Internal Calls Only
-
+// Private Functions
 
 // Check the "real" lost frames by monitoring a wave form and chacking the data increases on each SBUS update
 // Also determines the correct Tx / Rx mode (8ch or 16ch)

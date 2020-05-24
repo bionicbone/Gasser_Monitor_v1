@@ -63,8 +63,8 @@ extern int8_t		overallE2EQuality;									// A calculation that includes lostFra
 
 
 // Public Functions
-void rxLinkQuality_ActivateSBUS();
-void rxLinkQuality_Scan(bool firstRun);
+void _rxLinkQuality_ActivateSBUS();
+void _rxLinkQuality_Scan(bool firstRun);
 
 
 // Private Functions

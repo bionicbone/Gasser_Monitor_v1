@@ -239,7 +239,7 @@ void updateValue(byte sensorNumber) {
 }
 
 
-void telemetry_ActivateTelemetry() {
+void _telemetry_ActivateTelemetry() {
 	//Sport UART 8N1 57K6
 #if defined (__AVR_ATmega328P__)
 	sport.begin(57600);
@@ -262,7 +262,7 @@ void telemetry_ActivateTelemetry() {
 }
 
 
-void telemetry_SendTelemetry() {
+void _telemetry_SendTelemetry() {
 	// Read SPort bytes
 	while (sport.available()) {
 		byte val = 0;

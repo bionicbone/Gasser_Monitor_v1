@@ -25,7 +25,7 @@ unsigned long becDischargeStoreTimeMs = millis();					// Sets to millis() each t
 
 
 // Set up the Power Reading Pins on the Teensy
-void power_Setup() {
+void _power_Setup() {
 	pinMode(PIN_BATTERY_AMPS, INPUT);
 	pinMode(PIN_BEC_AMPS, INPUT);
 	pinMode(PIN_TEENSY_VOLTAGE, INPUT);
@@ -37,11 +37,12 @@ void power_Setup() {
 
 
 // Read all the attached sensors
-void power_ReadSensors() {
+void _power_ReadSensors() {
 	power_chargeVoltages();
 	power_Battery_Amps_ASC712();
 	power_BEC_Amps_ASC712();
 }
+
 
 
 // Private Functions

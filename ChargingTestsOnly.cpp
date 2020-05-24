@@ -22,7 +22,7 @@ constexpr auto PULSE_TIMER = 2000;					//	default pulse time, in millis(), 1000 
 byte tCounter = 0;												// Stability Counter
 
 void chargingTestOnly_Setup() {
-	power_Setup();
+	_power_Setup();
 	
 	pinMode(PIN_CHARGE_RELAY, OUTPUT);
 	pinMode(PIN_DISCHARGE_RELAY, OUTPUT);
@@ -96,12 +96,12 @@ void chargingTestOnly_Control() {
 	//digitalWrite(PIN_CHARGE_RELAY, HIGH);
 
 	while (true) {
-		calcualte_RPMSensorPulse();
-		for(int i=0;i<100;i++) read_temperatures();
+		_rpm_calcualte_SensorPulse();
+		for(int i=0;i<100;i++) _temperatures_Read();
 		power_Battery_Amps_ASC712();
 		power_BEC_Amps_ASC712();
 		power_chargeVoltages(); 
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		//Serial.print("Data:,"); Serial.print(counter); Serial.print(", "); Serial.print(millis() - startOfTestTimer); Serial.print(", ");
 		//Serial.print(teensy); Serial.print(", "); Serial.print(mainRPMSensorDetectedRPM); Serial.print(", ");
 		//Serial.print(engineTemp); Serial.print(", "); Serial.print(reg); Serial.print(", "); 
@@ -141,7 +141,7 @@ void chargeBattery() {
 
 		// pause an acurate 1 second while maintaining telemetry that also updates cell[] and cellSmoothed[] values
 		while (millis() - storedDataTimer < 1000) {
-			telemetry_SendTelemetry();
+			_telemetry_SendTelemetry();
 		}
 		storedDataTimer = millis();
 		
@@ -186,9 +186,9 @@ void discharge_mAh(float mAh) {
 		//Serial.println(thismAh);
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
-			read_temperatures();
+			_temperatures_Read();
 			power_Battery_Amps_ASC714();
-			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 			thisDischargeMAH += batteryDischargeLoopMAH;
 			//Serial.println(thisDischargeMAH);
 			// delayLowVoltageCounterOnStartUp allows battery to stabilise at start of a discharge
@@ -251,9 +251,9 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 			delay(1000);
 		}
 		// Prime everything and write data
-		read_temperatures();
+		_temperatures_Read();
 		power_Battery_Amps_ASC714();
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		storedDataTimer = millis();
 		sCell1 = cellSmoothed[0];
 		sCell2 = cellSmoothed[1];
@@ -269,12 +269,12 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		// Keep the discharge for x ms
 		while (millis() - this_dischargeStoreTimeMs < (unsigned long)milliseconds) {
 		// We need to keep updating Telemetry
-			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		//	Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(millis()); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		}
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		power_Battery_Amps_ASC714();
-		read_temperatures();
+		_temperatures_Read();
 		storedDataTimer = millis();
 		dCell1 = cellSmoothed[0];
 		dCell2 = cellSmoothed[1];
@@ -290,13 +290,13 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		this_dischargeStoreTimeMs = millis();
 		while (millis() - this_dischargeStoreTimeMs < ((unsigned long)milliseconds) * 5) {
 			// We need to keep updating Telemetry
-			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		//	Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(millis()); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		}
 		// Take recovery readings
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		power_Battery_Amps_ASC714();
-		read_temperatures();
+		_temperatures_Read();
 		storedDataTimer = millis();
 		fCell1 = cellSmoothed[0];
 		fCell2 = cellSmoothed[1];
@@ -337,7 +337,7 @@ void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds
 	while (tCounter < howStable) {
 		startMillis = millis();
 		power_chargeVoltages();
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		// if not the same as the previous reading start counter again.
 		float answer = (cellSmoothed[0] + cellSmoothed[1]) - (tCell1 + tCell2);
 		if (abs(stabilityVoltageDelta) < abs(answer) && tCell1 != 0) stabilityVoltageDelta = answer;
@@ -348,7 +348,7 @@ void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds
 		//Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(tCounter); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		// Create a delay for 1 second, triggering the update if need be
 		while (millis() - startMillis < 1000) {
-			telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 			if (millis() - storedDataTimer > REPORT_TIMER) {
 				storedDataTimer = millis();
 				stabiltyCount = tCounter;
@@ -360,7 +360,7 @@ void stabiliseVoltages(byte howStable, float accuracy, bool reportEvery30Seconds
 	// dont leave until we have just written the latest data
 	while (millis() - storedDataTimer < REPORT_TIMER) {
 		// Keep telemetry live
-		telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
+		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 	}
 	storedDataTimer = millis();
 	stabiltyCount = tCounter;

@@ -48,8 +48,8 @@ extern float	becDischargeLoopAmps;										// The current AMPS measured when fu
 extern float	becDischargeLoopMAH;										// The last MAH used during the loop
 
 // Public Functions
-void power_Setup();
-void power_ReadSensors();
+void _power_Setup();
+void _power_ReadSensors();
 
 // Private Functions
 void power_chargeVoltages();

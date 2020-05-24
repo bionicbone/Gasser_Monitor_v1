@@ -40,8 +40,8 @@ extern float engineTemp;			// NOTE: These are float values on purpose so we can 
 extern float becTemp;					// NOTE: These are float values on purpose so we can detect disconnected sensors
 
 // Public Functions
-void read_temperatures();
-void temperature_Setup();
+void _temperatures_Read();
+void _temperature_Setup();
 
 // Private Functions
 

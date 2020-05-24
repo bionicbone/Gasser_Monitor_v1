@@ -30,8 +30,8 @@ extern unsigned long	FLVSSRefreshRate;							// Sensor refresh rate
 
 
 // Public Functions
-void telemetry_ActivateTelemetry();
-void telemetry_SendTelemetry();
+void _telemetry_ActivateTelemetry();
+void _telemetry_SendTelemetry();
 
 
 // Private Functions
