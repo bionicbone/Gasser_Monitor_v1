@@ -34,10 +34,10 @@ constexpr auto PIN_ENGINE_TEMPERATURE_LM35 = 28;								// Pin number for the en
 constexpr auto PIN_BEC_TEMPERATURE_LM35 = 31;										// Pin number for the BEC sensor 
 
 // Public Variables
-extern float ambientTemp;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-extern float canopyTemp;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-extern float engineTemp;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-extern float becTemp;					// NOTE: These are float values on purpose so we can detect disconnected sensors
+extern float _ambientTemp;			// NOTE: These are float values on purpose so we can detect disconnected sensors
+extern float _canopyTemp;				// NOTE: These are float values on purpose so we can detect disconnected sensors
+extern float _engineTemp;				// NOTE: These are float values on purpose so we can detect disconnected sensors
+extern float _becTemp;					// NOTE: These are float values on purpose so we can detect disconnected sensors
 
 // Public Functions
 void _temperatures_Read();

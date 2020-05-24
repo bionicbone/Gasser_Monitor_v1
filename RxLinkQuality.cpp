@@ -8,16 +8,16 @@ SBUS sbus(Serial1);
 
 
 // Public Variables
-uint32_t			totalFrames = 0;														// Total SBUS frames received and processed
-uint16_t			lostFramesPercentage100Result = 0;					// The current percentage based on last 100 frames processed
-uint16_t			badFramesPercentage100Result = 0;						// The current percentage based on last 100 frames processed
-uint16_t			wave1 = 0;																	// Used to pass current value to telemetry
-uint16_t			wave2 = 0;																	// Used to pass current value to telemetry
-uint32_t			channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
-float					channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-uint16_t			sbusFrameLowMicros = 0;											// Stores the SBUS Lowest time before next refresh over the last 100 frames
-uint16_t			sbusFrameHighMicros = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
-int8_t				overallE2EQuality = 0;											// A complex calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
+uint32_t			_totalFrames = 0;														// Total SBUS frames received and processed
+uint16_t			_lostFramesPercentage100Result = 0;					// The current percentage based on last 100 frames processed
+uint16_t			_badFramesPercentage100Result = 0;					// The current percentage based on last 100 frames processed
+uint16_t			_wave1 = 0;																	// Used to pass current value to telemetry
+uint16_t			_wave2 = 0;																	// Used to pass current value to telemetry
+uint32_t			_channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
+float					_channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
+uint16_t			_sbusFrameLowMicros = 0;										// Stores the SBUS Lowest time before next refresh over the last 100 frames
+uint16_t			_sbusFrameHighMicros = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
+int8_t				_overallE2EQuality = 0;											// A complex calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
 
 
 // Private Variables
@@ -102,7 +102,7 @@ void _rxLinkQuality_Scan(bool firstRun) {
 		sbus_FrameRate();
 
 		// Increase total frames received
-		totalFrames++;
+		_totalFrames++;
 
 		// These are just for debugging purposes
 #if defined(DEBUG_FS_LF_ERRORS) || defined(DEBUG_WAVE_CHANNEL_DATA)
@@ -130,8 +130,8 @@ void _rxLinkQuality_Scan(bool firstRun) {
 		calculate_Overall_EndToEnd_Quality();
 
 		// Capture the current channel value for Telemetry
-		wave1 = channels[badFramesMonitoringChannel1 - 1];
-		wave2 = channels[badFramesMonitoringChannel2 - 1];
+		_wave1 = channels[badFramesMonitoringChannel1 - 1];
+		_wave2 = channels[badFramesMonitoringChannel2 - 1];
 
 		// Capture the current channel value for the next loop
 		channelsPrevious[badFramesMonitoringChannel1 - 1] = channels[badFramesMonitoringChannel1 - 1];
@@ -177,9 +177,9 @@ void calculate_BB_Bits() {
 	if (badFramesMonitoringType == 1) {														// 8ch mode.
 		//Serial.println("8ch Mode");
 		MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_1;												// 11
-		if (badFramesPercentage100Result < TRSHLD_8CH_1_CHNG) {			// <75			
+		if (_badFramesPercentage100Result < TRSHLD_8CH_1_CHNG) {			// <75			
 			MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_2;											// 9
-			if (badFramesPercentage100Result < TRSHLD_8CH_2_CHNG) {		// <50
+			if (_badFramesPercentage100Result < TRSHLD_8CH_2_CHNG) {		// <50
 				MaxTriangleDiff = MAX_TRIANGLE_DIFF_8CH_3;										// 9
 			}
 		}
@@ -188,9 +188,9 @@ void calculate_BB_Bits() {
 		// determine BB_Bit threshold based on BB Link Quality						
 		//Serial.println("16ch Mode");
 		MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_1;												// 19
-		if (badFramesPercentage100Result < TRSHLD_16CH_1_CHNG) {			// <75			
+		if (_badFramesPercentage100Result < TRSHLD_16CH_1_CHNG) {			// <75			
 			MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_2;											// 18
-			if (badFramesPercentage100Result < TRSHLD_16CH_2_CHNG) {		// <50
+			if (_badFramesPercentage100Result < TRSHLD_16CH_2_CHNG) {		// <50
 				MaxTriangleDiff = MAX_TRIANGLE_DIFF_16CH_3;										// 17
 			}
 		}
@@ -254,15 +254,15 @@ void calculate_BB_Bits() {
 	if (badFramesPercentage100Counter >= 100)  badFramesPercentage100Counter = 0;
 
 	// Calculate bad frame % based on last 100 frames received.
-	badFramesPercentage100Result = 0;
+	_badFramesPercentage100Result = 0;
 	for (int i = 0; i < 100; i++) {
-		badFramesPercentage100Result += badFramesPercentage100Array[i];
+		_badFramesPercentage100Result += badFramesPercentage100Array[i];
 	}
 	// Due to lost frames it is possible for the result to be more than 100!!
-	if (badFramesPercentage100Result > 100) badFramesPercentage100Result = 100;
+	if (_badFramesPercentage100Result > 100) _badFramesPercentage100Result = 100;
 
 	// The % calculation
-	badFramesPercentage100Result = 100 - badFramesPercentage100Result;
+	_badFramesPercentage100Result = 100 - _badFramesPercentage100Result;
 
 	/*
 	badFramesMonitoringType == 1 - 8ch mode, wave on Ch1 - Ch8
@@ -272,10 +272,10 @@ void calculate_BB_Bits() {
 */
 
 // Handle Telemetry Reporting of the Monitoring Type and Channels
-	if (totalFrames < 1000 && badFramesMonitoringType == 1) { badFramesPercentage100Result = 8; }
-	if (totalFrames < 1000 && badFramesMonitoringType > 1) { badFramesPercentage100Result = 16; }
-	if (totalFrames >= 1000 && totalFrames < 2000 && badFramesMonitoringType != 3) { badFramesPercentage100Result = badFramesMonitoringChannel1; }
-	if (totalFrames >= 1500 && totalFrames < 2000 && badFramesMonitoringType == 4) { badFramesPercentage100Result = badFramesMonitoringChannel2; }
+	if (_totalFrames < 1000 && badFramesMonitoringType == 1) { _badFramesPercentage100Result = 8; }
+	if (_totalFrames < 1000 && badFramesMonitoringType > 1) { _badFramesPercentage100Result = 16; }
+	if (_totalFrames >= 1000 && _totalFrames < 2000 && badFramesMonitoringType != 3) { _badFramesPercentage100Result = badFramesMonitoringChannel1; }
+	if (_totalFrames >= 1500 && _totalFrames < 2000 && badFramesMonitoringType == 4) { _badFramesPercentage100Result = badFramesMonitoringChannel2; }
 
 #if defined(DEBUG_CURRENT_BFP)		
 	if (badFramesPercentage100Result != lastbadFramesPercentage100Result) {
@@ -352,9 +352,9 @@ RETURN_EARLY:
 	if (channelMaxHold100Counter == 100) { channelMaxHold100Counter = 0; }
 
 	// Find the highest value in the array
-	channelsMaxHoldMillis100Resul = 0;
+	_channelsMaxHoldMillis100Resul = 0;
 	for (int i = 0; i < 100; i++) {
-		if (channelsMaxHoldMillis100Arra[i] > channelsMaxHoldMillis100Resul) { channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
+		if (channelsMaxHoldMillis100Arra[i] > _channelsMaxHoldMillis100Resul) { _channelsMaxHoldMillis100Resul = channelsMaxHoldMillis100Arra[i]; }
 	}
 
 #if defined(DEBUG_CHANNEL_HOLD_DATA)
@@ -456,12 +456,12 @@ void sync_16chFrame(bool firstRun) {
 				}
 			}
 		}
-		channel16chFrameSyncSuccessRate = 100 - (float)channel16chFrameSyncErrorCounter / totalFrames * 100;
+		_channel16chFrameSyncSuccessRate = 100 - (float)channel16chFrameSyncErrorCounter / _totalFrames * 100;
 
 		// TEMP - Serial Print if the success rate is low
-		if (firstRun == false && channel16chFrameSyncSuccessRate < 97.5) {
+		if (firstRun == false && _channel16chFrameSyncSuccessRate < 97.5) {
 			// TODO - Add this as a ERROR on telemetry inside sync_16chFrame() - once done #if this out with   DEBUG_SBUS_16CH_FRAME_SYNC_DATA
-			Serial.print("Low SBUS Frame Sync Success Rate @ "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
+			Serial.print("Low SBUS Frame Sync Success Rate @ "); Serial.print(_channel16chFrameSyncSuccessRate); Serial.println("%");
 		}
 	}
 
@@ -517,13 +517,13 @@ void calculate_LostFrames() {
 	if (lostFramesPercentage100Counter >= 100)  lostFramesPercentage100Counter = 0;
 
 	// Calculate bad frame % based on last 100 frames received.
-	lostFramesPercentage100Result = 0;
+	_lostFramesPercentage100Result = 0;
 	for (int i = 0; i < 100; i++) {
-		lostFramesPercentage100Result += lostFramesPercentage100Array[i];
+		_lostFramesPercentage100Result += lostFramesPercentage100Array[i];
 	}
 	// It should not be possible to have an answer over 100 but just in case
-	if (lostFramesPercentage100Result > 100) lostFramesPercentage100Result = 100;
-	lostFramesPercentage100Result = 100 - lostFramesPercentage100Result;
+	if (_lostFramesPercentage100Result > 100) _lostFramesPercentage100Result = 100;
+	_lostFramesPercentage100Result = 100 - _lostFramesPercentage100Result;
 }
 
 
@@ -645,7 +645,7 @@ void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMoni
 // Dumps Previous vs Current Channel of the Wave Channel(s) to USB serial.
 void debug_Wave_Data() {
 	// Alway compile this, it is used in many routines
-	Serial.print(micros()); Serial.print(":");		Serial.print("  BFP ="); Serial.println(badFramesPercentage100Result);
+	Serial.print(micros()); Serial.print(":");		Serial.print("  BFP ="); Serial.println(_badFramesPercentage100Result);
 
 	if (badFramesMonitoringChannel1 != 0) {
 		Serial.print("CH"); Serial.print(badFramesMonitoringChannel1); Serial.print(" = ");
@@ -681,7 +681,7 @@ void sbus_FrameRate() {
 		sbusFrame100Counter = 0;
 
 		if (sbusFrameRateOK == false) {
-			sbusNormalRefreshRate = (sbusNormalRefreshRate + (sbusFrameLowMicros + ((sbusFrameHighMicros - sbusFrameLowMicros) / 2))) / 2;
+			sbusNormalRefreshRate = (sbusNormalRefreshRate + (_sbusFrameLowMicros + ((_sbusFrameHighMicros - _sbusFrameLowMicros) / 2))) / 2;
 			if (sbusPreviousRefreshRate >= sbusNormalRefreshRate - 10 && sbusPreviousRefreshRate <= sbusNormalRefreshRate + 10) {
 				sbusFrameRateOK = true;
 				sbusNormalRefreshRate = int((sbusNormalRefreshRate + 50) / 100) * 100;
@@ -695,17 +695,17 @@ void sbus_FrameRate() {
 #endif
 
 		sbusPreviousRefreshRate = sbusNormalRefreshRate;
-		sbusFrameLowMicros = sbusNormalRefreshRate;
-		sbusFrameHighMicros = sbusNormalRefreshRate;
+		_sbusFrameLowMicros = sbusNormalRefreshRate;
+		_sbusFrameHighMicros = sbusNormalRefreshRate;
 	}
 
-	if (micros() - sbusFrameStartMicros < sbusFrameLowMicros) {
-		sbusFrameLowMicros = micros() - sbusFrameStartMicros;
-		if (sbusFrameLowMicros < SBUS_MIN_FRAME_RATE) { sbusFrameLowMicros = SBUS_DEFAULT_FRAME_RATE; }
+	if (micros() - sbusFrameStartMicros < _sbusFrameLowMicros) {
+		_sbusFrameLowMicros = micros() - sbusFrameStartMicros;
+		if (_sbusFrameLowMicros < SBUS_MIN_FRAME_RATE) { _sbusFrameLowMicros = SBUS_DEFAULT_FRAME_RATE; }
 	}
-	if (micros() - sbusFrameStartMicros > sbusFrameHighMicros) {
-		sbusFrameHighMicros = micros() - sbusFrameStartMicros;
-		if (sbusFrameHighMicros > SBUS_MAX_FRAME_RATE) { sbusFrameHighMicros = SBUS_DEFAULT_FRAME_RATE; }
+	if (micros() - sbusFrameStartMicros > _sbusFrameHighMicros) {
+		_sbusFrameHighMicros = micros() - sbusFrameStartMicros;
+		if (_sbusFrameHighMicros > SBUS_MAX_FRAME_RATE) { _sbusFrameHighMicros = SBUS_DEFAULT_FRAME_RATE; }
 	}
 
 
@@ -716,13 +716,13 @@ void sbus_FrameRate() {
 
 // Calculate the End to End quality of the Tx Rx and Sbus
 void calculate_Overall_EndToEnd_Quality() {
-	overallE2EQuality = 100;
+	_overallE2EQuality = 100;
 	int16_t calc = 0;
 
 	// Reduce for the SBUS frame rate deviation
-	calc = (sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
+	calc = (_sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
 	if (calc < 0) calc = 0;
-	overallE2EQuality -= calc;
+	_overallE2EQuality -= calc;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("sbusFrameHighMicros = "); Serial.println(sbusFrameHighMicros);
 	//Serial.print("sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
@@ -730,18 +730,18 @@ void calculate_Overall_EndToEnd_Quality() {
 #endif
 
 	// Reduce for the Lost Frames %
-	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;
+	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - _lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;
 	if (calc < 0) calc = 0;
-	overallE2EQuality -= calc;
+	_overallE2EQuality -= calc;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("lostFramesPercentage100Result = "); Serial.println(lostFramesPercentage100Result);
 	Serial.print("lostFramesPercentage100Result QI = "); Serial.println(calc);
 #endif
 
 	// Reduce for the Bad Frames %
-	calc = (E2E_QI_BADFRAME_ALLOWED_MIN - badFramesPercentage100Result) * E2E_QI_BADFRAME_MULTIPLIER;
+	calc = (E2E_QI_BADFRAME_ALLOWED_MIN - _badFramesPercentage100Result) * E2E_QI_BADFRAME_MULTIPLIER;
 	if (calc < 0) calc = 0;
-	overallE2EQuality -= calc;
+	_overallE2EQuality -= calc;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("badFramesPercentage100Result = "); Serial.println(badFramesPercentage100Result);
 	Serial.print("badFramesPercentage100Result QI = "); Serial.println(calc);
@@ -749,9 +749,9 @@ void calculate_Overall_EndToEnd_Quality() {
 
 	// Reduce for the 16ch SBUS Sync Success Rate %
 	if (badFramesMonitoringType > 1) {
-		calc = (E2E_QI_16CHSYNC_ALLOWED_MIN - channel16chFrameSyncSuccessRate) * E2E_QI_16CHSYNC_MULTIPLIER;
+		calc = (E2E_QI_16CHSYNC_ALLOWED_MIN - _channel16chFrameSyncSuccessRate) * E2E_QI_16CHSYNC_MULTIPLIER;
 		if (calc < 0) calc = 0;
-		overallE2EQuality -= calc;
+		_overallE2EQuality -= calc;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 		//Serial.print("channel16chFrameSyncSuccessRate = "); Serial.println(channel16chFrameSyncSuccessRate);
 		Serial.print("channel16chFrameSyncSuccessRate QI = "); Serial.println(calc);
@@ -759,16 +759,16 @@ void calculate_Overall_EndToEnd_Quality() {
 	}
 
 	// Reduce for the the frame Holds %
-	calc = channelsMaxHoldMillis100Resul - E2E_QI_FRAMEHOLD_ALLOWED_MAX;
+	calc = _channelsMaxHoldMillis100Resul - E2E_QI_FRAMEHOLD_ALLOWED_MAX;
 	if (calc < 0) calc = 0;
-	overallE2EQuality -= calc;
+	_overallE2EQuality -= calc;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 	//Serial.print("channelsMaxHoldMillis100Resul = "); Serial.println(channelsMaxHoldMillis100Resul);
 	Serial.print("channelsMaxHoldMillis100Resul QI = "); Serial.println(calc);
 #endif
 
-	if (overallE2EQuality < 0 || failSafe == true) overallE2EQuality = 0;
-	if (overallE2EQuality > 100) overallE2EQuality = 100;
+	if (_overallE2EQuality < 0 || failSafe == true) _overallE2EQuality = 0;
+	if (_overallE2EQuality > 100) _overallE2EQuality = 100;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
 	Serial.print("overallE2EQuality = "); Serial.println(overallE2EQuality);
 #endif

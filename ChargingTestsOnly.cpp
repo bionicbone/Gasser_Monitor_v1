@@ -110,8 +110,8 @@ void chargingTestOnly_Control() {
 		//Serial.print(batteryDischargeLoopAmps); Serial.print(", "); Serial.print(0 - batteryDischargeTotalMAH); Serial.print(", ");
 		//Serial.print(cellSmoothed[0]); Serial.print(", "); Serial.println(cellSmoothed[1]);
 		counter++;
-		if (engineTemp >= 35) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
-		if (ambientTemp >= 55) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (_engineTemp >= 35) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
+		if (_ambientTemp >= 55) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
 		if (cellSmoothed[0] <= 3.0) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
 		if (cellSmoothed[1] <= 3.0) { digitalWrite(PIN_DISCHARGE_RELAY, LOW); }
 		if (cellSmoothed[0] >= 3.43) { digitalWrite(PIN_CHARGE_RELAY, LOW); }
@@ -127,7 +127,7 @@ void chargeBattery() {
 		storedDataTimer = millis();
 
 		// If we think we have charged more than 1900mAH then stop the charge
-		if (batteryDischargeTotalMAH > 1900) {
+		if (_batteryDischargeTotalMAH > 1900) {
 			storeDataInArrays(10);
 			break;
 		}
@@ -165,7 +165,7 @@ void discharge_mAh(float mAh) {
 	byte lowVoltage = false;
 	float thisDischargeMAH = 0.000;
 	float thismAh = 0.000; 
-	batteryDischargeLoopAmps = 0.000;
+	_batteryDischargeLoopAmps = 0.000;
 
 	// pulse discharge so we get a first reading, ultimately this is the data needed
 	// what is the voltage drop and recovery when the battery has x % remaining
@@ -182,14 +182,14 @@ void discharge_mAh(float mAh) {
 		// battery capacity.
 		// this takes into account that the pulse discharge
 		// effects the remaining capacity.
-		thismAh = mAh - (((batteryDischargeTotalMAH / mAh) - int(batteryDischargeTotalMAH / mAh)) * mAh);
+		thismAh = mAh - (((_batteryDischargeTotalMAH / mAh) - int(_batteryDischargeTotalMAH / mAh)) * mAh);
 		//Serial.println(thismAh);
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
 			_temperatures_Read();
 			power_Battery_Amps_ASC714();
 			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-			thisDischargeMAH += batteryDischargeLoopMAH;
+			thisDischargeMAH += _batteryDischargeLoopMAH;
 			//Serial.println(thisDischargeMAH);
 			// delayLowVoltageCounterOnStartUp allows battery to stabilise at start of a discharge
 			// otherwise it can be detected as a flat battery way before its actaully flat
@@ -412,10 +412,10 @@ void storeDataInArrays(byte cycleType) {
 	Serial.print(cellSmoothed[0], 4); Serial.print(",");
 	Serial.print(cellSmoothed[1], 4); Serial.print(",");
 	Serial.print(cellSmoothed[2], 4); Serial.print(",");
-	Serial.print(batteryDischargeLoopAmps); Serial.print(",");
-	Serial.print(batteryDischargeTotalMAH); Serial.print(",");
-	Serial.print(becVoltage); Serial.print(",");
-	Serial.print(recVoltage); Serial.print(",");
+	Serial.print(_batteryDischargeLoopAmps); Serial.print(",");
+	Serial.print(_batteryDischargeTotalMAH); Serial.print(",");
+	Serial.print(_becVoltage); Serial.print(",");
+	Serial.print(_recVoltage); Serial.print(",");
 	Serial.println(tCounter);
 	aCounter++;
 }

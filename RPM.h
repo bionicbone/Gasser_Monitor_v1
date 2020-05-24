@@ -18,9 +18,9 @@ const uint8_t		PIN_MAIN_RPM_SENSOR_INTERRUPT_0 = 2;			// Digital Input Pin for R
 const uint8_t		PIN_CLUTCH_RPM_SENSOR_INTERRUPT_1 = 3;		// Digital Input Pin for RPM Sensor (A3144 Hall Effect Sensor)
 
 // Public Variables
-extern uint32_t mainRPMSensorDetectedRPM;
-extern uint32_t clutchRPMSensorDetectedRPM;
-extern bool inFlight;
+extern uint32_t _mainRPMSensorDetectedRPM;
+extern uint32_t _clutchRPMSensorDetectedRPM;
+extern bool			_inFlight;
 
 // Public Functions
 void _rpm_calcualte_SensorPulse();

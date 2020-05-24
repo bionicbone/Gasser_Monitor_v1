@@ -39,13 +39,13 @@ constexpr float	BEC_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;			// Teensy is only 3.3v,
 																														// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
 
 // Public Variables
-extern float	teensyVoltage, recVoltage, becVoltage;	// Teensy 5v line, Regulator and BEC voltages
-extern float	batteryDischargeTotalMAH;								// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-extern float	batteryDischargeLoopAmps;								// The current AMPS measured when function called
-extern float	batteryDischargeLoopMAH;								// The last MAH used during the loop
-extern float	becDischargeTotalMAH;										// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-extern float	becDischargeLoopAmps;										// The current AMPS measured when function called
-extern float	becDischargeLoopMAH;										// The last MAH used during the loop
+extern float	_teensyVoltage, _recVoltage, _becVoltage;			// Teensy 5v line, Regulator and BEC voltages
+extern float	_batteryDischargeTotalMAH;										// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+extern float	_batteryDischargeLoopAmps;										// The current AMPS measured when function called
+extern float	_batteryDischargeLoopMAH;											// The last MAH used during the loop
+extern float	_becDischargeTotalMAH;												// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+extern float	_becDischargeLoopAmps;												// The current AMPS measured when function called
+extern float	_becDischargeLoopMAH;													// The last MAH used during the loop
 
 // Public Functions
 void _power_Setup();

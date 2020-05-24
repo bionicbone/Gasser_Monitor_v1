@@ -7,13 +7,13 @@
 
 
 // Public Variables
-float					teensyVoltage, recVoltage, becVoltage;			// Teensy, Rectifier and BEC voltages
-float					batteryDischargeTotalMAH = 0;								// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-float					batteryDischargeLoopAmps = 0.00;						// The current AMPS measured when function called
-float					batteryDischargeLoopMAH = 0.00;							// The last MAH used during the loop
-float					becDischargeTotalMAH = 0;;									// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
-float					becDischargeLoopAmps = 0.00;								// The current AMPS measured when function called
-float					becDischargeLoopMAH = 0.00;									// The last MAH used during the loop
+float				_teensyVoltage, _recVoltage, _becVoltage;			// Teensy, Rectifier and BEC voltages
+float				_batteryDischargeTotalMAH = 0;								// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+float				_batteryDischargeLoopAmps = 0.00;							// The current AMPS measured when function called
+float				_batteryDischargeLoopMAH = 0.00;							// The last MAH used during the loop
+float				_becDischargeTotalMAH = 0;;										// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
+float				_becDischargeLoopAmps = 0.00;									// The current AMPS measured when function called
+float				_becDischargeLoopMAH = 0.00;									// The last MAH used during the loop
 
 // Private Variables
 float					avgTeensy, avgRec, avgBec;									// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
@@ -149,10 +149,10 @@ void power_Battery_Amps_ASC712() {
 	batteryDischargeLoopTimeMs = (millis() - batteryDischargeStoreTimeMs);
 	batteryDischargeStoreTimeMs = millis();
 	float myFloat = (float)batteryDischargeLoopTimeMs;
-	batteryDischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
-	batteryDischargeLoopMAH = batteryDischargeLoopMAH * 1000000;
-	batteryDischargeTotalMAH += batteryDischargeLoopMAH;
-	batteryDischargeLoopAmps = result;
+	_batteryDischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
+	_batteryDischargeLoopMAH = _batteryDischargeLoopMAH * 1000000;
+	_batteryDischargeTotalMAH += _batteryDischargeLoopMAH;
+	_batteryDischargeLoopAmps = result;
 #if defined(DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
 	Serial.print("   myAMPs "); Serial.print(result);
 	Serial.print("   batteryDischargeTotalMAH "); Serial.println(int(batteryDischargeTotalMAH));
@@ -265,10 +265,10 @@ void power_BEC_Amps_ASC712() {
 	becDischargeLoopTimeMs = (millis() - becDischargeStoreTimeMs);
 	becDischargeStoreTimeMs = millis();
 	float myFloat = (float)becDischargeLoopTimeMs;
-	becDischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
-	becDischargeLoopMAH = becDischargeLoopMAH * 1000000;
-	becDischargeTotalMAH += becDischargeLoopMAH;
-	becDischargeLoopAmps = result;
+	_becDischargeLoopMAH = ((result / 1000)  * myFloat) / 3600000;
+	_becDischargeLoopMAH = _becDischargeLoopMAH * 1000000;
+	_becDischargeTotalMAH += _becDischargeLoopMAH;
+	_becDischargeLoopAmps = result;
 #if defined(DEBUG_ASC712_BEC_AMPS_CALCULATION)
 	Serial.print("   myAMPs "); Serial.print(result);
 	Serial.print("   becDischargeTotalMAH "); Serial.println(int(becDischargeTotalMAH));
@@ -293,20 +293,20 @@ void power_chargeVoltages() {
 
 	chargeReadings++;
 	if (chargeReadings > 3) {
-		recVoltage = (avgRec / chargeReadings) * 16.20;
-		becVoltage = (avgBec / chargeReadings) * 7.739580311;
-		teensyVoltage = (avgTeensy / chargeReadings) * 1.75;
+		_recVoltage = (avgRec / chargeReadings) * 16.20;
+		_becVoltage = (avgBec / chargeReadings) * 7.739580311;
+		_teensyVoltage = (avgTeensy / chargeReadings) * 1.75;
 		chargeReadings = 0;
 		
 		// Calibrate
-		recVoltage += REG_CALIBRATION;
-		becVoltage += BEC_CALIBRATION;
-		teensyVoltage += TEENSY_CALIBRATION;
+		_recVoltage += REG_CALIBRATION;
+		_becVoltage += BEC_CALIBRATION;
+		_teensyVoltage += TEENSY_CALIBRATION;
 		
 		// Stop irrelevent data
-		if (recVoltage == REG_CALIBRATION || recVoltage < 1) recVoltage = 0;
-		if (becVoltage == BEC_CALIBRATION || becVoltage < 1) becVoltage = 0;
-		if (teensyVoltage == TEENSY_CALIBRATION || teensyVoltage < 1) teensyVoltage = 0;
+		if (_recVoltage == REG_CALIBRATION || _recVoltage < 1) _recVoltage = 0;
+		if (_becVoltage == BEC_CALIBRATION || _becVoltage < 1) _becVoltage = 0;
+		if (_teensyVoltage == TEENSY_CALIBRATION || _teensyVoltage < 1) _teensyVoltage = 0;
 
 		avgRec = 0;
 		avgBec = 0;

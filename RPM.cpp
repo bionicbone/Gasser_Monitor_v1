@@ -6,9 +6,9 @@
 
 
 // Public Variables
-uint32_t				mainRPMSensorDetectedRPM = 0;				// Holds the main current RPM value (based on an average over several readings)
-uint32_t				clutchRPMSensorDetectedRPM = 0;			// Holds the main current RPM value (based on an average over several readings)
-bool						inFlight = false;										// true if in flight, detected by RPM > 600
+uint32_t				_mainRPMSensorDetectedRPM = 0;			// Holds the main current RPM value (based on an average over several readings)
+uint32_t				_clutchRPMSensorDetectedRPM = 0;		// Holds the main current RPM value (based on an average over several readings)
+bool						_inFlight = false;									// true if in flight, detected by RPM > 600
 
 
 // Private Variables
@@ -40,7 +40,7 @@ void _rpm_calcualte_SensorPulse() {
 		
 		// do we need to calculate the average
 		if (mainRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
-			mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2;  // For some unknown reason my flywheel counts double the pluses
+			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2;  // For some unknown reason my flywheel counts double the pluses
 			mainRPMSensorAvgRPM = 0;
 			mainRPMSensorAvgCounter = 0;
 		}
@@ -58,7 +58,7 @@ void _rpm_calcualte_SensorPulse() {
 		
 		// do we need to calculate the average
 		if (clutchRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
-			clutchRPMSensorDetectedRPM = clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter;
+			_clutchRPMSensorDetectedRPM = clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter;
 			clutchRPMSensorAvgRPM = 0;
 			clutchRPMSensorAvgCounter = 0;
 		}
@@ -68,12 +68,12 @@ void _rpm_calcualte_SensorPulse() {
 
 	// update the inFlight flag
 	// inFlight flag used mainly to stop OLED updates which can take time and effect the RPM accuracy
-	if (mainRPMSensorDetectedRPM < 600 || mainRPMSensorDetectedRPM > 30000) {
-		mainRPMSensorDetectedRPM = 0;
-		inFlight = false;
+	if (_mainRPMSensorDetectedRPM < 600 || _mainRPMSensorDetectedRPM > 30000) {
+		_mainRPMSensorDetectedRPM = 0;
+		_inFlight = false;
 	}
 	else {
-		inFlight = true;
+		_inFlight = true;
 #if defined(OLED_OUTPUT)
 		// sleep the OLED screen for safety and not much use in flight.
 		oLED_Sleep();

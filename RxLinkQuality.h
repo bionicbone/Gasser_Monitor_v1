@@ -50,16 +50,16 @@ constexpr auto E2E_QI_FRAMEHOLD_ALLOWED_MAX = 48;		// Frame Holds can increase t
 
 
 // Public Variables
-extern uint16_t lostFramesPercentage100Result;			// The final % value for lost frames calculated using the BB_Bits Method
-extern uint16_t badFramesPercentage100Result;				// The final % value for bad frames calculated using the BB_Bits Method
-extern uint32_t totalFrames;												// Total number of SBUS frames processed
-extern uint16_t wave1;															// Used to pass current value to telemetry
-extern uint16_t wave2;															// Used to pass current value to telemetry
-extern uint32_t channelsMaxHoldMillis100Resul;			// Stores max millis() for every 100 readings
-extern float		channel16chFrameSyncSuccessRate;		// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-extern uint16_t	sbusFrameLowMicros;									// Stores the SBUS Lowest time before next refresh over the last 100 frames
-extern uint16_t	sbusFrameHighMicros;								// Stores the SBUS highest time before next refresh over the last 100 frames
-extern int8_t		overallE2EQuality;									// A calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
+extern uint16_t _lostFramesPercentage100Result;			// The final % value for lost frames calculated using the BB_Bits Method
+extern uint16_t _badFramesPercentage100Result;			// The final % value for bad frames calculated using the BB_Bits Method
+extern uint32_t _totalFrames;												// Total number of SBUS frames processed
+extern uint16_t _wave1;															// Used to pass current value to telemetry
+extern uint16_t _wave2;															// Used to pass current value to telemetry
+extern uint32_t _channelsMaxHoldMillis100Resul;			// Stores max millis() for every 100 readings
+extern float		_channel16chFrameSyncSuccessRate;		// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
+extern uint16_t	_sbusFrameLowMicros;								// Stores the SBUS Lowest time before next refresh over the last 100 frames
+extern uint16_t	_sbusFrameHighMicros;								// Stores the SBUS highest time before next refresh over the last 100 frames
+extern int8_t		_overallE2EQuality;									// A calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
 
 
 // Public Functions
