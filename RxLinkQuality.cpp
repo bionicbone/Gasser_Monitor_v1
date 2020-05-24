@@ -2,9 +2,9 @@
 #include "RxLinkQuality.h"
 
 
-// Config
+// Setup SBUS
 SBUS sbus(Serial1);
-const uint16_t MAX_WAIT_TIME_MS = 200;										// Maximum wait time for a valid SBUS signal when activating SBUS or looking for a valid wave
+
 
 
 // Public Variables
