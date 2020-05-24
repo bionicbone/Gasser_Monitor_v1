@@ -5,27 +5,6 @@
 #include "Power.h"
 #include "Config.h"
 
-// Config
-const float		REG_CALIBRATION = 0.00;
-const float		BEC_CALIBRATION = 0.00; 
-const float		TEENSY_CALIBRATION = -0.06;
-const int			ADCRAW_PRECISION = 4096;										// DO NOT ALTER, Teensy 12 bit
-const float		VREF_CALCULATION_VOLTAGE = 3.3;							// 3.3v for  Teensy, measured and perfect with 5v to Teensy
-const float		ASC714_0_AMPS_OFFSET = -2.4790;							// ASC714 offset to 0 Amps as per datasheet
-const float		ASC714_0_AMPS_OFFSET_CALIBRATION = -0.07;		// ASC714 offset to 0 Amps as required, in case of slight variation
-const float		ASC713_0_AMPS_OFFSET = -0.4955;							// ASC713 offset to 0 Amps as per datasheet
-const float		ASC713_0_AMPS_OFFSET_CALIBRATION = -0.040;	// ASC713 offset to 0 Amps as required, in case of slight variation
-const float		BATTERY_ASC712_0_AMPS_OFFSET = -2.53;				// Battery ASC712 offset to 0 Amps as per datasheet
-const float		BATTERY_ASC712_0_AMPS_POS_DIVIDER = 0.165;	// Battery ASC712 mV/A divider, as measured under load
-const float		BATTERY_ASC712_0_AMPS_NEG_DIVIDER = 0.175;	// Battery ASC712 mV/A divider, as measured under load
-const float		BEC_ASC712_0_AMPS_OFFSET = -2.5284;					// BEC ASC712 offset to 0 Amps as per datasheet
-const float		BEC_ASC712_0_AMPS_POS_DIVIDER = 0.150;			// BEC ASC712 mV/A divider, as measured under load
-const float		BEC_ASC712_0_AMPS_NEG_DIVIDER = 0.185;			// BEC ASC712 mV/A divider, as measured under load
-const float		TEENSY_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;		// Teensy is only 3.3v, if a divider circuit is used we ...
-const float		BATTERY_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;  // Teensy is only 3.3v, if a divider circuit is used we ...
-const float		BEC_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;			// Teensy is only 3.3v, if a divider circuit is used we, 
-																													// need to recaluate the voltage back to 2.5v @ 0 AMPS
-																													// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
 
 // Public Variables
 float					teensyVoltage, recVoltage, becVoltage;			// Teensy, Rectifier and BEC voltages
