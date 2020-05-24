@@ -152,7 +152,7 @@ void calculate_BB_Bits() {
 	uint16_t MaxTriangleDiff = 0;
 
 #if defined(DEBUG_CURRENT_BFP)	
-	uint16_t lastbadFramesPercentage100Result = badFramesPercentage100Result;
+	uint16_t lastbadFramesPercentage100Result = _badFramesPercentage100Result;
 #endif
 
 	// check we know the correct scan channel before attempting to scan
@@ -278,9 +278,9 @@ void calculate_BB_Bits() {
 	if (_totalFrames >= 1500 && _totalFrames < 2000 && badFramesMonitoringType == 4) { _badFramesPercentage100Result = badFramesMonitoringChannel2; }
 
 #if defined(DEBUG_CURRENT_BFP)		
-	if (badFramesPercentage100Result != lastbadFramesPercentage100Result) {
+	if (_badFramesPercentage100Result != lastbadFramesPercentage100Result) {
 		Serial.print("millis(): "); Serial.print(millis()); Serial.print("   ");
-		Serial.print("BFP: "); Serial.println(badFramesPercentage100Result);
+		Serial.print("BFP: "); Serial.println(_badFramesPercentage100Result);
 	}
 #endif
 }
@@ -358,7 +358,7 @@ RETURN_EARLY:
 	}
 
 #if defined(DEBUG_CHANNEL_HOLD_DATA)
-	Serial.print("MFH  = "); Serial.print(channelsMaxHoldMillis100Resul); Serial.println("ms");
+	Serial.print("MFH  = "); Serial.print(_channelsMaxHoldMillis100Resul); Serial.println("ms");
 #endif
 }
 
@@ -470,7 +470,7 @@ void sync_16chFrame(bool firstRun) {
 	Serial.print("FrameSyncValue = "); Serial.println(channel16chFrameSync);
 	Serial.print("Next Frame expected on  1-8? = "); Serial.println(channel16chFrameSync);
 	Serial.print("Next Frame expected on 9-16? = "); Serial.println(!channel16chFrameSync);
-	Serial.print("Sync Frame Success Rate = "); Serial.print(channel16chFrameSyncSuccessRate); Serial.println("%");
+	Serial.print("Sync Frame Success Rate = "); Serial.print(_channel16chFrameSyncSuccessRate); Serial.println("%");
 #endif
 }
 
@@ -689,8 +689,8 @@ void sbus_FrameRate() {
 		}
 
 #if defined (DEBUG_SBUS_FRAME_TIME)
-		Serial.print("SBUS Frame Rate Low  = "); Serial.println(sbusFrameLowMicros);
-		Serial.print("SBUS Frame Rate High = "); Serial.println(sbusFrameHighMicros);
+		Serial.print("SBUS Frame Rate Low  = "); Serial.println(_sbusFrameLowMicros);
+		Serial.print("SBUS Frame Rate High = "); Serial.println(_sbusFrameHighMicros);
 		Serial.print("sbusFrameRateOK = "); Serial.print(sbusFrameRateOK); Serial.print("  :  sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
 #endif
 
@@ -770,6 +770,6 @@ void calculate_Overall_EndToEnd_Quality() {
 	if (_overallE2EQuality < 0 || failSafe == true) _overallE2EQuality = 0;
 	if (_overallE2EQuality > 100) _overallE2EQuality = 100;
 #if defined (DEBUG_E2E_OVERALL_QUALITY)
-	Serial.print("overallE2EQuality = "); Serial.println(overallE2EQuality);
+	Serial.print("overallE2EQuality = "); Serial.println(_overallE2EQuality);
 #endif
 }

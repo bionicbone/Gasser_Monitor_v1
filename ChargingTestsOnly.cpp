@@ -96,7 +96,7 @@ void chargingTestOnly_Control() {
 	//digitalWrite(PIN_CHARGE_RELAY, HIGH);
 
 	while (true) {
-		_rpm_calcualte_SensorPulse();
+		_rpm_calculate_SensorPulse();
 		for(int i=0;i<100;i++) _temperatures_Read();
 		power_Battery_Amps_ASC712();
 		power_BEC_Amps_ASC712();

@@ -65,7 +65,7 @@ void power_Battery_Amps_ASC712() {
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 
 #if defined(DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
-	Serial.print("Teensy Volts "); Serial.print(teensyVoltage, 2);
+	Serial.print("Teensy Volts "); Serial.print(_teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
 	// Compensate for the voltage divider circuit, make back to 2.5v @ 0 AMPS
@@ -101,7 +101,7 @@ void power_Battery_Amps_ASC712() {
 	_batteryDischargeLoopAmps = result;
 #if defined(DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
 	Serial.print("   myAMPs "); Serial.print(result);
-	Serial.print("   batteryDischargeTotalMAH "); Serial.println(int(batteryDischargeTotalMAH));
+	Serial.print("   batteryDischargeTotalMAH "); Serial.println(int(_batteryDischargeTotalMAH));
 #endif
 }
 
@@ -122,7 +122,7 @@ void power_BEC_Amps_ASC712() {
 	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 #if defined(DEBUG_ASC712_BEC_AMPS_CALCULATION)
-	Serial.print("Teensy Volts "); Serial.print(teensyVoltage, 2);
+	Serial.print("Teensy Volts "); Serial.print(_teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
 	// Compensate for 5v line supply deviation
@@ -163,7 +163,7 @@ void power_BEC_Amps_ASC712() {
 	_becDischargeLoopAmps = result;
 #if defined(DEBUG_ASC712_BEC_AMPS_CALCULATION)
 	Serial.print("   myAMPs "); Serial.print(result);
-	Serial.print("   becDischargeTotalMAH "); Serial.println(int(becDischargeTotalMAH));
+	Serial.print("   becDischargeTotalMAH "); Serial.println(int(_becDischargeTotalMAH));
 #endif
 }
 

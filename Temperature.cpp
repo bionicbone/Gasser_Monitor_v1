@@ -94,10 +94,10 @@ void _temperatures_Read() {
 		if (_becTemp > 200) _engineTemp = 0;
 
 #if defined (DEBUG_LM35_TEMPERATURE_READINGS)
-		Serial.print("Ambient Temperature = "); Serial.print(ambientTemp); Serial.println("c");
-		Serial.print(" Canopy Temperature = "); Serial.print(canopyTemp); Serial.println("c");
-		Serial.print(" Engine Temperature = "); Serial.print(engineTemp); Serial.println("c");
-		Serial.print("    BEC Temperature = "); Serial.print(becTemp); Serial.println("c");
+		Serial.print("Ambient Temperature = "); Serial.print(_ambientTemp); Serial.println("c");
+		Serial.print(" Canopy Temperature = "); Serial.print(_canopyTemp); Serial.println("c");
+		Serial.print(" Engine Temperature = "); Serial.print(_engineTemp); Serial.println("c");
+		Serial.print("    BEC Temperature = "); Serial.print(_becTemp); Serial.println("c");
 #endif
 	}
 }
