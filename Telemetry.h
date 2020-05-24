@@ -12,11 +12,7 @@
 #endif
 
 
-
-
 // Links to "extern" variables
-
-
 
 
 // Public Variables
@@ -39,4 +35,4 @@ void sendFrame();
 void getFLVSSdata();
 void smoothFLVXXdata(byte cellArrayNumber);
 
-#endif
+#endif  // .h #endif

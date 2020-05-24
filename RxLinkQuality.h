@@ -12,8 +12,6 @@
 #endif
 
 
-#endif
-
 // Links to "extern" variables
 #include "SBUS.h"
 
@@ -78,3 +76,6 @@ void debug_Data();
 void debug_Wave_Data();
 void sbus_FrameRate();
 void calculate_Overall_EndToEnd_Quality();
+
+
+#endif  // .h #endif

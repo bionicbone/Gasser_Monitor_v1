@@ -1,3 +1,5 @@
+// config.h
+
 #pragma once
 
 
@@ -10,8 +12,6 @@
 #include "WProgram.h"
 #endif
 
-
-#endif
 
 const uint16_t	MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS = 5000;		// Must do x loops before triggering any loop errors
 const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the Long Loop Error - May need to increase
@@ -101,3 +101,5 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the 
 #if defined (DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
 #error DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
 #endif
+
+#endif  // .h #endif

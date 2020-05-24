@@ -12,8 +12,6 @@
 #endif
 
 
-#endif
-
 extern uint32_t mainRPMSensorDetectedRPM;
 extern uint32_t clutchRPMSensorDetectedRPM;
 extern bool inFlight;
@@ -23,3 +21,6 @@ void calcualte_RPMSensorPulse();
 void onMainRPMSensorPulse();
 void onClutchRPMSensorPulse();
 void rpm_ActivateInterrupts();
+
+
+#endif  // .h #endif

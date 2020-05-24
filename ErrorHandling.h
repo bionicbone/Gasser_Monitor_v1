@@ -1,5 +1,7 @@
 // ErrorHandling.h
 
+#pragma once
+
 #ifndef _ERRORHANDLING_h
 #define _ERRORHANDLING_h
 
@@ -26,5 +28,5 @@ void errorHandling_errorLEDsOn(bool status);
 // Private Functions
 
 
-#endif
+#endif  // .h #endif
 

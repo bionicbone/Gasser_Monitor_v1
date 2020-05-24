@@ -12,9 +12,6 @@
 #endif
 
 
-#endif
-
-
 // Config
 constexpr auto TEMPERATURE_READINGS_FOR_AVERAGE					= 50;
 constexpr auto PROG_DELAY_BEFORE_FLIGHT_STAT_UPDATES		= 7500;		// if too low min/max values may not be stable. DEFAULT 7500;
@@ -43,3 +40,7 @@ void read_temperatures();
 void temperature_Setup();
 
 // Private Functions
+
+
+
+#endif  // .h #endif
