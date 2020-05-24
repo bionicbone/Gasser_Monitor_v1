@@ -13,7 +13,7 @@
 
 
 // Config
-const byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
+constexpr byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
 
 
 // Public Variables
