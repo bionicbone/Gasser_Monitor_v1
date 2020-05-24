@@ -4,16 +4,11 @@
 
 #include "RPM.h"
 
-// Config
-const byte			RPM_AVERAGE_DIVIDER = 8;
-const uint32_t	MAX_UPDATE_TIME_MS = 250000;
-const uint8_t		PIN_MAIN_RPM_SENSOR_INTERRUPT_0 = 2;			// Digital Input Pin for RPM Sensor (A3144 Hall Effect Sensor)
-const uint8_t		PIN_CLUTCH_RPM_SENSOR_INTERRUPT_1 = 3;		// Digital Input Pin for RPM Sensor (A3144 Hall Effect Sensor)
 
 // Public Variables
-uint32_t				mainRPMSensorDetectedRPM = 0;				// Holds the main current RPM value (based on an average over several readings)
-uint32_t				clutchRPMSensorDetectedRPM = 0;			// Holds the main current RPM value (based on an average over several readings)
-bool						inFlight = false;										// true if in flight, detected by RPM > 600
+uint32_t				_mainRPMSensorDetectedRPM = 0;			// Holds the main current RPM value (based on an average over several readings)
+uint32_t				_clutchRPMSensorDetectedRPM = 0;		// Holds the main current RPM value (based on an average over several readings)
+bool						_inFlight = false;									// true if in flight, detected by RPM > 600
 
 
 // Private Variables
@@ -29,7 +24,10 @@ int							clutchRPMSensorReadings = 0;				// Number of RPM readings for calculat
 
 // TODO - Ideal code to turn into a class
 
-void calcualte_RPMSensorPulse() {
+
+// Public Functions
+
+void _rpm_calculate_SensorPulse() {
 	// interrupts complete mainRPMSensorReadings++ and clutchRPMSensorReadings++ ONLY
 
 	// Update if 60 or more interrupt signals or it more than MAX_UPDATE_TIME_MS since the last update
@@ -42,7 +40,7 @@ void calcualte_RPMSensorPulse() {
 		
 		// do we need to calculate the average
 		if (mainRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
-			mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2;  // For some unknown reason my flywheel counts double the pluses
+			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2;  // For some unknown reason my flywheel counts double the pluses
 			mainRPMSensorAvgRPM = 0;
 			mainRPMSensorAvgCounter = 0;
 		}
@@ -60,7 +58,7 @@ void calcualte_RPMSensorPulse() {
 		
 		// do we need to calculate the average
 		if (clutchRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
-			clutchRPMSensorDetectedRPM = clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter;
+			_clutchRPMSensorDetectedRPM = clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter;
 			clutchRPMSensorAvgRPM = 0;
 			clutchRPMSensorAvgCounter = 0;
 		}
@@ -70,12 +68,12 @@ void calcualte_RPMSensorPulse() {
 
 	// update the inFlight flag
 	// inFlight flag used mainly to stop OLED updates which can take time and effect the RPM accuracy
-	if (mainRPMSensorDetectedRPM < 600 || mainRPMSensorDetectedRPM > 30000) {
-		mainRPMSensorDetectedRPM = 0;
-		inFlight = false;
+	if (_mainRPMSensorDetectedRPM < 600 || _mainRPMSensorDetectedRPM > 30000) {
+		_mainRPMSensorDetectedRPM = 0;
+		_inFlight = false;
 	}
 	else {
-		inFlight = true;
+		_inFlight = true;
 #if defined(OLED_OUTPUT)
 		// sleep the OLED screen for safety and not much use in flight.
 		oLED_Sleep();
@@ -84,20 +82,8 @@ void calcualte_RPMSensorPulse() {
 }
 
 
-// The interrupt routine
-void onMainRPMSensorPulse() {
-	mainRPMSensorReadings++;
-}
-
-
-// The interrupt routine
-void onClutchRPMSensorPulse() {
-	clutchRPMSensorReadings++;
-}
-
-
 // Setup the interrupt pins for the attached RPM sensors
-void rpm_ActivateInterrupts() {
+void _rpm_ActivateInterrupts() {
 
 #if defined(__MK20DX256__)
 	// Pull up the PIN and activate interrupt IRQ 0 (NANO pin2, Teensy pin1) for the RPM sensor
@@ -116,4 +102,19 @@ void rpm_ActivateInterrupts() {
 	attachInterrupt(digitalPinToInterrupt(3), onClutchRPMSensorPulse, CHANGE);
 	Serial.println("Nano Interrupts Setup");
 #endif
+}
+
+
+
+// Private Functions
+
+// The interrupt routine
+void onMainRPMSensorPulse() {
+	mainRPMSensorReadings++;
+}
+
+
+// The interrupt routine
+void onClutchRPMSensorPulse() {
+	clutchRPMSensorReadings++;
 }

@@ -6,18 +6,11 @@
 #include "Temperature.h"
 
 
-// Config
-const float AMBIENT_TEMP_CALIBRATION = -0.48;
-const float CANOPY_TEMP_CALIBRATION = -0.13;
-const float ENGINE_TEMP_CALIBRATION = 0.41;
-const float BEC_TEMP_CALIBRATION = 0.00;
-
-
 // Public Variables
-float ambientTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-float canopyTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-float engineTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
-float becTemp = 0.00;					// NOTE: These are float values on purpose so we can detect disconnected sensors
+float _ambientTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
+float _canopyTemp = 0.00;				// NOTE: These are float values on purpose so we can detect disconnected sensors
+float _engineTemp = 0.00;				// NOTE: These are float values on purpose so we can detect disconnected sensors
+float _becTemp = 0.00;					// NOTE: These are float values on purpose so we can detect disconnected sensors
 
 
 // Private Variables
@@ -29,14 +22,16 @@ uint8_t		tempReadings = 0;
 bool			eepromUpdateRequired = false;
 
 
-void temperature_Setup() {
+// Public Functions
+void _temperature_Setup() {
 	pinMode(PIN_AMBIENT_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_CANOPY_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_ENGINE_TEMPERATURE_LM35, INPUT);
 	pinMode(PIN_BEC_TEMPERATURE_LM35, INPUT);
 }
 
-void read_temperatures() {
+
+void _temperatures_Read() {
 	// takes the average of 50 readings and populates ambientTemp, canopyTemp &  engineTemp global variables
 
 	avgAmbientTemp += (analogRead(PIN_AMBIENT_TEMPERATURE_LM35) * 3.3 / 4096) * 100 + AMBIENT_TEMP_CALIBRATION;
@@ -45,15 +40,15 @@ void read_temperatures() {
 	avgBecTemp += (analogRead(PIN_BEC_TEMPERATURE_LM35) * 3.3 / 4096) * 100 + BEC_TEMP_CALIBRATION;
 	tempReadings++;
 	if (tempReadings > TEMPERATURE_READINGS_FOR_AVERAGE) {
-		ambientTemp = avgAmbientTemp / tempReadings;
-		canopyTemp = avgCanopyTemp / tempReadings;
-		engineTemp = avgEngineTemp / tempReadings;
-		becTemp = avgBecTemp / tempReadings;
+		_ambientTemp = avgAmbientTemp / tempReadings;
+		_canopyTemp = avgCanopyTemp / tempReadings;
+		_engineTemp = avgEngineTemp / tempReadings;
+		_becTemp = avgBecTemp / tempReadings;
 		tempReadings = 0;
-		if (ambientTemp == AMBIENT_TEMP_CALIBRATION) ambientTemp = 0;
-		if (canopyTemp == CANOPY_TEMP_CALIBRATION) canopyTemp = 0;
-		if (engineTemp == ENGINE_TEMP_CALIBRATION) engineTemp = 0;
-		if (becTemp == BEC_TEMP_CALIBRATION) becTemp = 0;
+		if (_ambientTemp == AMBIENT_TEMP_CALIBRATION) _ambientTemp = 0;
+		if (_canopyTemp == CANOPY_TEMP_CALIBRATION) _canopyTemp = 0;
+		if (_engineTemp == ENGINE_TEMP_CALIBRATION) _engineTemp = 0;
+		if (_becTemp == BEC_TEMP_CALIBRATION) _becTemp = 0;
 		avgAmbientTemp = 0;
 		avgCanopyTemp = 0;
 		avgEngineTemp = 0;
@@ -93,16 +88,16 @@ void read_temperatures() {
 		//}
 
 		// Sanity check the values and and set to zero if LM35 sensor is not attached
-		if (ambientTemp > 200) ambientTemp = 0;
-		if (canopyTemp > 200) canopyTemp = 0;
-		if (engineTemp > 200) engineTemp = 0;
-		if (becTemp > 200) engineTemp = 0;
+		if (_ambientTemp > 200) _ambientTemp = 0;
+		if (_canopyTemp > 200) _canopyTemp = 0;
+		if (_engineTemp > 200) _engineTemp = 0;
+		if (_becTemp > 200) _engineTemp = 0;
 
 #if defined (DEBUG_LM35_TEMPERATURE_READINGS)
-		Serial.print("Ambient Temperature = "); Serial.print(ambientTemp); Serial.println("c");
-		Serial.print(" Canopy Temperature = "); Serial.print(canopyTemp); Serial.println("c");
-		Serial.print(" Engine Temperature = "); Serial.print(engineTemp); Serial.println("c");
-		Serial.print("    BEC Temperature = "); Serial.print(becTemp); Serial.println("c");
+		Serial.print("Ambient Temperature = "); Serial.print(_ambientTemp); Serial.println("c");
+		Serial.print(" Canopy Temperature = "); Serial.print(_canopyTemp); Serial.println("c");
+		Serial.print(" Engine Temperature = "); Serial.print(_engineTemp); Serial.println("c");
+		Serial.print("    BEC Temperature = "); Serial.print(_becTemp); Serial.println("c");
 #endif
 	}
 }

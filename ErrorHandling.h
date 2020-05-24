@@ -1,5 +1,7 @@
 // ErrorHandling.h
 
+#pragma once
+
 #ifndef _ERRORHANDLING_h
 #define _ERRORHANDLING_h
 
@@ -11,20 +13,19 @@
 
 
 // Config
-const byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
+constexpr byte PIN_ERROR_LED = 5;						// Digital - Output Pin for Warning LEDs.
 
 
 // Public Variables
 
 
 // Public Functions
-void errorHandling_Setup();
-void errorHandling_checkErrors();
-void errorHandling_errorLEDsOn(bool status);
+void _errorHandling_Setup();
+void _errorHandling_checkErrors();
 
 
 // Private Functions
+void errorHandling_errorLEDsOn(bool status);
 
-
-#endif
+#endif  // .h #endif
 

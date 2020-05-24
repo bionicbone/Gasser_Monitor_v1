@@ -37,9 +37,5 @@ void chargeRelay_Status(bool status);
 void dischargeRelay_Status(bool status);
 void dischargeMosfet_Status(bool status);
 
-
-
-
-
-#endif
+#endif  // .h #endif
 
