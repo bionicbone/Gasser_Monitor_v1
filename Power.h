@@ -53,8 +53,6 @@ void _power_ReadSensors();
 
 // Private Functions
 void power_chargeVoltages();
-void power_Battery_Amps_ASC714();
-void power_BEC_Amps_ASC713();
 void power_BEC_Amps_ASC712();
 void power_Battery_Amps_ASC712();
 

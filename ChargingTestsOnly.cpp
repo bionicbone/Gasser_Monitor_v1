@@ -146,7 +146,7 @@ void chargeBattery() {
 		storedDataTimer = millis();
 		
 		// Read the current AMPS going into the battery
-		power_Battery_Amps_ASC714();
+		power_Battery_Amps_ASC712();
 		storeDataInArrays(8);
 	}
 	digitalWrite(PIN_CHARGE_RELAY, LOW);
@@ -187,7 +187,7 @@ void discharge_mAh(float mAh) {
 		int delayLowVoltageCounterOnStartUp = 0;
 		while (thisDischargeMAH <= thismAh) {
 			_temperatures_Read();
-			power_Battery_Amps_ASC714();
+			power_Battery_Amps_ASC712();
 			_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 			thisDischargeMAH += _batteryDischargeLoopMAH;
 			//Serial.println(thisDischargeMAH);
@@ -252,7 +252,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		}
 		// Prime everything and write data
 		_temperatures_Read();
-		power_Battery_Amps_ASC714();
+		power_Battery_Amps_ASC712();
 		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
 		storedDataTimer = millis();
 		sCell1 = cellSmoothed[0];
@@ -273,7 +273,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		//	Serial.print("Stabilise:"); Serial.print(" - Posistion: "); Serial.print(millis()); Serial.print(" - Cell1: "); Serial.print(cell1, 4); Serial.print(" v  -- Cell2: "); Serial.print(cell2, 4); Serial.println(" v");
 		}
 		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-		power_Battery_Amps_ASC714();
+		power_Battery_Amps_ASC712();
 		_temperatures_Read();
 		storedDataTimer = millis();
 		dCell1 = cellSmoothed[0];
@@ -295,7 +295,7 @@ void pulseDischargeReading(byte attempts, int milliseconds, char stabilise) {
 		}
 		// Take recovery readings
 		_telemetry_SendTelemetry();  // Updates cell[] and cellSmoothed[] values
-		power_Battery_Amps_ASC714();
+		power_Battery_Amps_ASC712();
 		_temperatures_Read();
 		storedDataTimer = millis();
 		fCell1 = cellSmoothed[0];
