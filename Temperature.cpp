@@ -6,13 +6,6 @@
 #include "Temperature.h"
 
 
-// Config
-const float AMBIENT_TEMP_CALIBRATION = -0.48;
-const float CANOPY_TEMP_CALIBRATION = -0.13;
-const float ENGINE_TEMP_CALIBRATION = 0.41;
-const float BEC_TEMP_CALIBRATION = 0.00;
-
-
 // Public Variables
 float ambientTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
 float canopyTemp = 0.00;			// NOTE: These are float values on purpose so we can detect disconnected sensors
