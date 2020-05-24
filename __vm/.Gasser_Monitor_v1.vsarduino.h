@@ -16,7 +16,7 @@
 #define __HARDWARE_mk20dx256__
 #define __HARDWARE_MK20DX256__
 #define __MK20DX256__
-#define TEENSYDUINO 150
+#define TEENSYDUINO 152
 #define ARDUINO 108011
 #define ARDUINO_TEENSY32
 #define F_CPU 96000000

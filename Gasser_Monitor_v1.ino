@@ -38,6 +38,11 @@
 #include <SBUS.h>
 #include "RxLinkQuality.h"
 #include "RPM.h"
+#include "SdCard.h"
+#include <SD.h>
+#include <SPI.h>
+#include <TimeLib.h>
+
 
 unsigned long		timeLoopMicros = 0;								// Used to remember micros() at the start of the main loop.
 unsigned long		lastLoopMicros = 0;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us
@@ -57,6 +62,9 @@ void setup() {
 	analogReadResolution(12);
 	
 	delay(500);
+
+	// Start the SD Card Logging
+	_sd_SetUp();
 
 	// Start RPM for Engine and Clutch sensor monitoring
 	_rpm_ActivateInterrupts();
@@ -120,14 +128,14 @@ void loop() {
 	// check for errors and report
 	_errorHandling_checkErrors();
 
+	// write SD log
+	_sd_WriteLogDate();
+
 	//*******************************
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
 	
-	if (millis() - testMillis > 600000) {
-		stop();
-	}
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***

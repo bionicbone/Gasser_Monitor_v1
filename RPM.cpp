@@ -15,11 +15,11 @@ bool						_inFlight = false;									// true if in flight, detected by RPM > 600
 unsigned long		mainRPMSensorStartTime;							// New version that disables interrupts
 float						mainRPMSensorAvgRPM = 0.0;					// RPM is calcualted over several readings (RPM_AVERAGE_DIVIDER) 
 int							mainRPMSensorAvgCounter = 0;				// Used as a counter for the average
-int							mainRPMSensorReadings = 0;					// Number of RPM readings for calculating the average
+volatile int		mainRPMSensorReadings = 0;					// Number of RPM readings for calculating the average
 unsigned long		clutchRPMSensorStartTime;						// New version that disables interrupts
 float						clutchRPMSensorAvgRPM = 0.0;				// RPM is calcualted over several readings (RPM_AVERAGE_DIVIDER) 
 int							clutchRPMSensorAvgCounter = 0;			// Used as a counter for the average
-int							clutchRPMSensorReadings = 0;				// Number of RPM readings for calculating the average
+volatile int		clutchRPMSensorReadings = 0;				// Number of RPM readings for calculating the average
 
 
 // TODO - Ideal code to turn into a class
@@ -103,7 +103,6 @@ void _rpm_ActivateInterrupts() {
 	Serial.println("Nano Interrupts Setup");
 #endif
 }
-
 
 
 // Private Functions
