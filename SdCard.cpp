@@ -14,6 +14,9 @@
 #include "Temperature.h"
 
 
+// Private Variables
+bool sdCardLoggingActive = false;
+
 File SdFile;
 
 // Public Functions
@@ -23,26 +26,29 @@ void _sd_SetUp() {
 	if (!SD.begin(14)) { // CS Pin 14
 		// TODO - Send Telemetry Error instead - persistent
 		Serial.println("initialization failed!");
-		while (1);
+		sdCardLoggingActive = false;
 	}
-	// Choose the Next FileName number
-	char myFileName[13];
-	char fileNamePrefix[] = "GM_";
-	char fileNameSuffix[] = ".log";
-	for (uint16_t i = 0; i < 65535; i++) {
-		sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
-		if (!SD.exists(myFileName)) break;
+	else {
+		sdCardLoggingActive = true;
+		// Choose the Next FileName number
+		char myFileName[13];
+		char fileNamePrefix[] = "GM_";
+		char fileNameSuffix[] = ".log";
+		for (uint16_t i = 0; i < 65535; i++) {
+			sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
+			if (!SD.exists(myFileName)) break;
+		}
+		// Open the filename
+		SdFile = SD.open(myFileName, FILE_WRITE);
+		delay(1);
+		sd_WriteLogHeader();
 	}
-	// Open the filename
-	SdFile = SD.open(myFileName, FILE_WRITE);
-	delay(1);
-	sd_WriteLogHeader();
 }
 
 
 void _sd_WriteLogDate() {
 	// if the file opened okay, write to it:
-	if (SdFile) {
+	if (SdFile && sdCardLoggingActive) {
 		String text = "";
 		// Format data and time 
 		char strmonth[3], strday[3], strhour[3], strminute[3], strsecond[3];
@@ -97,6 +103,7 @@ void _sd_WriteLogDate() {
 	}
 	else {
 		// if the file didn't open, print an error:
+		// TODO - Send Telemetry Error instead
 		Serial.println("error writting test.txt");
 	}
 }
@@ -114,6 +121,7 @@ void sd_WriteLogHeader() {
 	}
 	else {
 		// if the file didn't open, print an error:
+		// TODO - Send Telemetry Error instead
 		Serial.println("error writting test.txt");
 	}
 }
