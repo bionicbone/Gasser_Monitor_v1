@@ -50,7 +50,7 @@ uint16_t				firstRunCounter = 0;							// counts the first loops
 bool						firstRun = true;									// Resets to false when firstRunCounter hits its target
 
 
-unsigned long		testMillis = 0;
+unsigned long		sdCardLogMillis = 0;							// Used to log data on SD Card every x milliseconds
 
 void setup() {
 	// Start the USB serial for debugging
@@ -93,11 +93,9 @@ void setup() {
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
 	//*******************************
-
+	
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
-
-	testMillis = millis();
 }
 
 
@@ -129,7 +127,10 @@ void loop() {
 	_errorHandling_checkErrors();
 
 	// write SD log
-	_sd_WriteLogDate();
+	if (millis() - sdCardLogMillis > 200 - 1 || sdCardLogMillis == 0) {
+		sdCardLogMillis = millis();
+		_sd_WriteLogDate();
+	}
 
 	//*******************************
 	//*** START - TESTING ONLY !! ***
