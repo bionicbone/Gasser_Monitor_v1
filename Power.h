@@ -12,6 +12,7 @@
 #endif
 
 // Config
+constexpr int PIN_BATTERY_VOLTAGE = A6;											// Analog - FLight Battery Voltage
 constexpr int PIN_BATTERY_AMPS = A7;												// Analog - AMPs measurement to / from battery
 constexpr int PIN_BEC_AMPS = A8;														// Analog - AMPs measurement from BEC
 constexpr int PIN_TEENSY_VOLTAGE = A9;											// Analog - TEENSY Voltage 
@@ -39,7 +40,7 @@ constexpr float	BEC_VOLTAGE_DIVIDER_MULTIPLIER = 1.00;			// Teensy is only 3.3v,
 																														// i.e. 1.59v on pin @ 0 AMPS then 2.5 / 1.59 = 1.5723 as a Mulitplier
 
 // Public Variables
-extern float	_teensyVoltage, _recVoltage, _becVoltage;			// Teensy 5v line, Regulator and BEC voltages
+extern float	_teensyVoltage, _recVoltage, _becVoltage, _batteryVoltage;			// Teensy 5v line, Regulator and BEC voltages
 extern float	_batteryDischargeTotalMAH;										// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 extern float	_batteryDischargeLoopAmps;										// The current AMPS measured when function called
 extern float	_batteryDischargeLoopMAH;											// The last MAH used during the loop
