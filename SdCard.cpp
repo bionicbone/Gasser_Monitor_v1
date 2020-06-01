@@ -33,7 +33,7 @@ void _sd_SetUp() {
 		// Choose the Next FileName number
 		char myFileName[13];
 		char fileNamePrefix[] = "GM_";
-		char fileNameSuffix[] = ".log";
+		char fileNameSuffix[] = ".csv";
 		for (uint16_t i = 0; i < 65535; i++) {
 			sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
 			if (!SD.exists(myFileName)) break;
