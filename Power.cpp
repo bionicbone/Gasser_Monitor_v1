@@ -7,7 +7,7 @@
 
 
 // Public Variables
-float				_teensyVoltage, _recVoltage, _becVoltage;			// Teensy, Rectifier and BEC voltages
+float				_teensyVoltage, _recVoltage, _becVoltage, _batteryVoltage;			// Teensy, Rectifier and BEC voltages
 float				_batteryDischargeTotalMAH = 0;								// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 float				_batteryDischargeLoopAmps = 0.00;							// The current AMPS measured when function called
 float				_batteryDischargeLoopMAH = 0.00;							// The last MAH used during the loop
@@ -16,7 +16,7 @@ float				_becDischargeLoopAmps = 0.00;									// The current AMPS measured when
 float				_becDischargeLoopMAH = 0.00;									// The last MAH used during the loop
 
 // Private Variables
-float					avgTeensy, avgRec, avgBec;									// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
+float					avgTeensy, avgRec, avgBec, avgBat;					// Regulator and BEC voltages are calcualted over several readings (3 hard coded)
 int						chargeReadings = 0;													// Number of Rectifier and BEC voltage readings for calculating the average
 unsigned long batteryDischargeLoopTimeMs = 0;							// The last discharge timer value in MS
 unsigned long batteryDischargeStoreTimeMs = millis();			// Sets to millis() each time the MAH has been calculated
@@ -182,12 +182,15 @@ void power_chargeVoltages() {
 	avgBec += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 	adcRaw = analogRead(PIN_TEENSY_VOLTAGE);
 	avgTeensy += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+	adcRaw = analogRead(PIN_BATTERY_VOLTAGE);
+	avgBat += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 
 	chargeReadings++;
 	if (chargeReadings > 3) {
 		_recVoltage = (avgRec / chargeReadings) * 16.20;
 		_becVoltage = (avgBec / chargeReadings) * 7.739580311;
 		_teensyVoltage = (avgTeensy / chargeReadings) * 1.75;
+		_batteryVoltage = (avgBat / chargeReadings) * 7.74;  // Temporary Value, needs calibrating
 		chargeReadings = 0;
 		
 		// Calibrate
@@ -199,12 +202,14 @@ void power_chargeVoltages() {
 		if (_recVoltage == REG_CALIBRATION || _recVoltage < 1) _recVoltage = 0;
 		if (_becVoltage == BEC_CALIBRATION || _becVoltage < 1) _becVoltage = 0;
 		if (_teensyVoltage == TEENSY_CALIBRATION || _teensyVoltage < 1) _teensyVoltage = 0;
+		if (_batteryVoltage < 1) _batteryVoltage = 0;
 
 		avgRec = 0;
 		avgBec = 0;
 		avgTeensy = 0;
+		avgBat = 0;
 
-		//Serial.print("Rec "); Serial.print(recVoltage, 6); Serial.print("    Bec "); Serial.print(becVoltage, 6); Serial.print("    Teensy "); Serial.println(teensyVoltage, 6);
+		//Serial.print("Rec "); Serial.print(recVoltage, 6); Serial.print("    Bec "); Serial.print(becVoltage, 6); Serial.print("   Bat "); Serial.println(batteryVoltage, 6); Serial.print("    Teensy "); Serial.println(teensyVoltage, 6);
 
 		
 		// WARNING if 5v line is < 4.97  or > 5.03

@@ -87,6 +87,7 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(cells);
 		text.concat(","); text.concat(_batteryDischargeLoopAmps);
 		text.concat(","); text.concat(_batteryDischargeTotalMAH);
+		text.concat(","); text.concat(_batteryVoltage);
 		text.concat(","); text.concat(cell[0]);
 		text.concat(","); text.concat(cell[1]);
 		text.concat(","); text.concat(_teensyVoltage);
@@ -113,7 +114,7 @@ void _sd_WriteLogDate() {
 
 void sd_WriteLogHeader() {
 	if (SdFile) {
-		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,CELS,BatA,BmAH,Cel1,Cel2,TeeV,AmbT,CanT,EngT";
+		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,CELS,BatA,BmAH,BatV,Cel1,Cel2,TeeV,AmbT,CanT,EngT";
 		Serial.println(text);
 		SdFile.println(text);
 		// Just flush the data, never close the file:
