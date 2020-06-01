@@ -38,6 +38,11 @@
 #include <SBUS.h>
 #include "RxLinkQuality.h"
 #include "RPM.h"
+#include "SdCard.h"
+#include <SD.h>
+#include <SPI.h>
+#include <TimeLib.h>
+
 
 unsigned long		timeLoopMicros = 0;								// Used to remember micros() at the start of the main loop.
 unsigned long		lastLoopMicros = 0;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us
@@ -45,7 +50,7 @@ uint16_t				firstRunCounter = 0;							// counts the first loops
 bool						firstRun = true;									// Resets to false when firstRunCounter hits its target
 
 
-unsigned long		testMillis = 0;
+unsigned long		sdCardLogMillis = 0;							// Used to log data on SD Card every x milliseconds
 
 void setup() {
 	// Start the USB serial for debugging
@@ -57,6 +62,9 @@ void setup() {
 	analogReadResolution(12);
 	
 	delay(500);
+
+	// Start the SD Card Logging
+	_sd_SetUp();
 
 	// Start RPM for Engine and Clutch sensor monitoring
 	_rpm_ActivateInterrupts();
@@ -85,11 +93,9 @@ void setup() {
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
 	//*******************************
-
+	
 	Serial.println("Setup Complete");
 	Serial.print("System Started millis() "); Serial.println(millis());
-
-	testMillis = millis();
 }
 
 
@@ -120,6 +126,12 @@ void loop() {
 	// check for errors and report
 	_errorHandling_checkErrors();
 
+	// write SD log
+	if (firstRun == false && millis() - sdCardLogMillis > 200 - 1) {
+		sdCardLogMillis = millis();
+		_sd_WriteLogDate();
+	}
+
 	//*******************************
 	//*** START - TESTING ONLY !! ***
 	//*******************************
@@ -134,16 +146,20 @@ void loop() {
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
 
-	if (firstRun == MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
+	if (firstRun == false && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
 		Serial.print(millis()); Serial.print(": Long Loop @ "); Serial.print(lastLoopMicros); Serial.println("us");
 	}
 
 	// Format and Send the telemetry data using the FrSky S.Port solution
 	_telemetry_SendTelemetry();
+	
 	// Deal with the first run that inhibits errors etc.
-	if (firstRunCounter < MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS) { 
-		firstRunCounter++; 
-		if (firstRunCounter == MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS) { firstRun = false; }
+	if (firstRunCounter < MIN_MAIN_LOOP_FIRST_RUN_LOOPS) {
+		firstRunCounter++;
+	}
+	else
+	{
+		firstRun = false;
 	}
 	// *** !!! Place nothing else here !!! ***
 

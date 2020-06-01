@@ -13,8 +13,9 @@
 #endif
 
 
-const uint16_t	MIN_MAIN_LOOP_BEFORE_REPORTING_ERRORS = 5000;		// Must do x loops before triggering any loop errors
+const uint16_t	MIN_MAIN_LOOP_FIRST_RUN_LOOPS = 5000;						// Must do x loops before triggering data recording or errors
 const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 100;					// Value triggers the Long Loop Error - May need to increase
+const uint16_t	MIN_MAIN_LOOP_BEFORE_SD_CARD_LOGGING = 5000;		// Must do x loops before logging data to SD card
 
 
 // DEVELOPER - Program debug options
