@@ -40,7 +40,7 @@ void _rpm_calculate_SensorPulse() {
 		
 		// do we need to calculate the average
 		if (mainRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
-			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2;  // For some unknown reason my flywheel counts double the pluses
+			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter); 
 			mainRPMSensorAvgRPM = 0;
 			mainRPMSensorAvgCounter = 0;
 		}
