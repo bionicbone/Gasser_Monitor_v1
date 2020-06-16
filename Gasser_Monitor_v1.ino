@@ -145,7 +145,7 @@ void loop() {
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
-
+	
 	if (firstRun == false && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
 		Serial.print(millis()); Serial.print(": Long Loop @ "); Serial.print(lastLoopMicros); Serial.println("us");
 	}
@@ -156,10 +156,7 @@ void loop() {
 	// Deal with the first run that inhibits errors etc.
 	if (firstRunCounter < MIN_MAIN_LOOP_FIRST_RUN_LOOPS) {
 		firstRunCounter++;
-	}
-	else
-	{
-		firstRun = false;
+		if (firstRunCounter == MIN_MAIN_LOOP_FIRST_RUN_LOOPS) { firstRun = false; }
 	}
 	// *** !!! Place nothing else here !!! ***
 
