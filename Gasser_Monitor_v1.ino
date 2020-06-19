@@ -55,13 +55,23 @@ unsigned long		sdCardLogMillis = 0;							// Used to log data on SD Card every x
 void setup() {
 	// Start the USB serial for debugging
 	Serial.begin(115200);
-	
+
 	// Set analogue reference voltage to 3.3v with 12 bit resolution
 	// ** DO NOT ALTER **
 	analogReference(DEFAULT);
 	analogReadResolution(12);
-	
+
 	delay(500);
+
+	// TODO - Add function to set time
+	// Get the RTC time
+	setSyncProvider(getTeensy3Time);
+	// Set the Time
+	if (year() == 1970) {
+		setSyncProvider(getTeensy3Time);
+		setTime(05, 47, 00, 19, 06, 2020);
+		Teensy3Clock.set(now());
+	}
 
 	// Start the SD Card Logging
 	_sd_SetUp();
@@ -160,6 +170,11 @@ void loop() {
 	}
 	// *** !!! Place nothing else here !!! ***
 
+}
+
+time_t getTeensy3Time()
+{
+	return Teensy3Clock.get();
 }
 
 
