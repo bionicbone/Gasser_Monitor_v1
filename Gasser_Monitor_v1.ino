@@ -29,6 +29,9 @@
 		*/
 
 
+#include <U8g2lib.h>
+#include <Wire.h>
+#include "OLED.h"
 #include "ChargingTestsOnly.h"
 #include "ErrorHandling.h"
 #include "Power.h"
@@ -62,6 +65,8 @@ void setup() {
 	analogReadResolution(12);
 
 	delay(500);
+
+	_oled_Setup();
 
 	// TODO - Add function to set time
 	// Get the RTC time
@@ -140,13 +145,14 @@ void loop() {
 	if (firstRun == false && millis() - sdCardLogMillis > 200 - 1) {
 		sdCardLogMillis = millis();
 		_sd_WriteLogDate();
+		_oled_FlightBatteryVoltage();
 	}
 
 	//*******************************
 	//*** START - TESTING ONLY !! ***
 	//*******************************
 
-	
+
 
 	//*******************************
 	//*** END -  TESTING ONLY !!  ***
