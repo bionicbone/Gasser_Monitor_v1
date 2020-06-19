@@ -6,12 +6,12 @@
 #include "Config.h"
 #include "SD.h"
 #include "SPI.h"
-#include "TimeLib.h"
 #include "RPM.h"
 #include "RxLinkQuality.h"
 #include "Power.h"
 #include "Telemetry.h"
 #include "Temperature.h"
+#include <TimeLib.h>
 
 
 // Private Variables
@@ -30,14 +30,31 @@ void _sd_SetUp() {
 	}
 	else {
 		sdCardLoggingActive = true;
-		// Choose the Next FileName number
 		char myFileName[13];
-		char fileNamePrefix[] = "GM_";
-		char fileNameSuffix[] = ".csv";
-		for (uint16_t i = 0; i < 65535; i++) {
-			sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
-			if (!SD.exists(myFileName)) break;
-		}
+
+		// Choose the Next FileName number
+		//char fileNamePrefix[] = "GM_";
+		//char fileNameSuffix[] = ".csv";
+		//for (uint16_t i = 0; i < 65535; i++) {
+		//	sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
+		//	if (!SD.exists(myFileName)) break;
+		//}
+
+		// New Method
+		// Format Date for Filename
+		char fileNamePrefix[9];
+		char fileNameSuffix[5] = ".csv";
+		char stryear[5], strmonth[3], strday[3];
+		sprintf(stryear, "%04d", year());
+		sprintf(strmonth, "%02d", month());
+		sprintf(strday, "%02d", day());
+
+		strcpy(fileNamePrefix, stryear);
+		strcat(fileNamePrefix, strmonth);
+		strcat(fileNamePrefix, strday);
+
+		sprintf(myFileName, "%s%s", fileNamePrefix, fileNameSuffix);
+
 		// Open the filename
 		SdFile = SD.open(myFileName, FILE_WRITE);
 		delay(1);
