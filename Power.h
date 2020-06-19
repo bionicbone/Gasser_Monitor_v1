@@ -47,6 +47,7 @@ extern float	_batteryDischargeLoopMAH;											// The last MAH used during the
 extern float	_becDischargeTotalMAH;												// Keeps the total MAH used during the whole cycle, can go up as well as down for charging / discharging
 extern float	_becDischargeLoopAmps;												// The current AMPS measured when function called
 extern float	_becDischargeLoopMAH;													// The last MAH used during the loop
+extern float	_myArrayList[102][2];																// Battery Cell values
 
 // Public Functions
 void _power_Setup();

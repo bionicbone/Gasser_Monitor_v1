@@ -48,6 +48,9 @@
     <ClInclude Include="SdCard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OLED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RPM.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SdCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OLED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
