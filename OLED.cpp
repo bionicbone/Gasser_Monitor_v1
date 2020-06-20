@@ -12,6 +12,7 @@
 // Display U8G2 Constructor using Standard Software SPI
 U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI u8g2(U8G2_R0, PIN_OLED_D0, PIN_OLED_D1, PIN_OLED_CS, PIN_OLED_DC, PIN_OLED_RES);
 
+// bool testCellDataDirection = true;
 
 // Public Functions
 void _oled_Setup() {
@@ -21,6 +22,20 @@ void _oled_Setup() {
 
 
 void _oled_FlightBatteryVoltage() {
+	//// Test Code
+	//if (cell[0] < 2.40) { cell[0] = 2.40; cell[1] = 2.40; }
+	//if (testCellDataDirection == true) {
+	//	cell[0] += 0.01;
+	//	cell[1] += 0.01;
+	//}
+	//else {
+	//	cell[0] -= 0.01;
+	//	cell[1] -= 0.01;
+	//}
+	//if (cell[0] > 3.75) testCellDataDirection = false;
+	//if (cell[0] < 2.45) testCellDataDirection = true;
+
+
 	// Displays a screen that details the current state of the flight battery
 	// Includes:
 	// graphical display of C1 and C2, with % and current voltage of each
