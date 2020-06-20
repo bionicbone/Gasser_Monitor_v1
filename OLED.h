@@ -15,8 +15,8 @@ const int PIN_OLED_RES = 25;
 const int PIN_OLED_D1 = 32;
 const int PIN_OLED_D0 = 33;
 const int PIN_OLED_CS = 4;                            // Not Physically Connected
-const float OLED_CRITICAL_VOLTAGE_WARNING = 2.45;
-const float OLED_OVERCHARGED_VOLTAGE_WARNING = 3.65;
+const float OLED_CRITICAL_VOLTAGE_WARNING = 3.15;
+const float OLED_OVERCHARGED_VOLTAGE_WARNING = 3.55;
 
 //Public Variables
 
