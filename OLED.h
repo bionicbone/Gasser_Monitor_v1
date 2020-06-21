@@ -1,5 +1,7 @@
 // OLED.h
 
+#pragma once
+
 #ifndef _OLED_h
 #define _OLED_h
 

@@ -122,7 +122,7 @@ void _sd_WriteLogDate() {
 	else {
 		// if the file didn't open, print an error:
 		// TODO - Send Telemetry Error instead
-		Serial.println("error writting test.txt");
+		Serial.println("error writting to SD Card");
 	}
 }
 
@@ -140,6 +140,6 @@ void sd_WriteLogHeader() {
 	else {
 		// if the file didn't open, print an error:
 		// TODO - Send Telemetry Error instead
-		Serial.println("error writting test.txt");
+		Serial.println("error writting to SD Card");
 	}
 }
