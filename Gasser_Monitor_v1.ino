@@ -29,6 +29,7 @@
 		*/
 
 
+#include "MCU6050.h"
 #include <U8g2lib.h>
 #include <Wire.h>
 #include "OLED.h"
@@ -67,6 +68,8 @@ void setup() {
 	delay(500);
 
 	_oled_Setup();
+
+	_mcu6050_Setup();
 
 	// TODO - Add function to set time
 	// Get the RTC time
@@ -121,22 +124,26 @@ void loop() {
 	// Must be at the start of the loop
 	timeLoopMicros = micros();
 
-	// Calculate the Current RPM data
+	// Calculate the Current RPM data (<5us)
 	// updates variables mainRPMSensorDetectedRPM & clutchRPMSensorDetectedRPM
 	// also updates variable inFlight
 	_rpm_calculate_SensorPulse();
 
-	// Calculate the voltages and current sensors
+	// Calculate the voltages and current sensors (Normally <80us, occational at 2600us)
 	// updates variables 
 	_power_ReadSensors();
 
-	// Calculate the Rx Quality Indicators
+	// Calculate the Rx Quality Indicators (from 10us to occational 60us)
 	// updates variables lostFramesPercentage100Result & badFramesPercentage100Result
 	// also updates variable totalFrames
 	_rxLinkQuality_Scan(firstRun);
 
-	// read the temperatures (ambient/canopy/engine)
+	// read the temperatures (ambient/canopy/engine) (<80us)
 	_temperatures_Read();
+
+	// read MCU vobration sensor data ( Significant at 1600us )
+	// NOTE: Time to execute could cause "Sensor Loss" issues for FrSky Telemetry or SD Card recording
+	_mcu6050_Read();
 
 	// check for errors and report
 	_errorHandling_checkErrors();
@@ -145,7 +152,7 @@ void loop() {
 	if (firstRun == false && millis() - sdCardLogMillis > 200 - 1) {
 		sdCardLogMillis = millis();
 		_sd_WriteLogDate();
-		_oled_FlightBatteryVoltage();
+		_oled_FlightBatteryVoltage();  // Normally 8us, occasionally massive at 78000-120000us)
 	}
 
 	//*******************************
@@ -161,7 +168,7 @@ void loop() {
 	// calculate the time it took to run the loop.
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
-	
+
 	if (firstRun == false && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
 		Serial.print(millis()); Serial.print(": Long Loop @ "); Serial.print(lastLoopMicros); Serial.println("us");
 	}
