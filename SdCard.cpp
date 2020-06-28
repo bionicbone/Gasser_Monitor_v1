@@ -32,14 +32,6 @@ void _sd_SetUp() {
 		sdCardLoggingActive = true;
 		char myFileName[13];
 
-		// Choose the Next FileName number
-		//char fileNamePrefix[] = "GM_";
-		//char fileNameSuffix[] = ".csv";
-		//for (uint16_t i = 0; i < 65535; i++) {
-		//	sprintf(myFileName, "%s%u%s", fileNamePrefix, i, fileNameSuffix);
-		//	if (!SD.exists(myFileName)) break;
-		//}
-
 		// New Method
 		// Format Date for Filename
 		char fileNamePrefix[9];
@@ -100,11 +92,11 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_becVoltage);
 		text.concat(","); text.concat(_becDischargeLoopAmps);
 		text.concat(","); text.concat(_becTemp);
-		float cells = cell[0] + cell[1];
-		text.concat(","); text.concat(cells);
+		text.concat(","); text.concat(_batteryVoltage);
 		text.concat(","); text.concat(_batteryDischargeLoopAmps);
 		text.concat(","); text.concat(_batteryDischargeTotalMAH);
-		text.concat(","); text.concat(_batteryVoltage);
+		float cells = cell[0] + cell[1];
+		text.concat(","); text.concat(cells);
 		text.concat(","); text.concat(cell[0]);
 		text.concat(","); text.concat(cell[1]);
 		text.concat(","); text.concat(_teensyVoltage);
@@ -112,6 +104,8 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_ambientTemp);
 		text.concat(","); text.concat(_canopyTemp);
 		text.concat(","); text.concat(_engineTemp);
+		// Vibration Data
+
 
 
 		Serial.println(text);
@@ -131,7 +125,7 @@ void _sd_WriteLogDate() {
 
 void sd_WriteLogHeader() {
 	if (SdFile) {
-		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,CELS,BatA,BmAH,BatV,Cel1,Cel2,TeeV,AmbT,CanT,EngT";
+		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT";
 		Serial.println(text);
 		SdFile.println(text);
 		// Just flush the data, never close the file:
