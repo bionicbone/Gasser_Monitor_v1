@@ -12,6 +12,7 @@
 #include "Telemetry.h"
 #include "Temperature.h"
 #include <TimeLib.h>
+#include "MCU6050.h"
 
 
 // Private Variables
@@ -105,8 +106,13 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_canopyTemp);
 		text.concat(","); text.concat(_engineTemp);
 		// Vibration Data
-
-
+		text.concat(","); text.concat(_AccX);
+		text.concat(","); text.concat(_AccY);
+		text.concat(","); text.concat(_AccZ);
+		text.concat(","); text.concat(_AccTmp);
+		text.concat(","); text.concat(_GyrX);
+		text.concat(","); text.concat(_GyrY);
+		text.concat(","); text.concat(_vibrationStatus);
 
 		Serial.println(text);
 		SdFile.println(text);
@@ -125,7 +131,7 @@ void _sd_WriteLogDate() {
 
 void sd_WriteLogHeader() {
 	if (SdFile) {
-		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT";
+		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
 		Serial.println(text);
 		SdFile.println(text);
 		// Just flush the data, never close the file:
