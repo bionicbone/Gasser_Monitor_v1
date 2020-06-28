@@ -27,6 +27,8 @@ const float OLED_OVERCHARGED_VOLTAGE_WARNING = 3.55;
 // Public Functions
 void _oled_Setup();
 void _oled_FlightBatteryVoltage();
+void _oled_Device_Name();
+void _oled_DateAndTime();
 
 
 //Private Functions

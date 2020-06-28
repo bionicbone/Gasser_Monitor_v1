@@ -149,6 +149,9 @@ void loop() {
 	// check for errors and report
 	_errorHandling_checkErrors();
 
+	// display the Date and Time while initialising
+	if (firstRun == true) _oled_DateAndTime();
+
 	// write SD log
 	if (firstRun == false && millis() - sdCardLogMillis > 200 - 1) {
 		sdCardLogMillis = millis();
