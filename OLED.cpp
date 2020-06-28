@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include "Telemetry.h"
 #include "Power.h"
+#include <TimeLib.h>
 
 
 // Display U8G2 Constructor using Standard Software SPI
@@ -18,6 +19,7 @@ U8G2_SSD1306_128X64_NONAME_1_4W_SW_SPI u8g2(U8G2_R0, PIN_OLED_D0, PIN_OLED_D1, P
 void _oled_Setup() {
 	// Set up the OLED Interface if required
 	u8g2.begin();
+	_oled_Device_Name();
 }
 
 
@@ -81,6 +83,64 @@ void _oled_FlightBatteryVoltage() {
 	while (u8g2.nextPage());
 }
 
+
+void _oled_Device_Name() {
+	u8g2.firstPage();
+	do {
+		u8g2.setFont(u8g2_font_luBIS08_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(4, 12, "Gasser Monitor");
+		u8g2.drawStr(14, 30, "by Fifty Shades");
+		u8g2.drawStr(24, 50, "of Orange");
+		
+		u8g2.setFont(u8g2_font_micro_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(100, 60, "v1.0");
+	}
+	// Start the OLED display update
+	while (u8g2.nextPage());
+}
+
+
+void _oled_DateAndTime() {
+	
+	// Format Date for OLED
+	char myDate[11];
+	char stryear[5], strmonth[3], strday[3];
+	sprintf(stryear, "%04d", year());
+	sprintf(strmonth, "%02d", month());
+	sprintf(strday, "%02d", day());
+
+	strcpy(myDate, strday);
+	strcat(myDate, "/");
+	strcat(myDate, strmonth);
+	strcat(myDate, "/");
+	strcat(myDate, stryear);
+
+	// Format Time for OLED
+	char myTime[11];
+	char strhour[3], strmin[3], strsecond[3];
+	sprintf(strhour, "%02d", hour());
+	sprintf(strmin, "%02d", minute());
+	sprintf(strsecond, "%02d", second());
+
+	strcpy(myTime, strhour);
+	strcat(myTime, ":");
+	strcat(myTime, strmin);
+	strcat(myTime, ":");
+	strcat(myTime, strsecond);
+
+	// Format the display
+	u8g2.firstPage();
+	do {
+		u8g2.setFont(u8g2_font_6x10_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(4, 8, "Gasser Monitor v1.0");
+
+		u8g2.setFont(u8g2_font_luBIS08_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(20, 26, myDate);
+		u8g2.drawStr(30, 46, myTime);
+	}
+	// Start the OLED display update
+	while (u8g2.nextPage());
+}
 
 // Private Functions
 int percentcell(float targetVoltage) {
