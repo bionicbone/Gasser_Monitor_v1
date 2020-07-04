@@ -57,6 +57,8 @@ bool						firstRun = true;									// Resets to false when firstRunCounter hits 
 unsigned long		sdCardLogMillis = 0;							// Used to log data on SD Card every x milliseconds
 unsigned long		oledUpdateMillis = 0;							// Used to update OLED every x milliseconds
 
+bool						oledUpdateInFlight = false;				// True if OLED has been updated to show in Flight
+
 void setup() {
 	// Start the USB serial for debugging
 	Serial.begin(115200);
@@ -161,7 +163,14 @@ void loop() {
 	// update OLED
 	if (firstRun == false && millis() - oledUpdateMillis > 210 - 1) {
 		oledUpdateMillis = millis();
-		_oled_FlightBatteryVoltage();  // Normally 8us, occasionally massive at 78000-120000us)
+		if (_inFlight == false) {
+			_oled_FlightBatteryVoltage();						// Normally 8us, occasionally massive at 78000-120000us)
+			oledUpdateInFlight = false;
+		}
+		else if (oledUpdateInFlight == false) {		// Only update the display once when in flight
+			_oled_inFlight();												// Normally 8us, occasionally massive at 78000us)
+			oledUpdateInFlight = true;
+		}
 	}
 
 	//*******************************

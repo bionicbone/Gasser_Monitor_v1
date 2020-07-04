@@ -142,6 +142,27 @@ void _oled_DateAndTime() {
 	while (u8g2.nextPage());
 }
 
+
+void _oled_inFlight() {
+
+	// Format Time for OLED
+	char myDisplay[]= "In Flight";
+
+	// Format the display
+	u8g2.firstPage();
+	do {
+		u8g2.setFont(u8g2_font_6x10_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(4, 8, "Gasser Monitor v1.0");
+
+		u8g2.setFont(u8g2_font_tenfatguys_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
+		u8g2.drawStr(20, 35, myDisplay);
+	}
+	// Start the OLED display update
+	while (u8g2.nextPage());
+}
+
+
+
 // Private Functions
 int percentcell(float targetVoltage) {
 	// selects the correct % based on the current "targetVoltage"
