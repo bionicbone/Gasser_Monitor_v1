@@ -29,6 +29,7 @@ void _oled_Setup();
 void _oled_FlightBatteryVoltage();
 void _oled_Device_Name();
 void _oled_DateAndTime();
+void _oled_inFlight();
 
 
 //Private Functions

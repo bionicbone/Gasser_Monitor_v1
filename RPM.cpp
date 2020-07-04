@@ -74,10 +74,6 @@ void _rpm_calculate_SensorPulse() {
 	}
 	else {
 		_inFlight = true;
-#if defined(OLED_OUTPUT)
-		// sleep the OLED screen for safety and not much use in flight.
-		oLED_Sleep();
-#endif
 	}
 }
 
