@@ -33,6 +33,8 @@ unsigned long batteryDischargeStoreTimeMs = millis();			// Sets to millis() each
 unsigned long becDischargeLoopTimeMs = 0;									// The last discharge timer value in MS
 unsigned long becDischargeStoreTimeMs = millis();					// Sets to millis() each time the MAH has been calculated
 
+float					calibrationTeeV, calibrationRecV, calibrationBecV, calibrationBatV;
+int						calibrationReadings;
 
 // Set up the Power Reading Pins on the Teensy
 void _power_Setup() {
@@ -75,6 +77,7 @@ void power_Battery_Amps_ASC712() {
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 
 #if defined(DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
+	Serial.println("DEBUG_ASC712_BATTERY_AMPS_CALCULATION");
 	Serial.print("Teensy Volts "); Serial.print(_teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
@@ -132,6 +135,7 @@ void power_BEC_Amps_ASC712() {
 	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
 	result = (result * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 #if defined(DEBUG_ASC712_BEC_AMPS_CALCULATION)
+	Serial.println("DEBUG_ASC712_BEC_AMPS_CALCULATION");
 	Serial.print("Teensy Volts "); Serial.print(_teensyVoltage, 2);
 	Serial.print("   Pin Volts "); Serial.print(result, 4);
 #endif
@@ -196,32 +200,32 @@ void power_chargeVoltages() {
 	avgBat += (adcRaw *(VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
 
 	chargeReadings++;
-	if (chargeReadings > 3) {
-		_recVoltage = (avgRec / chargeReadings) * 16.20;
-		_becVoltage = (avgBec / chargeReadings) * 7.739580311;
-		_teensyVoltage = (avgTeensy / chargeReadings) * 1.75;
-		_batteryVoltage = (avgBat / chargeReadings) * 7.74;  // Temporary Value, needs calibrating
+	if (chargeReadings >= 3) {
+		_recVoltage = (avgRec / chargeReadings) * REC_VOLTAGE_MULTIPLIER;
+		_becVoltage = (avgBec / chargeReadings) * BEC_VOLTAGE_MULTIPLIER;
+		_teensyVoltage = (avgTeensy / chargeReadings) * TEENSY_VOLTAGE_MULTIPLIER;
+		_batteryVoltage = (avgBat / chargeReadings) * BAT_VOLTAGE_MULTIPLIER;
 		chargeReadings = 0;
-		
-		// Calibrate
-		_recVoltage += REG_CALIBRATION;
-		_becVoltage += BEC_CALIBRATION;
-		_teensyVoltage += TEENSY_CALIBRATION;
-		
-		// Stop irrelevent data
-		if (_recVoltage == REG_CALIBRATION || _recVoltage < 1) _recVoltage = 0;
-		if (_becVoltage == BEC_CALIBRATION || _becVoltage < 1) _becVoltage = 0;
-		if (_teensyVoltage == TEENSY_CALIBRATION || _teensyVoltage < 1) _teensyVoltage = 0;
+
+		// Reset the Averages
+		avgRec = 0; avgBec = 0; avgTeensy = 0; avgBat = 0;
+
+
+#if !defined(CALIBRATION_POWER)
+		// Stop irrelevent data (disable if calibrating
+		if (_recVoltage < 1) _recVoltage = 0;
+		if (_becVoltage < 1) _becVoltage = 0;
+		if (_teensyVoltage < 1) _teensyVoltage = 0;
 		if (_batteryVoltage < 1) _batteryVoltage = 0;
+#else
+		calibrationReadings++; calibrationRecV += _recVoltage; calibrationBecV += _becVoltage; calibrationBatV += _batteryVoltage; calibrationTeeV += _teensyVoltage;
+		if (calibrationReadings > 50) {
+			calibrationRecV = calibrationRecV / calibrationReadings; calibrationBecV = calibrationBecV / calibrationReadings; calibrationBatV = calibrationBatV / calibrationReadings; calibrationTeeV = calibrationTeeV / calibrationReadings;
+			Serial.print("RecV "); Serial.print(calibrationRecV, 3); Serial.print("    BecV "); Serial.print(calibrationBecV, 3); Serial.print("   BatV "); Serial.print(calibrationBatV, 3); Serial.print("    TeeV "); Serial.println(calibrationTeeV, 3);
+			calibrationReadings = 0; calibrationRecV = 0.00; calibrationBecV = 0.00; calibrationBatV = 0.00; calibrationTeeV = 0.00;
+		}
+#endif
 
-		avgRec = 0;
-		avgBec = 0;
-		avgTeensy = 0;
-		avgBat = 0;
-
-		//Serial.print("Rec "); Serial.print(recVoltage, 6); Serial.print("    Bec "); Serial.print(becVoltage, 6); Serial.print("   Bat "); Serial.println(batteryVoltage, 6); Serial.print("    Teensy "); Serial.println(teensyVoltage, 6);
-
-		
 		// WARNING if 5v line is < 4.97  or > 5.03
 		//if (teensyVoltage < 4.95 || teensyVoltage > 5.08) Serial.println("TEENSY 5v DRIFTING - NEED TO FIX !!!");
 
@@ -252,4 +256,3 @@ void power_chargeVoltages() {
 			//}
 	}
 }
-

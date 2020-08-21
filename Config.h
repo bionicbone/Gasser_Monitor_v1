@@ -34,7 +34,7 @@ const uint16_t	MIN_MAIN_LOOP_BEFORE_SD_CARD_LOGGING = 5000;		// Must do x loops 
 //#define DEBUG_FLVSS_CALCULATION															// Activate to display how the Cell voltages are being calculated from the FLVSS sensor
 //#define DEBUG_ASC712_BEC_AMPS_CALCULATION										// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
 //#define DEBUG_ASC712_BATTERY_AMPS_CALCULATION								// Activate to display how the AMPS are being calculated from the ASC712 hall effect sensor
-
+//#define CALIBRATION_POWER																		// Activate to display the Power Results
 
 #if defined (DEBUG_FS_LF_ERRORS)
 #error DONT FLASH WITH DEBUG_FS_LF_ERRORS ACTIVATED
@@ -91,6 +91,10 @@ const uint16_t	MIN_MAIN_LOOP_BEFORE_SD_CARD_LOGGING = 5000;		// Must do x loops 
 
 #if defined (DEBUG_ASC712_BATTERY_AMPS_CALCULATION)
 #error DONT FLASH WITH DEBUG_ASC713_BEC_AMPS_CALCULATION ACTIVATED
+#endif
+
+#if defined (CALIBRATION_POWER)
+#error DONT FLASH WITH CALIBRATION_POWER ACTIVATED
 #endif
 
 #endif  // .h #endif
