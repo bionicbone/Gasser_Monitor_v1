@@ -33,6 +33,7 @@ unsigned long batteryDischargeStoreTimeMs = millis();			// Sets to millis() each
 unsigned long becDischargeLoopTimeMs = 0;									// The last discharge timer value in MS
 unsigned long becDischargeStoreTimeMs = millis();					// Sets to millis() each time the MAH has been calculated
 
+unsigned long dischargeStoreTimeMs = 0;										// The last discharge timer value in MS
 float					calibrationTeeV, calibrationRecV, calibrationBecV, calibrationBatV;
 int						calibrationReadings;
 
@@ -51,8 +52,9 @@ void _power_Setup() {
 // Read all the attached sensors
 void _power_ReadSensors() {
 	power_chargeVoltages();
-	power_Battery_Amps_ASC712();
-	power_BEC_Amps_ASC712();
+	//power_Battery_Amps_ASC712();
+	//power_BEC_Amps_ASC712();
+	power_chargeAmps();
 }
 
 
@@ -255,4 +257,70 @@ void power_chargeVoltages() {
 			//	if (eepromUpdateRequired == true) eeprom_WriteFilghtDataStats();
 			//}
 	}
+}
+
+
+// Read the Battery and BEC AMPs
+void power_chargeAmps() {
+	// if its been less than 500ms since last reading then skip
+	if (millis() - dischargeStoreTimeMs < 500) return;
+
+	// initilise the reading variables
+	int adcRawBat = 0;
+	int adcRawBec = 0;
+	float resultBat = 0.000;
+	float resultBec = 0.000;
+	float pinVoltageBat = 0.000;
+	float pinVoltageBec = 0.000;
+
+
+	// Take 50 readings
+	for (int i = 0; i < 50; i++) {
+		adcRawBat += analogRead(PIN_BATTERY_AMPS);	// Raw ADC Reading
+		adcRawBec += analogRead(PIN_BEC_AMPS);			// Raw ADC Reading
+	}
+	// Calculate the average
+	resultBat = adcRawBat / 50;
+	resultBec = adcRawBec / 50;
+	// Calculate the voltage from the ASC714, this is the actual voltage on the pin
+	resultBat = (resultBat * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+	resultBec = (resultBec * (VREF_CALCULATION_VOLTAGE / (float)ADCRAW_PRECISION));
+	pinVoltageBat = resultBat;
+	pinVoltageBec = resultBec;
+	// Remove the ASC714 offset to make 0v = zero current and Calculate the AMPs
+	resultBat = resultBat + BATTERY_ASC712_0_AMPS_OFFSET;
+	resultBec = resultBec + BEC_ASC712_0_AMPS_OFFSET;
+	// Multiply to the actual voltage
+	resultBat = resultBat * BATTERY_AMPS_MULTIPLIER;
+	resultBec = resultBec * BEC_AMPS_MULTIPLIER;
+
+	// Remove small readings
+#if !defined(CALIBRATION_POWER)
+	// Stop irrelevent data (disable if calibrating)
+	if (resultBat < 0.2) resultBat = 0;
+	if (resultBec < 0.2) resultBec = 0;
+#endif
+
+	//Calculate the AMPs and MAH used since last call
+	batteryDischargeLoopTimeMs = (millis() - batteryDischargeStoreTimeMs);
+	float myFloat = (float)batteryDischargeLoopTimeMs;
+	_batteryDischargeLoopMAH = ((resultBat / 1000)  * myFloat) / 3600000;
+	_batteryDischargeLoopMAH = _batteryDischargeLoopMAH * 1000000;
+	_batteryDischargeTotalMAH += _batteryDischargeLoopMAH;
+	_batteryDischargeLoopAmps = resultBat;
+
+	becDischargeLoopTimeMs = (millis() - becDischargeStoreTimeMs);
+	myFloat = (float)becDischargeLoopTimeMs;
+	_becDischargeLoopMAH = ((resultBec / 1000)  * myFloat) / 3600000;
+	_becDischargeLoopMAH = _becDischargeLoopMAH * 1000000;
+	_becDischargeTotalMAH += _becDischargeLoopMAH;
+	_becDischargeLoopAmps = resultBec;
+
+
+	// Reset the next reading timer
+	dischargeStoreTimeMs = millis();
+
+#if defined(CALIBRATION_POWER)
+	Serial.print("BatPin "); Serial.print(pinVoltageBat, 3); Serial.print("    BatA "); Serial.print(resultBat, 3); Serial.print("    BatmAH "); Serial.print(_batteryDischargeTotalMAH, 3); Serial.print("    BecPin "); Serial.print(pinVoltageBec, 3); Serial.print("    BecA "); Serial.print(_becDischargeLoopAmps, 3); Serial.print("   BecmAH "); Serial.println(_becDischargeTotalMAH, 3);
+#endif
 }

@@ -16,6 +16,8 @@ constexpr float BAT_VOLTAGE_MULTIPLIER = 7.792053295;				// Follow Calibration P
 constexpr float TEENSY_VOLTAGE_MULTIPLIER = 1.7464;					// Follow Calibration Process
 constexpr float REC_VOLTAGE_MULTIPLIER = 16.18122977;				// Follow Calibration Process
 constexpr float BEC_VOLTAGE_MULTIPLIER = 7.853345148;				// Follow Calibration Process  
+constexpr float BATTERY_AMPS_MULTIPLIER = 5.2023;								// Follow Calibration Process  
+constexpr float BEC_AMPS_MULTIPLIER = 4.4437; // 5.040983607;										// Follow Calibration Process  
 
 
 // Config
@@ -27,10 +29,10 @@ constexpr int		PIN_RECTIFIER_VOLTAGE = A2;									// Analog - Rectifier Voltage
 constexpr int		PIN_BEC_VOLTAGE = A3;												// Analog - BEC output voltage
 constexpr int		ADCRAW_PRECISION = 4096;										// DO NOT ALTER, Teensy 12 bit
 constexpr float	VREF_CALCULATION_VOLTAGE = 3.3;							// 3.3v for  Teensy, measured and perfect with 5v to Teensy
-constexpr float	BATTERY_ASC712_0_AMPS_OFFSET = -2.53;				// Battery ASC712 offset to 0 Amps as per datasheet
+constexpr float	BATTERY_ASC712_0_AMPS_OFFSET = -2.662;				// Battery ASC712 offset to 0 Amps as per datasheet
 constexpr float	BATTERY_ASC712_0_AMPS_POS_DIVIDER = 0.165;	// Battery ASC712 mV/A divider, as measured under load
 constexpr float	BATTERY_ASC712_0_AMPS_NEG_DIVIDER = 0.175;	// Battery ASC712 mV/A divider, as measured under load
-constexpr float	BEC_ASC712_0_AMPS_OFFSET = -2.5284;					// BEC ASC712 offset to 0 Amps as per datasheet
+constexpr float	BEC_ASC712_0_AMPS_OFFSET = -2.653;					// BEC ASC712 offset to 0 Amps as per datasheet
 constexpr float	BEC_ASC712_0_AMPS_POS_DIVIDER = 0.150;			// BEC ASC712 mV/A divider, as measured under load
 constexpr float	BEC_ASC712_0_AMPS_NEG_DIVIDER = 0.185;			// BEC ASC712 mV/A divider, as measured under load
 
@@ -57,6 +59,7 @@ void _power_ReadSensors();
 void power_chargeVoltages();
 void power_BEC_Amps_ASC712();
 void power_Battery_Amps_ASC712();
+void power_chargeAmps();
 
 #endif  // .h #endif
 
