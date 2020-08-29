@@ -33,7 +33,6 @@
 #include <U8g2lib.h>
 #include <Wire.h>
 #include "OLED.h"
-#include "ChargingTestsOnly.h"
 #include "ErrorHandling.h"
 #include "Power.h"
 #include "Temperature.h"

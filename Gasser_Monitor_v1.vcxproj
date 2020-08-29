@@ -106,7 +106,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChargingTestsOnly.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="ErrorHandling.h" />
     <ClInclude Include="MCU6050.h" />
@@ -120,7 +119,6 @@
     <ClInclude Include="__vm\.Gasser_Monitor_v1.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChargingTestsOnly.cpp" />
     <ClCompile Include="ErrorHandling.cpp" />
     <ClCompile Include="MCU6050.cpp" />
     <ClCompile Include="OLED.cpp" />
