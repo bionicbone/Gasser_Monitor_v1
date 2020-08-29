@@ -17,6 +17,7 @@
 
 // Private Variables
 bool sdCardLoggingActive = false;
+bool fileExists = false;
 
 File SdFile;
 
@@ -49,6 +50,7 @@ void _sd_SetUp() {
 		sprintf(myFileName, "%s%s", fileNamePrefix, fileNameSuffix);
 
 		// Open the filename
+		fileExists = SD.exists(myFileName);
 		SdFile = SD.open(myFileName, FILE_WRITE);
 		delay(1);
 		sd_WriteLogHeader();
@@ -133,7 +135,10 @@ void sd_WriteLogHeader() {
 	if (SdFile) {
 		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
 		Serial.println(text);
-		SdFile.println(text);
+		if (!fileExists) {
+			SdFile.println(text);
+			Serial.println("Header written to SD Card");
+		}
 		// Just flush the data, never close the file:
 		SdFile.flush();
 	}
