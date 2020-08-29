@@ -15,8 +15,6 @@ uint16_t			_wave1 = 0;																	// Used to pass current value to telemetr
 uint16_t			_wave2 = 0;																	// Used to pass current value to telemetry
 uint32_t			_channelsMaxHoldMillis100Resul = 0;					// Stores max millis() for every 100 readings, for 16ch 2 waves it is the highest of all readings
 float					_channel16chFrameSyncSuccessRate = 0;				// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-uint16_t			_sbusFrameLowMicros = 0;										// Stores the SBUS Lowest time before next refresh over the last 100 frames
-uint16_t			_sbusFrameHighMicros = 0;										// Stores the SBUS highest time before next refresh over the last 100 frames
 int8_t				_overallE2EQuality = 0;											// A complex calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
 
 
@@ -47,11 +45,11 @@ bool					failSafeDetected = false;										// True if the fail safe flag is set
 unsigned long failSafeStartMillis = 0;										// Stores millis() when fail safe flag on Rx is first set 
 uint32_t			failSafeCounter = 0;												// Constantly increments on each fail safe as indicated by the Rx Flag
 uint32_t			failSafeLongestMillis = 0;									// Stores the longest time is ms that the fail safe flag is set
-uint16_t			sbusNormalRefreshRate = 0;									// SBUS normal refresh rate, based on average, used to reset SBUS frame rate analysis every 100 frames 
-uint16_t			sbusPreviousRefreshRate = 0;								// SBUS previous refresh rate, used to work out if we have successfully determined Normal Rate.
-bool					sbusFrameRateOK = false;										// true once SBUS Frame Rate is determined
-unsigned long sbusFrameStartMicros = 0;										// Stores micros() when an SBUS frame is received, for calculting SBUS frame rate
-uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
+//uint16_t			sbusNormalRefreshRate = 0;									// SBUS normal refresh rate, based on average, used to reset SBUS frame rate analysis every 100 frames 
+//uint16_t			sbusPreviousRefreshRate = 0;								// SBUS previous refresh rate, used to work out if we have successfully determined Normal Rate.
+//bool					sbusFrameRateOK = false;										// true once SBUS Frame Rate is determined
+//unsigned long sbusFrameStartMicros = 0;										// Stores micros() when an SBUS frame is received, for calculting SBUS frame rate
+//uint8_t				sbusFrame100Counter = 0;										// Counter for reset back to 9000
 
 
 
@@ -88,18 +86,12 @@ void _rxLinkQuality_ActivateSBUS() {
 	// Given these only print once then we always allow.
 	Serial.print("SBUS Startup Cleared with "); Serial.print(counter); Serial.print(" reads");
 	Serial.print(" in (ms) "); Serial.println(millis() - maxWaitTimeMillis);
-
-	// stop errors on SBUS frame rates
-	sbusFrameStartMicros = micros();
 }
 
 
 // Main control loop to determine the Quality of the Rx SBUS signal
 void _rxLinkQuality_Scan(bool firstRun) {
 	if (sbus.read(&channels[0], &failSafe, &lostFrame)) {
-
-		// Capture current SBUS Frame Rate
-		sbus_FrameRate();
 
 		// Increase total frames received
 		_totalFrames++;
@@ -673,61 +665,10 @@ void debug_Data() {
 }
 
 
-// Determines current SBUS frame Rate & updates sbusFrameLowMicros & sbusFrameHighMicros
-// Also sets sbusFrameRateOK = true once we have a fixed value
-void sbus_FrameRate() {
-	sbusFrame100Counter++;
-	if (sbusFrame100Counter == 100) {
-		sbusFrame100Counter = 0;
-
-		if (sbusFrameRateOK == false) {
-			sbusNormalRefreshRate = (sbusNormalRefreshRate + (_sbusFrameLowMicros + ((_sbusFrameHighMicros - _sbusFrameLowMicros) / 2))) / 2;
-			if (sbusPreviousRefreshRate >= sbusNormalRefreshRate - 10 && sbusPreviousRefreshRate <= sbusNormalRefreshRate + 10) {
-				sbusFrameRateOK = true;
-				sbusNormalRefreshRate = int((sbusNormalRefreshRate + 50) / 100) * 100;
-			}
-		}
-
-#if defined (DEBUG_SBUS_FRAME_TIME)
-		Serial.print("SBUS Frame Rate Low  = "); Serial.println(_sbusFrameLowMicros);
-		Serial.print("SBUS Frame Rate High = "); Serial.println(_sbusFrameHighMicros);
-		Serial.print("sbusFrameRateOK = "); Serial.print(sbusFrameRateOK); Serial.print("  :  sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
-#endif
-
-		sbusPreviousRefreshRate = sbusNormalRefreshRate;
-		_sbusFrameLowMicros = sbusNormalRefreshRate;
-		_sbusFrameHighMicros = sbusNormalRefreshRate;
-	}
-
-	if (micros() - sbusFrameStartMicros < _sbusFrameLowMicros) {
-		_sbusFrameLowMicros = micros() - sbusFrameStartMicros;
-		if (_sbusFrameLowMicros < SBUS_MIN_FRAME_RATE) { _sbusFrameLowMicros = SBUS_DEFAULT_FRAME_RATE; }
-	}
-	if (micros() - sbusFrameStartMicros > _sbusFrameHighMicros) {
-		_sbusFrameHighMicros = micros() - sbusFrameStartMicros;
-		if (_sbusFrameHighMicros > SBUS_MAX_FRAME_RATE) { _sbusFrameHighMicros = SBUS_DEFAULT_FRAME_RATE; }
-	}
-
-
-
-	sbusFrameStartMicros = micros();
-}
-
-
 // Calculate the End to End quality of the Tx Rx and Sbus
 void calculate_Overall_EndToEnd_Quality() {
 	_overallE2EQuality = 100;
 	int16_t calc = 0;
-
-	// Reduce for the SBUS frame rate deviation
-	calc = (_sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
-	if (calc < 0) calc = 0;
-	_overallE2EQuality -= calc;
-#if defined (DEBUG_E2E_OVERALL_QUALITY)
-	//Serial.print("sbusFrameHighMicros = "); Serial.println(sbusFrameHighMicros);
-	//Serial.print("sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
-	Serial.print("SBUS Frame Rate QI = "); Serial.println(calc);
-#endif
 
 	// Reduce for the Lost Frames %
 	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - _lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;

@@ -86,8 +86,6 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_badFramesPercentage100Result);
 		text.concat(","); text.concat(_channelsMaxHoldMillis100Resul);
 		text.concat(","); text.concat(_channel16chFrameSyncSuccessRate);
-		text.concat(","); text.concat(_sbusFrameLowMicros);
-		text.concat(","); text.concat(_sbusFrameHighMicros);
 		text.concat(","); text.concat(_wave1);
 		text.concat(","); text.concat(_wave2);
 		// Power / Charging Data
@@ -114,6 +112,7 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_AccTmp);
 		text.concat(","); text.concat(_GyrX);
 		text.concat(","); text.concat(_GyrY);
+		text.concat(","); text.concat(_GyrZ);
 		text.concat(","); text.concat(_vibrationStatus);
 
 		Serial.println(text);
@@ -133,7 +132,7 @@ void _sd_WriteLogDate() {
 
 void sd_WriteLogHeader() {
 	if (SdFile) {
-		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,SBLO,SBHI,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
+		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
 		Serial.println(text);
 		if (!fileExists) {
 			SdFile.println(text);
