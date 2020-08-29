@@ -42,9 +42,6 @@
     <ClInclude Include="ErrorHandling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChargingTestsOnly.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SdCard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,9 +69,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ErrorHandling.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ChargingTestsOnly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SdCard.cpp">
