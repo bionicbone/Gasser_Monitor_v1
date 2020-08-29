@@ -33,13 +33,13 @@ constexpr auto TRSHLD_16CH_2_CHNG = 50;
 constexpr auto MAX_16CH_ESTIMATED_BB_Bits = 12;		// over this the remainder will be added to the next frame in 16ch 1 wave mode.
 
 // these parameters are mainly to stop weird values on first starting up which effect charting the data
-constexpr auto SBUS_MIN_FRAME_RATE = 4000;				// If the SBUS frame is determined under this value it will be set to this
-constexpr auto SBUS_MAX_FRAME_RATE = 24000;				// If the SBUS frame is determined under this value it will be set to this
-constexpr auto SBUS_DEFAULT_FRAME_RATE = 10000;		// If below min or above max it will be set to this
+//constexpr auto SBUS_MIN_FRAME_RATE = 4000;				// If the SBUS frame is determined under this value it will be set to this
+//constexpr auto SBUS_MAX_FRAME_RATE = 24000;				// If the SBUS frame is determined under this value it will be set to this
+//constexpr auto SBUS_DEFAULT_FRAME_RATE = 10000;		// If below min or above max it will be set to this
 
 // these values are for controling the overall End to End quality indicator result
-constexpr auto E2E_QI_RATE_ALLOWED_INCREASE = 250;	// SBUS Frame can the late by this value in us before it effects the QI value
-constexpr auto E2E_QI_RATE_DIVIDOR = 40;						// Result divisor 
+//constexpr auto E2E_QI_RATE_ALLOWED_INCREASE = 250;	// SBUS Frame can the late by this value in us before it effects the QI value
+//constexpr auto E2E_QI_RATE_DIVIDOR = 40;						// Result divisor 
 constexpr auto E2E_QI_LOSTFRAME_ALLOWED_MIN = 98;		// LostFrame% can drop to this level before it effects the QI value
 constexpr auto E2E_QI_LOSTFRAME_MULTIPLIER = 20;		// Result multiplier
 constexpr auto E2E_QI_BADFRAME_ALLOWED_MIN = 75;		// BadFrame% can drop to this level before it effects the QI value
@@ -57,8 +57,6 @@ extern uint16_t _wave1;															// Used to pass current value to telemetry
 extern uint16_t _wave2;															// Used to pass current value to telemetry
 extern uint32_t _channelsMaxHoldMillis100Resul;			// Stores max millis() for every 100 readings
 extern float		_channel16chFrameSyncSuccessRate;		// Store the SBUS Frame Sync Success Rate when in 16ch mode, should be >98% based on X4R
-extern uint16_t	_sbusFrameLowMicros;								// Stores the SBUS Lowest time before next refresh over the last 100 frames
-extern uint16_t	_sbusFrameHighMicros;								// Stores the SBUS highest time before next refresh over the last 100 frames
 extern int8_t		_overallE2EQuality;									// A calculation that includes lostFrames%, BadFrames%, Ch16%, SbusFrameRate, ChMaxHold, failSafe to give 0-100 quality indicator
 
 
@@ -76,7 +74,6 @@ void check_FailSafe();
 void find_WaveChannel_New(byte &badFramesMonitoringChannel1, byte &badFramesMonitoringChannel2, byte &badFramesMonitoringType);
 void debug_Data();
 void debug_Wave_Data();
-void sbus_FrameRate();
 void calculate_Overall_EndToEnd_Quality();
 
 
