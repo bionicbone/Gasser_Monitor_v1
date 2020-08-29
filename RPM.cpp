@@ -68,7 +68,7 @@ void _rpm_calculate_SensorPulse() {
 
 	// update the inFlight flag
 	// inFlight flag used mainly to stop OLED updates which can take time and effect the RPM accuracy
-	if (_mainRPMSensorDetectedRPM < 600 || _mainRPMSensorDetectedRPM > 30000) {
+	if (_mainRPMSensorDetectedRPM < 3500 || _mainRPMSensorDetectedRPM > 30000) {
 		_mainRPMSensorDetectedRPM = 0;
 		_inFlight = false;
 	}
