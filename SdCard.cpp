@@ -112,6 +112,7 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_AccTmp);
 		text.concat(","); text.concat(_GyrX);
 		text.concat(","); text.concat(_GyrY);
+		text.concat(","); text.concat(_GyrZ);
 		text.concat(","); text.concat(_vibrationStatus);
 
 		Serial.println(text);
