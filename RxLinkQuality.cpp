@@ -719,16 +719,6 @@ void calculate_Overall_EndToEnd_Quality() {
 	_overallE2EQuality = 100;
 	int16_t calc = 0;
 
-	// Reduce for the SBUS frame rate deviation
-	calc = (_sbusFrameHighMicros - sbusNormalRefreshRate - E2E_QI_RATE_ALLOWED_INCREASE) / E2E_QI_RATE_DIVIDOR;
-	if (calc < 0) calc = 0;
-	_overallE2EQuality -= calc;
-#if defined (DEBUG_E2E_OVERALL_QUALITY)
-	//Serial.print("sbusFrameHighMicros = "); Serial.println(sbusFrameHighMicros);
-	//Serial.print("sbusNormalRefreshRate = "); Serial.println(sbusNormalRefreshRate);
-	Serial.print("SBUS Frame Rate QI = "); Serial.println(calc);
-#endif
-
 	// Reduce for the Lost Frames %
 	calc = (E2E_QI_LOSTFRAME_ALLOWED_MIN - _lostFramesPercentage100Result) * E2E_QI_LOSTFRAME_MULTIPLIER;
 	if (calc < 0) calc = 0;
