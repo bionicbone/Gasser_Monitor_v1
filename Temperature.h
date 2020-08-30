@@ -14,14 +14,6 @@
 
 // Config
 constexpr auto TEMPERATURE_READINGS_FOR_AVERAGE = 50;						// take x temperature reading and calculate the average
-constexpr auto PROG_DELAY_BEFORE_FLIGHT_STAT_UPDATES = 7500;		// if too low min/max values may not be stable. DEFAULT 7500;
-constexpr auto ERROR_MIN_CANOPY_TEMPERATURE = 2;								// Triggers Errors
-constexpr auto ERROR_MAX_CANOPY_TEMPERATURE = 35;								// Triggers Errors
-constexpr auto ERROR_MIN_ENGINE_TEMPERATURE = 2;								// Triggers Errors
-constexpr auto ERROR_MAX_ENGINE_TEMPERATURE = 149;							// Triggers Errors
-constexpr auto ERROR_MIN_AMBIENT_TEMPERATURE = 2;								// Triggers Errors
-constexpr auto ERROR_MAX_AMBIENT_TEMPERATURE = 28;							// Triggers Errors
-// TODO - Add Min / Max for BEC temperature
 constexpr float AMBIENT_TEMP_CALIBRATION = -0.48;								// LM35's are never aligned, tweaking to get similar in ambient conditions is a good idea
 constexpr float CANOPY_TEMP_CALIBRATION = -0.13;								// LM35's are never aligned, tweaking to get similar in ambient conditions is a good idea
 constexpr float ENGINE_TEMP_CALIBRATION = 0.41;									// LM35's are never aligned, tweaking to get similar in ambient conditions is a good idea

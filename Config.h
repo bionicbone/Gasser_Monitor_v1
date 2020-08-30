@@ -18,6 +18,8 @@ const uint16_t	MAX_MAIN_LOOP_TIME_BEFORE_ERROR = 2000;					// Value triggers the
 const uint16_t	MIN_MAIN_LOOP_BEFORE_SD_CARD_LOGGING = 5000;		// Must do x loops before logging data to SD card
 
 
+extern unsigned long		lastLoopMicros;
+
 // DEVELOPER - Program debug options
 
 //#define DEBUG_FS_LF_ERRORS																	// Activate to report Rx FailSafe and LostFrame Flags on USB Serial

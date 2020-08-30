@@ -13,6 +13,7 @@
 #include "Temperature.h"
 #include <TimeLib.h>
 #include "MCU6050.h"
+#include "ErrorHandling.h"
 
 
 // Private Variables
@@ -73,8 +74,8 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(strhour); text.concat(":"); text.concat(strminute); text.concat(":"); text.concat(strsecond);
 		text.concat("."); text.concat(millis());
 		// Error Data
-		text.concat(","); text.concat("ERR");
-		text.concat(","); text.concat("ErrD");
+		text.concat(","); text.concat(_error);
+		text.concat(","); text.concat(_error1);
 		// RPM Data
 		text.concat(","); text.concat(_inFlight);
 		text.concat(","); text.concat(_mainRPMSensorDetectedRPM);
