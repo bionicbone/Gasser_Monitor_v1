@@ -16,10 +16,10 @@
 constexpr byte PIN_ERROR_LED = 5;													// Digital - Output Pin for Warning LEDs.
 constexpr int ERROR_MIN_NEXT_ERROR_REPORT_TIME = 1000;		// in 1000's of a second, i.e. 500 = 0.5 seconds.
 constexpr int ERROR_MIN_ALL_ERRORS_LOOP_TIME = 5000;			// in 1000's of a second, i.e. 5000 = 5 seconds.
-constexpr auto ERROR_MIN_CELL_VOLTAGE = 3.30;
+constexpr auto ERROR_MIN_CELL_VOLTAGE = 3.24;
 constexpr auto ERROR_MAX_CELL_VOLTAGE = 3.45;
 constexpr auto ERROR_MAX_CELL_DIFFERENCE = 0.05;
-constexpr auto ERROR_MIN_BATTERY_VOLTAGE = 6.6;
+constexpr auto ERROR_MIN_BATTERY_VOLTAGE = 6.48;
 constexpr auto ERROR_MAX_BATTERY_VOLTAGE = 6.9;
 constexpr auto ERROR_CHARGING_MIN_RPM = 9000;
 constexpr auto ERROR_CHARGING_MIN_RECTIFIER_VOLTAGE = 9.0;
