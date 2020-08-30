@@ -16,38 +16,38 @@
 /*
 Value | SensorID | Name | Description
 -------- | ----| -----| -----------
-5100 | 19 | ERR | Error - Info / Error Number(see error page)
+5100 | 19 | ERR  | Error - Info / Error Number(see error page)
 5101 | 19 | ErrD | Error - Info / Error Extra(see error page)
 5102 | 19 | TFCK | SBUS - Total SBUS Frames Received(*1000)
-5103 | 19 | BFP | SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames.To add a comparison for those using Reinhard LQBB sensor
+5103 | 19 | BFP  | SBUS - Bad Frames as calculated from SBUS data @bionicbone method in last 100 frames.To add a comparison for those using Reinhard LQBB sensor
 5104 | 19 | E2EQ | SBUS - End to End Quality as calculated from SBUS data @bionicbone method in last 100 frames
 5105 | 19 | MAIN | RPM - Main Engine RPM
 5106 | 19 | CLUT | RPM - Clutch RPM
 5107 | 19 | AmbT | Temperature - Ambient
 5108 | 19 | CanT | Temperature - Canopy
 5109 | 19 | EngT | Temperature - Engine
-510A | 19  |      | Not Used
-510B | 19  |      | Not Used
-510C | 19  |      | Not Used
-510D | 19  |      | Not Used
-510E | 19  |      | Not Used
-510F | 19  |      | Not Used
-5110 | 19  |      | Not Used
-5111 | 19  |      | Not Used
-5112 | 19  |      | Not Used
-5113 | 19  |      | Not Used
-5114 | 19  |      | Not Used
-5115 | 19  |      | Not Used
-5116 | 19  |      | Not Used
-5117 | 19  |      | Not Used
-5118 | 19  |      | Not Used
-5119 | 19  |      | TEST DATA
-511A | 19  |      | TEST DATA
-511B | 19  |      | TEST DATA
-511C | 19  |      | TEST DATA
-511D | 19  |      | TEST DATA
-511E | 19  |      | TEST DATA
-511F | 19  |      | TEST DATA
+510A | 19 | BatA | Battery AMPs
+510B | 19 |      | Not Used
+510C | 19 |      | Not Used
+510D | 19 |      | Not Used
+510E | 19 |      | Not Used
+510F | 19 |      | Not Used
+5110 | 19 |      | Not Used
+5111 | 19 |      | Not Used
+5112 | 19 |      | Not Used
+5113 | 19 |      | Not Used
+5114 | 19 |      | Not Used
+5115 | 19 |      | Not Used
+5116 | 19 |      | Not Used
+5117 | 19 |      | Not Used
+5118 | 19 |      | Not Used
+5119 | 19 |      | TEST DATA
+511A | 19 |      | TEST DATA
+511B | 19 |      | TEST DATA
+511C | 19 |      | TEST DATA
+511D | 19 |      | TEST DATA
+511E | 19 |      | TEST DATA
+511F | 19 |      | TEST DATA
 */
 
 /*
@@ -106,7 +106,7 @@ Stream* sportFlusher;											// Must flush to write otherwise we crash!!
 // Active Sensors and current value store
 // *** Maintain void updateValue(byte sensorNumber) when new sensors are added ***
 struct frSkyTeensySensorArray {
-	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  true,   true,   true,   true,   true,   true,   true };
+	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,   false,   false,   false,   false,   false,   false };
 	uint32_t	SensorID[32]			= { 0x5100, 0x5101, 0x5102, 0x5103, 0x5104, 0x5105, 0x5106, 0x5107, 0x5108, 0x5109, 0x510A, 0x510B, 0x510C, 0x510D, 0x510E, 0x510F, 0x5110, 0x5111, 0x5112, 0x5113, 0x5114, 0x5115, 0x5116, 0x5117, 0x5118, 0x5119, 0x511A, 0x511B, 0x511C, 0x511D, 0x511E, 0x511F };
 	uint32_t	SensorValue[32]		= { 0 };
 	bool			SensorDataChanged[32] = { {false} };
@@ -182,49 +182,7 @@ void updateValue(byte sensorNumber) {
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 10:													// 510A - Use Next
-		if (0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = 999;
-			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
-		}
-		break;
-
-
-
-	// 25 onwards used for temporary testing values
-	case 25:														// 5119 - TEST DATA - Teensy Voltage (Ratio 3.0)
-		if (_teensyVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			float calc = _teensyVoltage * 100;
-			uint32_t Tx = calc;
-			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
-			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
-		}
-		break;
-	case 26:														// 511A - TEST DATA - Rectifier Voltage (Ratio 3.0)
-		if (_recVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			float calc = _recVoltage * 100;
-			uint32_t Tx = calc;
-			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
-			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
-		}
-		break;
-	case 27:														// 511B - TEST DATA - BEC voltage (Ratio 3.0)
-		if (_becVoltage != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			float calc = _becVoltage * 100;
-			uint32_t Tx = calc;
-			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
-			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
-		}
-		break;
-	case 28:														// 511C - TEST DATA - BEC AMPS (Ratio 3.0)
-		if (_becDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			float calc = _becDischargeLoopAmps * 100;
-			uint32_t Tx = calc;
-			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
-			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
-		}
-		break;
-	case 29:														// 511D - TEST DATA - Battery AMPS (Ratio 3.0)
+	case 10:													// 510A - Battery AMPS (Ratio 2.5)
 		if (_batteryDischargeLoopAmps != frSkyTeensySensors.SensorValue[sensorNumber]) {
 			float calc = _batteryDischargeLoopAmps * 100;
 			int32_t Tx = calc;
@@ -232,16 +190,54 @@ void updateValue(byte sensorNumber) {
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 30:														// 511E - TEST DATA - Battery mAH
-		if (_batteryDischargeTotalMAH != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			int32_t Tx = _batteryDischargeTotalMAH;
-			frSkyTeensySensors.SensorValue[sensorNumber] = Tx;
+	case 11:													// 510B - Use Next
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 31:														// 511F - TEST DATA - BEC Temperature
-		if ((float)_becTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
-			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)_becTemp;
+
+
+	// 25 onwards used for temporary testing values
+	case 25:														// 5119 - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 26:														// 511A - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 27:														// 511B - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 28:														// 511C - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 29:														// 511D - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 30:														// 511E - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 31:														// 511F - TEST DATA - 
+		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
