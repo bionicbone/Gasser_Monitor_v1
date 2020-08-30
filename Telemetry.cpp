@@ -64,10 +64,11 @@ TODO List:-
 #include "Telemetry.h"
 #include "Temperature.h"
 #include "Power.h"
+#include "ErrorHandling.h"
 
 // Public Variables
-float					cell[6] = { 0.0000 };								// Final cell voltage store
-float cellSmoothed[6] = { 0.0000 };								// Final cell voltage after smoothing
+float					cell[6] = { 0.0000 };						// Final cell voltage store
+float cellSmoothed[6] = { 0.0000 };						// Final cell voltage after smoothing
 unsigned long	sensorRefreshRate = 0;					// Sensor refresh rate
 unsigned long	FLVSSRefreshRate = 0;						// Sensor refresh rate
 
@@ -121,8 +122,16 @@ void updateValue(byte sensorNumber) {
 	uint32_t totalFrames1K = _totalFrames / 1000;
 	switch (sensorNumber) {
 	case 0:														// 5100 - Error - Last Error Number, 0 if none, 99 if paused
+		if (_error != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = _error;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
 		break;
 	case 1:														// 5101 - Error - Additional Information
+		if (_error1 != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = _error1;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
 		break;
 	case 2:														// 5102 - SBUS - Total Frames / 1000
 		if (totalFrames1K != frSkyTeensySensors.SensorValue[sensorNumber]) {
