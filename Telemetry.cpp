@@ -122,9 +122,10 @@ void updateValue(byte sensorNumber) {
 	uint32_t totalFrames1K = _totalFrames / 1000;
 	switch (sensorNumber) {
 	case 0:														// 5100 - Error - Last Error Number, 0 if none, 99 if paused
-		if (_error != frSkyTeensySensors.SensorValue[sensorNumber]) {
+		if (_error != frSkyTeensySensors.SensorValue[sensorNumber] && _error !=98) {
 			frSkyTeensySensors.SensorValue[sensorNumber] = _error;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+			_error = 98;	// Signal data transmitted to ErrorHandling Code
 		}
 		break;
 	case 1:														// 5101 - Error - Additional Information
