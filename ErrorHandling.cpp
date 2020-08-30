@@ -119,11 +119,11 @@ void _errorHandling_checkErrors() {
 			//}
 
 
-			// detect slow running main loop and signal an error
-			if (lastLoopMicros >= 3600) {
-				_errorArray[97] = true;
-				_error1 = lastLoopMicros;
-			}
+			//// detect slow running main loop and signal an error
+			//if (lastLoopMicros >= 3600) {
+			//	_errorArray[97] = true;
+			//	_error1 = lastLoopMicros;
+			//}
 
 			if (_error == 98) {
 				for (uint8_t counter = errorArrayCounter; counter < 102; counter++) {
@@ -138,6 +138,7 @@ void _errorHandling_checkErrors() {
 					}
 				}
 				errorArrayCounter = 0;
+				_error = 0;
 			}
 
 
