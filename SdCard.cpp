@@ -138,9 +138,9 @@ void sd_WriteLogHeader() {
 		if (!fileExists) {
 			SdFile.println(text);
 			Serial.println("Header written to SD Card");
+			// Just flush the data, never close the file:
+			SdFile.flush();
 		}
-		// Just flush the data, never close the file:
-		SdFile.flush();
 	}
 	else {
 		// if the file didn't open, print an error:
