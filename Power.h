@@ -12,7 +12,7 @@
 #endif
 
 // Calibration
-constexpr float BAT_VOLTAGE_MULTIPLIER = 7.792053295;				// Follow Calibration Process
+constexpr float BAT_VOLTAGE_MULTIPLIER = 7.734504895;				// Follow Calibration Process
 constexpr float TEENSY_VOLTAGE_MULTIPLIER = 1.7464;					// Follow Calibration Process
 constexpr float REC_VOLTAGE_MULTIPLIER = 16.18122977;				// Follow Calibration Process
 constexpr float BEC_VOLTAGE_MULTIPLIER = 7.853345148;				// Follow Calibration Process  
