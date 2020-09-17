@@ -53,6 +53,7 @@ All sensors are at different levels of development:-
 
 **Acknowledgements:**
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library (arduino library)
+* Oliver for the U8g2 for the OLED library and GFX library (arduino library)
 * @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
 
 **Licencing:** 
