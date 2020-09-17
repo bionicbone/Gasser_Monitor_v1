@@ -6,22 +6,22 @@
 			All non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 			Note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: Teensy 3.2 / 3.1, Platform=teensy3, Package=teensy
+	Hardware: Teensy 3.5, Platform=teensy3, Package=teensy
 */
 
 #if defined(_VMICRO_INTELLISENSE)
 
 #ifndef _VSARDUINO_H_
 #define _VSARDUINO_H_
-#define __HARDWARE_mk20dx256__
-#define __HARDWARE_MK20DX256__
-#define __MK20DX256__
+#define __HARDWARE_mk64fx512__
+#define __HARDWARE_MK64FX512__
+#define __MK64FX512__
 #define TEENSYDUINO 153
 #define ARDUINO 108013
-#define ARDUINO_TEENSY32
-#define F_CPU 96000000
+#define ARDUINO_TEENSY35
+#define F_CPU 120000000
 #define USB_SERIAL
-#define LAYOUT_UNITED_KINGDOM
+#define LAYOUT_US_ENGLISH
 #define __cplusplus 201103L
 #undef __cplusplus
 #define __cplusplus 201103L

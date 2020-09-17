@@ -98,6 +98,10 @@ Stream* sportFlusher;											// Must flush to write otherwise we crash!!
 #define SPORT 10													// Digital Teensy Serial2 pin for SPort (bidirectional mode)
 volatile uint32_t *uartSingleTxRx = NULL;	// Controls the Single Wire mode (Tx / Rx), 8 bit for Teensy v3.2, 32 bit for Teensy v4.0
 Stream* sportFlusher;											// Must flush to write otherwise we crash!!
+#elif defined (__MK64FX512__)							// Teensy v3.5
+#define SPORT 10													// Digital Teensy Serial2 pin for SPort (bidirectional mode)
+volatile uint8_t *uartSingleTxRx = 0;			// Controls the Single Wire mode (Tx / Rx), 8 bit for Teensy v3.2, 32 bit for Teensy v4.0
+Stream* sportFlusher;
 #else
 #error "Unsupported processor! 5V 16MHz Arduino ProMini, Nano or Teensy v3.2 required";
 #endif
@@ -256,6 +260,13 @@ void _telemetry_ActivateTelemetry() {
 	// Teensy Serial2 needs to be single wire Tx/Rx
 	uartSingleTxRx = &UART1_C3;
 	UART1_C1 |= (UART_C1_LOOPS | UART_C1_RSRC);
+#elif defined (__MK64FX512__)
+#define sport Serial2
+	sportFlusher = &Serial2;
+	sport.begin(57600, SERIAL_8N1_RXINV_TXINV);   // 58824  // 56376
+	// Teensy Serial2 needs to be single wire Tx/Rx
+	uartSingleTxRx = &UART1_C3;
+	UART1_C1 |= (UART_C1_LOOPS | UART_C1_RSRC);
 #elif defined (__IMXRT1062__)
 #define sport Serial2
 	sportFlusher = &Serial2;
@@ -327,6 +338,9 @@ void sendFrame() {
 #elif defined (__MK20DX256__)
 	//Teensy Serial2 Tx Mode
 	*uartSingleTxRx |= UART_C3_TXDIR;
+#elif defined (__MK64FX512__)
+//Teensy Serial2 Tx Mode
+	*uartSingleTxRx |= UART_C3_TXDIR;
 #elif defined (__IMXRT1062__)
 	//Teensy v4.0 Serial2 Tx Mode
 	*uartSingleTxRx |= LPUART_CTRL_TXDIR;
@@ -385,6 +399,10 @@ void sendFrame() {
 	// Nano type processors
 	pinMode(SPORT, INPUT);
 #elif defined (__MK20DX256__)
+	sportFlusher->flush();
+	//Teensy v3.2 Serial2 Rx Mode
+	*uartSingleTxRx &= ~UART_C3_TXDIR;
+#elif defined (__MK64FX512__)
 	sportFlusher->flush();
 	//Teensy v3.2 Serial2 Rx Mode
 	*uartSingleTxRx &= ~UART_C3_TXDIR;
