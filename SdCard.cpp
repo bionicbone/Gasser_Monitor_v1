@@ -19,6 +19,7 @@
 // Private Variables
 bool sdCardLoggingActive = false;
 bool fileExists = false;
+byte csPin = 0;
 
 File SdFile;
 
@@ -26,9 +27,18 @@ File SdFile;
 
 void _sd_SetUp() {
 	delay(100);
-	if (!SD.begin(14)) { // CS Pin 14
+
+#if defined (__MK20DX256__)	
+	csPin = 14;
+#elif defined (__MK64FX512__)	
+	csPin = BUILTIN_SDCARD;
+#else
+#error "SD Card not supported, use Teensy v3.2 or v3.5";
+#endif
+
+	if (!SD.begin(csPin)) { // CS Pin 14
 		// TODO - Send Telemetry Error instead - persistent
-		Serial.println("initialization failed!");
+		Serial.println("SD Card initialization failed!");
 		sdCardLoggingActive = false;
 	}
 	else {
