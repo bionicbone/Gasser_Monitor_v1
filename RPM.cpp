@@ -81,7 +81,7 @@ void _rpm_calculate_SensorPulse() {
 // Setup the interrupt pins for the attached RPM sensors
 void _rpm_ActivateInterrupts() {
 
-#if defined(__MK20DX256__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__)
 	// Pull up the PIN and activate interrupt IRQ 0 (NANO pin2, Teensy pin1) for the RPM sensor
 	pinMode(PIN_MAIN_RPM_SENSOR_INTERRUPT_0, INPUT_PULLUP);
 	attachInterrupt(PIN_MAIN_RPM_SENSOR_INTERRUPT_0, onMainRPMSensorPulse, FALLING);
