@@ -42,7 +42,13 @@
     <ClInclude Include="ErrorHandling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChargingTestsOnly.h">
+    <ClInclude Include="SdCard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OLED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MCU6050.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,7 +71,13 @@
     <ClCompile Include="ErrorHandling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChargingTestsOnly.cpp">
+    <ClCompile Include="SdCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OLED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MCU6050.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

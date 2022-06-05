@@ -17,14 +17,14 @@ All sensors are at different levels of development:-
 * RPM sensors **(see wiki)**
   * Up to 2 RPM sensors (potentially more) can be connected with data sent back via telemetry
   * Ideal for gasser engine RC models to review clutch bite RPM and checking for clutch slip during flights
-* Battery Cell Voltage
+* Battery Cell Voltage **(see wiki)**
   * Initially up to 3 battery cells will be monitored with data sent back via telemetry
   * Battery status will be visible on OLED display
-* Temperature Sensors
+* Temperature Sensors **(see wiki)**
   * Gasser Engine / ESC Temperature
   * Inside Canopy Temperature
   * Ambient Temperature
-* SMART Power Charging / Monitoring
+* SMART Power Charging / Monitoring **(see wiki)**
   * Control correct charging of the flight battery on Gasser models (if fitted).
   * Current provided by a Gasser charging system (if fitted).
   * Current flow from or to flight battery (charging or discharging state).
@@ -37,7 +37,7 @@ All sensors are at different levels of development:-
   * Ability to detect levels of static caused by the HT system of a gasser engine, HT static can cause significant issues with flight controllers which simply changing the HT lead for better quality can resolve.
 * Warning LEDs
   * Can be fitted to model to give visual indication that something is wrong and landing should be considered.
-* Small Display Screen (1" OLED)
+* Small Display Screen (1" OLED) **(see wiki)**
   * Useful for pre-flight checks of flight battery cell voltage etc.
   * Useful for checking if any serious failures were reported on the last flight
 * Rx Link Quality **(see wiki)**
@@ -53,6 +53,7 @@ All sensors are at different levels of development:-
 
 **Acknowledgements:**
 * Bolder Flights Systems SBUS by Brian Taylor for the SBUS library (arduino library)
+* Oliver for the U8g2 for the OLED library and GFX library (arduino library)
 * @ReinhardZ1 for the testing and parameters to align the Rx Link Quality to the popular Tadango LQ Sensor
 
 **Licencing:** 
