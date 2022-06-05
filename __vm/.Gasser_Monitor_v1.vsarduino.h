@@ -21,7 +21,7 @@
 #define ARDUINO_TEENSY32
 #define F_CPU 96000000
 #define USB_SERIAL
-#define LAYOUT_UNITED_KINGDOM
+#define LAYOUT_US_ENGLISH
 #define __cplusplus 201103L
 #undef __cplusplus
 #define __cplusplus 201103L
