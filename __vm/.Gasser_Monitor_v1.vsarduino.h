@@ -16,12 +16,12 @@
 #define __HARDWARE_mk20dx256__
 #define __HARDWARE_MK20DX256__
 #define __MK20DX256__
-#define TEENSYDUINO 150
-#define ARDUINO 108011
+#define TEENSYDUINO 156
+#define ARDUINO 108019
 #define ARDUINO_TEENSY32
 #define F_CPU 96000000
 #define USB_SERIAL
-#define LAYOUT_UNITED_KINGDOM
+#define LAYOUT_US_ENGLISH
 #define __cplusplus 201103L
 #undef __cplusplus
 #define __cplusplus 201103L
@@ -40,8 +40,9 @@ typedef void *__builtin_va_list;
 #define NEW_H
 #undef _WIN32
 #define __STDC__ 
-#define __GNUC__ 2
-#define __GNUC_MINOR__ 5
+//#define __GNUC__ 2
+//#define __GNUC_MINOR__ 5
+#define __ARM_ARCH_7EM__
 
 extern int at_quick_exit(void (*f)(void));
 int at_quick_exit(void (*f)(void)) {
