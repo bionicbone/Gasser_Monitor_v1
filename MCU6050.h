@@ -12,7 +12,8 @@
 #endif
 
 // Config
-const int MPU_addr = 0x68;											// I2C address of the MPU-6050
+const uint8_t MPU_addr = 0x68;									// I2C address of the MPU-6050
+const uint8_t	MPU_qty = 14;											// Register Quantity
 const int MCU_STABILITY_DELAY = 10000;					// if too low min/max values may not be stable. DEFAULT 10000
 const int MCU_WAKE_AccX_ALLOWED_DIFF = 10000;		// If value greater for x times in a row then signal wake up
 const int MCU_WAKE_AccY_ALLOWED_DIFF = 10000;		// If value greater for x times in a row then signal wake up
