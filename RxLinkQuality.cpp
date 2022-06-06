@@ -1,11 +1,11 @@
 #include "Config.h"
 #include "RxLinkQuality.h"
+#include "sbus.h"
 
 
 // Setup SBUS
+//SbusRx sbus(&Serial1);
 SBUS sbus(Serial1);
-
-
 
 // Public Variables
 uint32_t			_totalFrames = 0;														// Total SBUS frames received and processed

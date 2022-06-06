@@ -39,7 +39,7 @@ void _mcu6050_Read() {
 	Wire1.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
 	Wire1.endTransmission(false);
 
-	Wire1.requestFrom(MPU_addr, 14, true);  // request a total of 14 registers
+	Wire1.requestFrom(MPU_addr, MPU_qty, true);  // request a total of 14 registers
 	avgAccX += Wire1.read() << 8 | Wire1.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
 	avgAccY += Wire1.read() << 8 | Wire1.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
 	avgAccZ += Wire1.read() << 8 | Wire1.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)

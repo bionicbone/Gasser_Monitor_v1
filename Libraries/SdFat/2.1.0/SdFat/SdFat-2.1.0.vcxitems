@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{02228996-38ae-4bfb-8d6d-1944b7cb9ba4}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\FreeStack.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\MinimumSerial.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FmtNumber.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsCache.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsDateTime.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsGetPartitionInfo.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsName.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsStructs.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\FsUtf.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\common\upcase.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatDbg.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFile.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFilePrint.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFileWrite.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFormatter.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatName.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatPartition.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatVolume.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ExFatLib\upcase.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatDbg.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatFile.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatFileLFN.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatFilePrint.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatFileSFN.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatFormatter.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatName.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatPartition.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FatLib\FatVolume.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FsLib\FsFile.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FsLib\FsNew.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\FsLib\FsVolume.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\iostream\istream.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\iostream\ostream.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\iostream\StdioStream.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\iostream\StreamBaseClass.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SdCard\SdCardInfo.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SdCard\SdioTeensy.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SdCard\SdSpiCard.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiArtemis.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiChipSelect.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiDue.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiESP.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiParticle.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiSTM32.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiSTM32Core.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiTeensy3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\BufferedPrint.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FreeStack.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\MinimumSerial.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\RingBuf.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdFat.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdFatConfig.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\sdios.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\ArduinoFiles.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\BlockDevice.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\BlockDeviceInterface.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\CompileDateTime.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\DebugMacros.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FmtNumber.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsApiConstants.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsCache.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsDateTime.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsGetPartitionInfo.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsName.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsStructs.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\FsUtf.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\SysCall.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\common\upcase.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\DigitalPin.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\SoftSPI.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\AvrDevelopersGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\BobuinoGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\GpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\LeonardoGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\MegaGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\SleepingBeautyGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\Standard1284GpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\Teensy2GpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\Teensy2ppGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DigitalIO\boards\UnoGpioPinMap.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatConfig.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFile.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatFormatter.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatLib.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatPartition.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatTypes.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ExFatLib\ExFatVolume.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FatLib\FatFile.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FatLib\FatFormatter.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FatLib\FatLib.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FatLib\FatPartition.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FatLib\FatVolume.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FsLib\FsFile.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FsLib\FsLib.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FsLib\FsNew.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\FsLib\FsVolume.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\ArduinoStream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\bufstream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\fstream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\ios.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\iostream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\istream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\ostream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\iostream\StdioStream.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdCard.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdCardInfo.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdCardInterface.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdioCard.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdioTeensy.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SdCard\SdSpiCard.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiArduinoDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiAvr.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiBareUnoDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiBaseClass.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiLibDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\SpiDriver\SdSpiSoftDriver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
+<Text Include="$(MSBuildThisFileDirectory)src\DigitalIO\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.md" />
+<None Include="$(MSBuildThisFileDirectory)src\common\CPPLINT.cfg" />
+<None Include="$(MSBuildThisFileDirectory)src\SdCard\CPPLINT.cfg" />
+  </ItemGroup>
+</Project>
