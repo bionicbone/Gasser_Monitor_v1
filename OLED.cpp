@@ -89,11 +89,10 @@ void _oled_Device_Name() {
 	do {
 		u8g2.setFont(u8g2_font_luBIS08_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
 		u8g2.drawStr(4, 12, "Gasser Monitor");
-		u8g2.drawStr(14, 30, "by Fifty Shades");
-		u8g2.drawStr(24, 50, "of Orange");
+		u8g2.drawStr(14, 30, "by Bionicbone");
 		
 		u8g2.setFont(u8g2_font_micro_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
-		u8g2.drawStr(100, 60, "v1.0");
+		u8g2.drawStr(100, 60, "v1.1");
 	}
 	// Start the OLED display update
 	while (u8g2.nextPage());
@@ -132,7 +131,7 @@ void _oled_DateAndTime() {
 	u8g2.firstPage();
 	do {
 		u8g2.setFont(u8g2_font_6x10_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
-		u8g2.drawStr(4, 8, "Gasser Monitor v1.0");
+		u8g2.drawStr(4, 8, "Gasser Monitor v1.1");
 
 		u8g2.setFont(u8g2_font_luBIS08_tr);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
 		u8g2.drawStr(20, 26, myDate);
@@ -152,7 +151,7 @@ void _oled_inFlight() {
 	u8g2.firstPage();
 	do {
 		u8g2.setFont(u8g2_font_6x10_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
-		u8g2.drawStr(4, 8, "Gasser Monitor v1.0");
+		u8g2.drawStr(4, 8, "Gasser Monitor v1.1");
 
 		u8g2.setFont(u8g2_font_tenfatguys_tf);		// many font available https://github.com/olikraus/u8g2/wiki/fntlistall
 		u8g2.drawStr(20, 35, myDisplay);
