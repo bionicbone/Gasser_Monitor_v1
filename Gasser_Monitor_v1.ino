@@ -1,7 +1,7 @@
 		/*
     Name:       Gasser_Monitor_v1.ino
     Created:		15/03/2020 16:19:35
-    Author:     (c) Kevin Guest - AKA The Bionicbone on RCGroups.
+    Author:     (c) Kevin Guest - AKA The "Bionicbone" on RCGroups / GitHub and "TheBionicbone" on YouTube.
 		Decription:	Migrating code from the Gasser Charger Module and placing into cpp & h files.
 		Use:				No Commercial Activities
 
