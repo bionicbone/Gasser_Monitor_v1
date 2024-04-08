@@ -19,20 +19,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "U8g2-2.32.15", "Libraries\U
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Time-1.6.1", "Libraries\Time\1.6.1\Time\Time-1.6.1.vcxitems", "{FB9271D8-DD8D-45FE-B857-B2527580428B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5119E21E-B60D-4DEC-9EC1-B0094D14C4CB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PID-1.2.0-1.2.0", "Libraries\PID-1.2.0\1.2.0\PID-1.2.0\PID-1.2.0-1.2.0.vcxitems", "{515568C5-7C44-4AF2-ACE0-9790FF8F5767}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\SdFat\2.1.0\SdFat\SdFat-2.1.0.vcxitems*{02228996-38ae-4bfb-8d6d-1944b7cb9ba4}*SharedItemsImports = 9
 		Libraries\SD\2.0.0\SD\SD-2.0.0.vcxitems*{2e471cef-4f61-437e-b370-b4b127d27ca6}*SharedItemsImports = 9
-		Libraries\PID-1.2.0\1.2.0\PID-1.2.0\PID-1.2.0-1.2.0.vcxitems*{515568c5-7c44-4af2-ace0-9790ff8f5767}*SharedItemsImports = 9
 		Libraries\U8g2\2.32.15\U8g2\U8g2-2.32.15.vcxitems*{6a78b248-d6a8-412f-87b7-54c30298d29b}*SharedItemsImports = 9
 		Libraries\Wire\1.0\Wire\Wire-1.0.vcxitems*{80ace913-2459-435b-a1ee-cbfb398dbce6}*SharedItemsImports = 9
 		Libraries\SPI\1.0\SPI\SPI-1.0.vcxitems*{a5e8f9b4-d62e-470a-8bf3-56f01da6dd90}*SharedItemsImports = 9
 		Libraries\Bolder_Flight_Systems_SBUS\1.0.1\Bolder_Flight_Systems_SBUS\Bolder_Flight_Systems_SBUS-1.0.1.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\PID-1.2.0\1.2.0\PID-1.2.0\PID-1.2.0-1.2.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SdFat\2.1.0\SdFat\SdFat-2.1.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SD\2.0.0\SD\SD-2.0.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPI\1.0\SPI\SPI-1.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4

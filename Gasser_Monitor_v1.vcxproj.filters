@@ -51,9 +51,6 @@
     <ClInclude Include="MCU6050.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestMotor_PID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RPM.cpp">
@@ -81,9 +78,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MCU6050.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestMotor_PID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
