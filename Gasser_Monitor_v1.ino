@@ -1,7 +1,7 @@
 		/*
     Name:       Gasser_Monitor_v1.ino
     Created:		15/03/2020 16:19:35
-    Author:     (c) Kevin Guest - AKA The Bionicbone on RCGroups.
+    Author:     (c) Kevin Guest - AKA The "Bionicbone" on RCGroups / GitHub and "TheBionicbone" on YouTube.
 		Decription:	Migrating code from the Gasser Charger Module and placing into cpp & h files.
 		Use:				No Commercial Activities
 
@@ -12,7 +12,7 @@
 		My licencing does allow people to make a "small profit" by helping other RC hobbyists, this includes pre-flashing a Teensy,
 		building and suppling sensors and even fully fitting to an RC model.
 			By means of clarity "small profit" is deemed to be not more than $35 overall profit for services provided to any individual RC Hobbyist.
-		Where misalignments occure between the above and the GPL attached then you should seek further clarification for myself
+		Where misalignments occure between the above and the GPL attached then you should seek further clarification from myself
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
