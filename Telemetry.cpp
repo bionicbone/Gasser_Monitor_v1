@@ -27,7 +27,7 @@ Value | SensorID | Name | Description
 5108 | 19 | CanT | Temperature - Canopy
 5109 | 19 | EngT | Temperature - Engine
 510A | 19 | BatA | Battery AMPs
-510B | 19 |      | Not Used
+510B | 19 | BecT | Temperature - BEC
 510C | 19 |      | Not Used
 510D | 19 |      | Not Used
 510E | 19 |      | Not Used
@@ -110,7 +110,7 @@ Stream* sportFlusher;
 // Active Sensors and current value store
 // *** Maintain void updateValue(byte sensorNumber) when new sensors are added ***
 struct frSkyTeensySensorArray {
-	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,   false,   false,   false,   false,   false,   false };
+	bool			SensorActive[32]	= { true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   true,   true,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,  false,   false,   false,   false,   false,   false,   false };
 	uint32_t	SensorID[32]			= { 0x5100, 0x5101, 0x5102, 0x5103, 0x5104, 0x5105, 0x5106, 0x5107, 0x5108, 0x5109, 0x510A, 0x510B, 0x510C, 0x510D, 0x510E, 0x510F, 0x5110, 0x5111, 0x5112, 0x5113, 0x5114, 0x5115, 0x5116, 0x5117, 0x5118, 0x5119, 0x511A, 0x511B, 0x511C, 0x511D, 0x511E, 0x511F };
 	uint32_t	SensorValue[32]		= { 0 };
 	bool			SensorDataChanged[32] = { {false} };
@@ -194,7 +194,13 @@ void updateValue(byte sensorNumber) {
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
 		}
 		break;
-	case 11:													// 510B - Use Next
+	case 11:													// 510B - Temperature - BEC
+		if ((uint32_t)_becTemp != frSkyTeensySensors.SensorValue[sensorNumber]) {
+			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)_becTemp;
+			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
+		}
+		break;
+	case 12:													// 510C - Use Next
 		if ((uint32_t)0 != frSkyTeensySensors.SensorValue[sensorNumber]) {
 			frSkyTeensySensors.SensorValue[sensorNumber] = (uint32_t)999;
 			frSkyTeensySensors.SensorDataChanged[sensorNumber] = true;
