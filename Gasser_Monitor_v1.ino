@@ -47,6 +47,8 @@
 #include "TimeLib.h"
 
 
+const char compile_details[] = __DATE__ " " __TIME__ " " __FILE__;
+
 unsigned long		timeLoopMicros = 0;								// Used to remember micros() at the start of the main loop.
 unsigned long		lastLoopMicros = 0;								// actual loop time in micros(), time between FrSky Telemetry Sends must be less than 3600us
 uint16_t				firstRunCounter = 0;							// counts the first loops
@@ -68,6 +70,8 @@ void setup() {
 	analogReadResolution(12);
 
 	delay(500);
+
+	Serial.print("Compiled: "); Serial.println(compile_details);
 
 	_oled_Setup();
 
@@ -186,9 +190,11 @@ void loop() {
 	// it counts everything other than the time to send the Telemetry data
 	lastLoopMicros = micros() - timeLoopMicros;
 
+#ifdef DEBUG_LONG_LOOP
 	if (firstRun == false && lastLoopMicros > MAX_MAIN_LOOP_TIME_BEFORE_ERROR) {
 		Serial.print(millis()); Serial.print(": Long Loop @ "); Serial.print(lastLoopMicros); Serial.println("us");
 	}
+#endif // DEBUG_LONG_LOOP
 
 	// Format and Send the telemetry data using the FrSky S.Port solution
 	_telemetry_SendTelemetry();

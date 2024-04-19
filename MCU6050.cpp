@@ -86,20 +86,23 @@ void _mcu6050_Read() {
 				wakeUp = true;
 				wakeUpNow = true;
 				_vibrationStatus = 1;
+#ifdef DEBUG_VIBRATION_SENSOR
 				Serial.println("Wake Up...");
 				Serial.print("AcX Diff = "); Serial.println(abs(AccX_Diff));
 				Serial.print("AcY Diff = "); Serial.println(abs(AccY_Diff));
 				Serial.print("AcZ Diff = "); Serial.println(abs(AccZ_Diff));
+#endif // DEBUG_VIBRATION_SENSOR
 			}
 			else if (MCU6050EngineCounter >= 100) {
 				wakeUp = false;
 				_vibrationStatus = 2;
-				Serial.println("Engine Running...");
+#ifdef DEBUG_VIBRATION_SENSOR
+				Serial.println("Engine Running");
 				Serial.print("AcX Diff = "); Serial.println(abs(AccX_Diff));
 				Serial.print("AcY Diff = "); Serial.println(abs(AccY_Diff));
 				Serial.print("AcZ Diff = "); Serial.println(abs(AccZ_Diff));
+#endif // DEBUG_VIBRATION_SENSOR
 			}
-
 
 			_AccX = avgAccX / MCU6050Readings;
 			_AccY = avgAccY / MCU6050Readings;
