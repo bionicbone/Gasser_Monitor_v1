@@ -35,6 +35,11 @@ extern unsigned long		lastLoopMicros;
 //#define DEBUG_TELEMETRY_REFRESH_RATES												// Activate to display the refresh rates of the Values and FLVSS decoding
 //#define DEBUG_FLVSS_CALCULATION															// Activate to display how the Cell voltages are being calculated from the FLVSS sensor
 //#define CALIBRATION_POWER																		// Activate to display the Power Results
+//#define DEBUG_SD_CARD																				// Activate to display the data writen to the SD Card
+//#define DEBUG_RPM												  									// Activate to display the RPM Data
+//#define DEBUG_LONG_LOOP									  									// Activate to display the LongLoop warnings Data
+//#define DEBUG_VIBRATION_SENSOR					  									// Activate to display the Vibration Data from the MCU6050
+
 
 #if defined (DEBUG_FS_LF_ERRORS)
 #error DONT FLASH WITH DEBUG_FS_LF_ERRORS ACTIVATED
@@ -86,7 +91,24 @@ extern unsigned long		lastLoopMicros;
 #endif
 
 #if defined (CALIBRATION_POWER)
-#warning DONT FLASH WITH CALIBRATION_POWER ACTIVATED
+#error DONT FLASH WITH CALIBRATION_POWER ACTIVATED
 #endif
+
+#if defined (DEBUG_SD_CARD)
+#error DONT FLASH WITH DEBUG_SD_CARD ACTIVATED
+#endif
+
+#if defined (DEBUG_RPM)
+#error DONT FLASH WITH DEBUG_RPM ACTIVATED
+#endif
+
+#if defined (DEBUG_LONG_LOOP)
+#error DONT FLASH WITH DEBUG_LONG_LOOP ACTIVATED
+#endif
+
+#if defined (DEBUG_VIBRATION_SENSOR)
+#error DONT FLASH WITH DEBUG_VIBRATION_SENSOR ACTIVATED
+#endif
+
 
 #endif  // .h #endif

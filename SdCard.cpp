@@ -90,6 +90,7 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_inFlight);
 		text.concat(","); text.concat(_mainRPMSensorDetectedRPM);
 		text.concat(","); text.concat(_clutchRPMSensorDetectedRPM);
+		text.concat(","); text.concat(_headRPMCalculatedRPM);
 		// SBUS Quality Data
 		text.concat(","); text.concat(_totalFrames);
 		text.concat(","); text.concat(_lostFramesPercentage100Result);
@@ -126,7 +127,10 @@ void _sd_WriteLogDate() {
 		text.concat(","); text.concat(_GyrZ);
 		text.concat(","); text.concat(_vibrationStatus);
 
+#ifdef DEBUG_SD_CARD
 		Serial.println(text);
+#endif // DEBUG_SD_CARD
+
 		SdFile.println(text);
 		// Just flush the data, never close the file:
 		SdFile.flush();
@@ -143,8 +147,12 @@ void _sd_WriteLogDate() {
 
 void sd_WriteLogHeader() {
 	if (SdFile) {
-		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,TFCK,LFP,E2EQ,BFP,MCHM,16FS,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
+		String text = "Date,Time,ERR,ErrD,InFlight,MAIN,CLUT,HEAD,TFCK,LFP,E2EQ,BFP,MCHM,16FS,Wav1,Wav2,RecV,BecV,BecA,BecT,BatV,BatA,BmAH,CELS,Cel1,Cel2,TeeV,AmbT,CanT,EngT,AccX,AccY,AccZ,AccTmp,GyrX,GyrY,GyrZ,VibS";
+
+#ifdef DEBUG_SD_CARD
 		Serial.println(text);
+#endif // DEBUG_SD_CARD
+
 		if (!fileExists) {
 			SdFile.println(text);
 			Serial.println("Header written to SD Card");
