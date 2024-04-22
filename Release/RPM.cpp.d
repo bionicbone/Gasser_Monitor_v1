@@ -1,6 +1,6 @@
 C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\RPM.cpp.o: \
  C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\RPM.cpp \
- C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\RPM.h \
+ C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\Config.h \
  C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release/pch/arduino.h \
  C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/WProgram.h \
  C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/avr/pgmspace.h \
@@ -43,4 +43,5 @@ C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\RP
  C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/CrashReport.h \
  C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/Printable.h \
  C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/WString.h \
- C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/pins_arduino.h
+ C:\Program\ Files\ EXE\arduino-1.8.19\hardware\teensy\avr\cores\teensy3/pins_arduino.h \
+ C:\Users\Micro\AppData\Local\Temp\VMBuilds\Gasser_Monitor_v1\teensy31\Release\RPM.h
