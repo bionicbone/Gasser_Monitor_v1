@@ -46,17 +46,17 @@ void _rpm_calculate_SensorPulse() {
 		if (mainRPMSensorAvgCounter >= RPM_AVERAGE_DIVIDER) {
 			
 			// average the main RPM
-			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter); 
+			_mainRPMSensorDetectedRPM = (mainRPMSensorAvgRPM / mainRPMSensorAvgCounter) / 2; 
 			mainRPMSensorAvgRPM = 0;
 			mainRPMSensorAvgCounter = 0;
 
 			// average the clutch RPM
-			_clutchRPMSensorDetectedRPM = clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter;
+			_clutchRPMSensorDetectedRPM = (clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter) / 2;
 			clutchRPMSensorAvgRPM = 0;
 			clutchRPMSensorAvgCounter = 0;
 
 			// Uncomment the next line to sync clutch RPM with main (engine RPM) during testing
-			_clutchRPMSensorDetectedRPM = _mainRPMSensorDetectedRPM;
+			//_clutchRPMSensorDetectedRPM = _mainRPMSensorDetectedRPM;
 			
 			// Calculate Blade RPM
 			_headRPMCalculatedRPM = _clutchRPMSensorDetectedRPM / HEAD_GEAR_RATIO;
