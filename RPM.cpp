@@ -51,7 +51,7 @@ void _rpm_calculate_SensorPulse() {
 			mainRPMSensorAvgCounter = 0;
 
 			// average the clutch RPM
-			_clutchRPMSensorDetectedRPM = (clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter) / 2;
+			_clutchRPMSensorDetectedRPM = (clutchRPMSensorAvgRPM / clutchRPMSensorAvgCounter);
 			clutchRPMSensorAvgRPM = 0;
 			clutchRPMSensorAvgCounter = 0;
 
